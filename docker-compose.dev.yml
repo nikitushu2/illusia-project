@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules  # Prevents overwriting node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    command: npm start
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend:/app
+      - /app/node_modules  # Prevents overwriting node_modules
+    ports:
+      - "5001:5000"
+    environment:
+      - NODE_ENV=development
+    command: npx ts-node-dev --respawn --transpile-only index.ts
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
