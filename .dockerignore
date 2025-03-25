@@ -1,0 +1,28 @@
+# Node.js and general files to exclude
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.DS_Store
+
+# Logs
+logs
+*.log
+
+# Build files (if you have a build process)
+dist
+build
+out
+
+# Docker-related files
+docker-compose.override.yml
+docker-compose.dev.yml
+
+# Environment files
+.env
+.env.local
+.env.development
+
+# Any other files/folders specific to your project
+*.md
+README.md
