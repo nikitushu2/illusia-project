@@ -7,6 +7,7 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      - /app/dist
     environment:
       - NODE_ENV=development
     depends_on:
