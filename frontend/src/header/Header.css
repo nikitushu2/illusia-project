@@ -1,0 +1,30 @@
+.header-background {
+    display: flex;
+    height: 100px;
+    background: rgb(52, 8, 8);
+    color: white;
+    padding: 20px;
+    
+}
+
+.logo {
+    display: flex;
+    align-items: center; 
+    justify-content: left;
+     
+}
+
+.button-element {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    margin: 0 auto;
+}
+
+.logOut-button {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    margin-left: auto; 
+}

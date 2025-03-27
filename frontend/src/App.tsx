@@ -1,9 +1,11 @@
 import Footer from "./components/footer/Footer"
 
+import { Header } from "./header/Header";
 
 function App() {
   return (
     <>
+      <Header />
       <Footer />
     </>
   )
