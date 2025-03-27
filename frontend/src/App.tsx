@@ -1,13 +1,15 @@
 import LandingPage from "./LandingPage";
+import { ThemeProvider } from "./themes/ThemeProvider";
 
 function App() {
   
   return (
-    <div>
-      <h3>Header section</h3>
-      <LandingPage />
-      <h3>Footer section</h3>
-    </div>
+    
+      <ThemeProvider>
+        <h1>HEADER</h1>
+        <LandingPage />
+        <h1>FOOTER</h1>
+      </ThemeProvider>
  );
 }
 
