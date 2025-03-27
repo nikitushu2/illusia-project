@@ -1,9 +1,10 @@
+import Footer from "./components/footer/Footer"
 
 
 function App() {
   return (
     <>
-    Home page.
+      <Footer />
     </>
   )
 }
