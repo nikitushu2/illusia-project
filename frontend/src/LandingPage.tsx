@@ -3,20 +3,28 @@ import {
   Card,
   Container,
   IconButton,
+  Rating,
   TextField,
   Typography,
 } from "@mui/material";
 import download from "./images/download.png";
 import { ThemeContext } from "./themes/themeContext";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
+
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+import RoomIcon from "@mui/icons-material/Room";
 
 const LandingPage = () => {
   
   // concerning light and dark mode
   const themeContext = useContext(ThemeContext);
+
+  // rating read only
+  const [value, setvalue] = useState<number []>([4,5]);
 
   if (!themeContext) {
     throw new Error(
@@ -48,6 +56,7 @@ const LandingPage = () => {
             component="img"
             src={download}
             sx={{ width: "800px", height: "200px" }}
+            // objectFit="cover"
           />
           <TextField type="text" sx={{ mb: 5 }} />
           <Typography variant="h4" align="center">
@@ -60,17 +69,56 @@ const LandingPage = () => {
             about the art of role playing. Come join us and experience the magic
             of Illusia. Also book your spot for the next event.
           </p>
+
+          {/* what we offer */}
+          <Typography variant="h5" sx={{ mt: 5 }} align="center">
+          What we offer
+          </Typography>
+          <p>We offer bookings and further manage items for your events</p>
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              mt: 5,
+              gap: "90px",
+            }}                
+          >
+            <Box>
+              <TrendingUpIcon />
+              <Typography variant="h6">Trending</Typography>
+              <Typography variant="body1">
+                Trending events and bookings
+              </Typography>
+            </Box>
+            <Box>
+              <ListAltIcon />
+              <Typography variant="h6">List</Typography>
+              <Typography variant="body1">
+                List of events and bookings
+              </Typography>
+            </Box>
+            <Box>
+              <RoomIcon />
+              <Typography variant="h6">Location</Typography>
+              <Typography variant="body1">
+                Location of events and bookings
+              </Typography>
+              </Box>
+          </Box>
         </Box>
 
-        <Typography variant="h5" sx={{ m: 20 }} align="center">
+        {/* user reviews */}
+        <Typography variant="h5" sx={{ mt: 10 }} align="center">
           USER REVIEWS
         </Typography>
-        <Box sx={{ mt: 5 }} display={"flex"} justifyContent={"space-between"}>
+        <Box sx={{ mt: 2 }} display={"flex"} justifyContent={"space-between"}>
           <Card sx={{ width: 300, p: 2, mb: 2 }}>
             <Typography variant="h6">Review 1</Typography>
             <Typography variant="body1">
               This is a review of Illusia{" "}
             </Typography>
+            <Rating name="read-only" value={4} readOnly />
           </Card>
 
           <Card sx={{ width: 300, p: 2, mb: 2 }}>
@@ -78,6 +126,7 @@ const LandingPage = () => {
             <Typography variant="body1">
               This is a review of Illusia{" "}
             </Typography>
+            <Rating name="read-only" value={5} readOnly />
           </Card>
 
           <Card sx={{ width: 300, p: 2, mb: 2 }}>
@@ -85,6 +134,7 @@ const LandingPage = () => {
             <Typography variant="body1">
               This is a review of Illusia{" "}
             </Typography>
+            <Rating name="read-only" value={4} readOnly />
           </Card>
         </Box>
       </Container>
