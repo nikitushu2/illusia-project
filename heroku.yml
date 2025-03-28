@@ -1,0 +1,16 @@
+setup:
+  addons:
+    - plan: heroku-postgresql # Example: Addons like database
+
+build:
+  docker:
+    frontend: ./frontend/dockerfile # Path to your frontend Dockerfile
+    backend: ./backend/dockerfile # Path to your backend Dockerfile
+
+release:
+  command:
+    - ./backend/migrate.sh # Example: Run DB migrations
+
+run:
+  web: npm start --prefix frontend
+  backend: npm start --prefix backend
