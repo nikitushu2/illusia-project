@@ -7,21 +7,41 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import download from "./images/download.png";
+//import download from "./images/download.png";
 import { ThemeContext } from "./themes/themeContext";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import ListAltIcon from "@mui/icons-material/ListAlt";
-import RoomIcon from "@mui/icons-material/Room";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import TheaterComedyIcon from '@mui/icons-material/TheaterComedy';
+import HandshakeIcon from '@mui/icons-material/Handshake';
+
+import image1 from "./images/image1.png";
+import image2 from "./images/image2.png";
+import image3 from "./images/image3.png";
+import image4 from "./images/image4.png";
+//import { AnimatePresence, motion } from "framer-motion";
 
 const LandingPage = () => {
   
   // concerning light and dark mode
   const themeContext = useContext(ThemeContext);
+
+  // image and text overlay
+  const images = [ image1, image2, image3, image4 ];
+  const [currentImage, setCurrentImage] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % images.length);
+    }, 3000); // Change image every 3 seconds
+
+    return () => clearInterval(interval);
+  }
+  , [images.length]);
+  
 
   // rating read only
   const [value, setvalue] = useState<number []>([4,5]);
@@ -37,11 +57,50 @@ const LandingPage = () => {
   return (
     <div>
       <Container>
-        {/* toggleMode for light and dark mode */}
 
+        {/* toggleMode for light and dark mode */}
         <IconButton onClick={toggleMode} color="inherit">
           {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
         </IconButton>
+
+        {/* Image Transition */}
+        <Box position="relative" width="50%" height="200px" overflow="hidden">
+        {/* <AnimatePresence>
+      <motion.img
+        key={currentImage}
+        src={images[currentImage]}
+        alt="Slideshow Image"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 1 }}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          position: "absolute",
+        }}
+      />
+      </AnimatePresence> */}
+
+      {/* Overlaying Text */}
+      <Typography
+        variant="h3"
+        color="white"
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          bgcolor: "rgba(180, 58, 58, 0.5)",
+          padding: "10px 20px",
+          borderRadius: 2,
+          textAlign: "center",
+        }}
+      >
+        Your Next Adventure Starts Here
+      </Typography>
+    </Box>
 
         <Box
           sx={{
@@ -52,29 +111,14 @@ const LandingPage = () => {
             mt: 5,
           }}
         >
-          <Card
-            component="img"
-            src={download}
-            sx={{ width: "800px", height: "200px" }}
-            // objectFit="cover"
-          />
           <TextField type="text" sx={{ mb: 5 }} />
           <Typography variant="h4" align="center">
-            Illusia Landing Page
+            Welcome to Illusia ry – The Heart of Immersive LARP Experiences!
           </Typography>
-          <p>Welcome to the landing page.</p>
-          <p>
-            A page where role play is possible with total immersion into the
-            character. We are a community of role players who are passionate
-            about the art of role playing. Come join us and experience the magic
-            of Illusia. Also book your spot for the next event.
-          </p>
+          <Typography>
+          Step into a world of boundless imagination with Illusia ry, the creative force behind Odysseus and other unforgettable live-action role-playing (LARP) adventures. Whether you're a seasoned LARPer or new to the scene, we invite you to bring your stories to life with our expertly crafted props, set pieces, and immersive game design.
+          </Typography>
 
-          {/* what we offer */}
-          <Typography variant="h5" sx={{ mt: 5 }} align="center">
-          What we offer
-          </Typography>
-          <p>We offer bookings and further manage items for your events</p>
 
           <Box
             sx={{
@@ -85,21 +129,21 @@ const LandingPage = () => {
             }}                
           >
             <Box>
-              <TrendingUpIcon />
+              <CalendarMonthIcon />
               <Typography variant="h6">Trending</Typography>
               <Typography variant="body1">
-                Trending events and bookings
+                Booking and Events
               </Typography>
             </Box>
             <Box>
-              <ListAltIcon />
+              <TheaterComedyIcon />
               <Typography variant="h6">List</Typography>
               <Typography variant="body1">
                 List of events and bookings
               </Typography>
             </Box>
             <Box>
-              <RoomIcon />
+              <HandshakeIcon />
               <Typography variant="h6">Location</Typography>
               <Typography variant="body1">
                 Location of events and bookings
