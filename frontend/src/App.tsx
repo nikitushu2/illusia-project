@@ -1,9 +1,14 @@
+import Footer from "./components/footer/Footer"
 
+import { Login } from "./components/login/Login";
+import { Header } from "./components/header/Header";
 
 function App() {
   return (
     <>
-    Home page.
+      <Header />
+      <Login />
+      <Footer />
     </>
   )
 }
