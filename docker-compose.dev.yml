@@ -10,6 +10,8 @@ services:
       - /app/node_modules
     ports:
       - "5173:5173"
+    env_file:
+      - .env
     environment:
       - VITE_API_URL=http://localhost:5173
     depends_on:
@@ -24,26 +26,28 @@ services:
       - /app/node_modules
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
       - NODE_ENV=development
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=password
-      - DB_NAME=storage_app
+      - DB_HOST_DEV=postgres
+      - DB_PORT_DEV=5432
+      - DB_USER_DEV=postgres
+      - DB_PASSWORD_DEV=password
+      - DB_NAME_DEV=storage_app
     depends_on:
       - postgres
 
   postgres:
     image: postgres:15-alpine
     ports:
-      - "5433:5433"
+      - "5433:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=storage_app
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_dev:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  postgres_data_dev:
