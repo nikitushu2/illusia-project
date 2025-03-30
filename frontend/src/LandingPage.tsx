@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-//import download from "./images/download.png";
+
 import { ThemeContext } from "./themes/themeContext";
 import { useContext, useEffect, useState } from "react";
 
@@ -22,7 +22,6 @@ import image1 from "./images/image1.png";
 import image2 from "./images/image2.png";
 import image3 from "./images/image3.png";
 import image4 from "./images/image4.png";
-//import { AnimatePresence, motion } from "framer-motion";
 
 const LandingPage = () => {
   
@@ -36,11 +35,13 @@ const LandingPage = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % images.length);
-    }, 3000); // Change image every 3 seconds
+    }, 5000); // Change image every 3 seconds
 
-    return () => clearInterval(interval);
+
+  return () => clearInterval(interval);
   }
   , [images.length]);
+  
   
 
   // rating read only
@@ -64,35 +65,20 @@ const LandingPage = () => {
         </IconButton>
 
         {/* Image Transition */}
-        <Box position="relative" width="50%" height="200px" overflow="hidden">
-        {/* <AnimatePresence>
-      <motion.img
-        key={currentImage}
-        src={images[currentImage]}
-        alt="Slideshow Image"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 1 }}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "contain",
-          position: "absolute",
-        }}
-      />
-      </AnimatePresence> */}
+        <Box position="relative" width="100%" height="10%" overflow="hidden">
+
+      <img src={images[currentImage]} alt="slideshow"  style={{width:"100%", height:"500px"}}/>
 
       {/* Overlaying Text */}
       <Typography
-        variant="h3"
+        variant="h4"
         color="white"
         sx={{
           position: "absolute",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          bgcolor: "rgba(180, 58, 58, 0.5)",
+          bgcolor: "rgba(104, 73, 73, 0.14)",
           padding: "10px 20px",
           borderRadius: 2,
           textAlign: "center",
@@ -130,23 +116,23 @@ const LandingPage = () => {
           >
             <Box>
               <CalendarMonthIcon />
-              <Typography variant="h6">Trending</Typography>
+              <Typography variant="h6">Booking</Typography>
               <Typography variant="body1">
-                Booking and Events
+                Book your next event or use our porps 
               </Typography>
             </Box>
             <Box>
               <TheaterComedyIcon />
-              <Typography variant="h6">List</Typography>
+              <Typography variant="h6">Events</Typography>
               <Typography variant="body1">
-                List of events and bookings
+                Events and games for you to join
               </Typography>
             </Box>
             <Box>
               <HandshakeIcon />
               <Typography variant="h6">Location</Typography>
               <Typography variant="body1">
-                Location of events and bookings
+                Real live events for you to join
               </Typography>
               </Box>
           </Box>
