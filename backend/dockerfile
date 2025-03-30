@@ -13,5 +13,9 @@ RUN npm ci
 # Copy the entire backend folder (including `src/`)
 COPY . .
 
-# Start the backend server from the `src` folder
-CMD ["npx", "ts-node-dev", "--respawn", "--transpile-only", "src/index.ts"]
+# Build TypeScript
+RUN npm run build
+
+EXPOSE 3000
+
+CMD ["node", "dist/index.js"]
