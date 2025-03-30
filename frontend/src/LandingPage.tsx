@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Card,
   Container,
   // IconButton,
@@ -23,6 +24,8 @@ import image1 from "./images/image1.png";
 import image2 from "./images/image2.png";
 import image3 from "./images/image3.png";
 import image4 from "./images/image4.png";
+
+
 
 const LandingPage = () => {
   
@@ -100,6 +103,7 @@ const LandingPage = () => {
           }}
         >
           <TextField type="text" sx={{ mb: 5 }} />
+          <Button>Log in ?</Button>
           <Typography variant="h4" align="center">
             Welcome to Illusia ry – The Heart of Immersive LARP Experiences!
           </Typography>
@@ -169,7 +173,9 @@ const LandingPage = () => {
             <Rating name="read-only" value={4} readOnly />
           </Card>
         </Box>
+
       </Container>
+      
     </div>
   );
 };
