@@ -2,17 +2,18 @@ import {
   Box,
   Card,
   Container,
-  IconButton,
+  // IconButton,
   Rating,
   TextField,
   Typography,
 } from "@mui/material";
 
-import { ThemeContext } from "./themes/themeContext";
-import { useContext, useEffect, useState } from "react";
+//import { ThemeContext } from "./themes/themeContext";
+import {  useEffect, useState } from "react";
+//import { useContext } from "react";
 
-import DarkModeIcon from "@mui/icons-material/DarkMode";
-import LightModeIcon from "@mui/icons-material/LightMode";
+// import DarkModeIcon from "@mui/icons-material/DarkMode";
+// import LightModeIcon from "@mui/icons-material/LightMode";
 
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import TheaterComedyIcon from '@mui/icons-material/TheaterComedy';
@@ -26,7 +27,7 @@ import image4 from "./images/image4.png";
 const LandingPage = () => {
   
   // concerning light and dark mode
-  const themeContext = useContext(ThemeContext);
+  // const themeContext = useContext(ThemeContext);
 
   // image and text overlay
   const images = [ image1, image2, image3, image4 ];
@@ -45,24 +46,25 @@ const LandingPage = () => {
   
 
   // rating read only
-  const [value, setvalue] = useState<number []>([4,5]);
+  /* const [value, setvalue] = useState<number []>([4,5]);
 
   if (!themeContext) {
     throw new Error(
       "ThemeContext is undefined. Make sure you are using ThemeProvider."
     );
-  }
+  } 
 
   const { mode, toggleMode } = themeContext;
+*/
 
   return (
     <div>
       <Container>
 
         {/* toggleMode for light and dark mode */}
-        <IconButton onClick={toggleMode} color="inherit">
+       {/*  <IconButton onClick={toggleMode} color="inherit">
           {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
-        </IconButton>
+        </IconButton> */}
 
         {/* Image Transition */}
         <Box position="relative" width="100%" height="10%" overflow="hidden">
