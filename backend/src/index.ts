@@ -5,7 +5,7 @@ import { ErrorRequestHandler } from "express";
 import { PORT } from "./util/config";
 import { connectToDatabase } from "./util/db";
 import { router as itemsRouter } from "./controllers/items";
-import { errorHandler, AppError } from "./controllers/items";
+import { errorHandler, AppError } from "./middleware/errorHandler";
 
 const app = express();
 

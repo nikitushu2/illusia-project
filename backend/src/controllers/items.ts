@@ -2,15 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import { Router } from "express";
 import { Item } from "../models/index";
 import { InferCreationAttributes } from "sequelize";
+import * as itemService from "../services/itemService";
 
 interface ItemRequest extends Request {
     item: Item | null;
   }
-
-interface AppError extends Error {
-    name: string;
-    message: string;
-    }
 
 type ItemCreationAttributes = InferCreationAttributes<Item>;
 
@@ -25,19 +21,19 @@ interface ItemUpdateRequest {
 const router = Router();
 
 const itemFinder = async (req: ItemRequest, _res: Response, next: NextFunction) => {
-  req.item = await Item.findByPk(req.params.id);
+  req.item = await itemService.findById(req.params.id);
   next();
 };
 
 router.get("/", async (_req: Request, res: Response) => {
-  const items = await Item.findAll();
+  const items = await itemService.findAll();
   console.log(JSON.stringify(items));
   res.json(items);
 });
 
 router.post("/", async (req: Request<{}, {}, ItemCreationAttributes>, res: Response, next: NextFunction) => {
   try {
-    const item = await Item.create(req.body);
+    const item = await itemService.create(req.body);
     res.json(item);
   } catch (error) {
     next(error);
@@ -92,8 +88,8 @@ router.put('/:id', (req: Request, res: Response, next: NextFunction) => itemFind
             typedItem.location = String(req.body.location);
         }
 
-        await typedItem.save();
-        res.json(typedItem);
+        const updatedItem = await itemService.update(item, req.body);
+        res.json(updatedItem);
     } catch (error) {
         next(error);
     }
@@ -101,26 +97,15 @@ router.put('/:id', (req: Request, res: Response, next: NextFunction) => itemFind
 });
 
 router.delete('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req, res) => {
-    if ((req as ItemRequest).item) {
-        await ((req as ItemRequest).item as unknown as { destroy(): Promise<void> }).destroy();
+    const typedReq = req as unknown as ItemRequest;
+    const item = typedReq.item;
+
+    if (item) {
+        await itemService.remove(item);
         res.status(204).end();
     } else {
         res.status(404).json({ error: "Item not found" });
     }
 });
 
-const errorHandler = (error: AppError, _request: Request, response: Response, next: NextFunction) => {
-    console.error(error.message);
-
-    if (error.name === 'CastError') {
-        return response.status(400).send({ error: 'malformatted id' });
-    } else if (error.name === 'ValidationError') {
-        return response.status(400).json({ error: error.message });
-    }
-
-    next(error);
-
-    return undefined;
-};
-
-export { router, errorHandler, AppError };
+export { router };
