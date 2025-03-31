@@ -1,29 +1,29 @@
-import express from "express";
-// import dotenv from "dotenv";
-// import db from "./config/db"; // Database connection file
-// import cors from "cors";
+// here application is configured and launched
 
-// Load environment variables
-// dotenv.config();
+import express from "express";
+import { ErrorRequestHandler } from "express";
+import { PORT } from "./util/config";
+import { connectToDatabase } from "./util/db";
+import { router as itemsRouter } from "./controllers/items";
+import { errorHandler, AppError } from "./middleware/errorHandler";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(express.json()); // Parse JSON requests
-// app.use(cors()); // Enable CORS
+app.use(express.json());
 
-// Sample Route
-app.get("/", (req, res) => {
-  res.send("Backend API is running...");
-});
+app.use('/api/items', itemsRouter);
 
-// Database Connection Check
-// db.connect()
-//   .then(() => console.log("Connected to PostgreSQL Database"))
-//   .catch((err) => console.error("Database connection error:", err.stack));
+const errorHandlerMiddleware: ErrorRequestHandler = (err, req, res, next) => {
+  errorHandler(err as AppError, req, res, next);
+};
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+app.use(errorHandlerMiddleware);
+
+const start = async () => {
+  await connectToDatabase();
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+};
+
+start();
