@@ -1,64 +1,103 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme } from '@mui/material/styles';
 
 export const lightTheme = createTheme({
   palette: {
-    mode: "light",
     primary: {
-      main: "#ffffff", // Primary color 
-      light: "#B971F3", 
-      dark: "#57008F", 
-      contrastText: "#000000", // White text on purple
+      main: '#9537c7', // Highlight 1 (purple)
+      contrastText: '#ffffff', // White text on purple
     },
     secondary: {
-      main: "#64BBB4", // Secondary color (teal)
-      light: "#97EEE7", 
-      contrastText: "#000000", // Black text on teal
+      main: '#3ec3ba', // Highlight 2 (teal)
+      contrastText: '#2a2a2a', // Dark gray text on teal
     },
     background: {
-      default: "#ffffff", // White background
-      paper: "#f5f5f5", // Light grey paper background for the user review cards
+      default: '#ffffff', // Light background (white)
     },
     text: {
-      primary: "#000000", // text
-      secondary: "#575757", // Grey text for less emphasis
+      primary: '#2a2a2a', // Font basic 
     },
+    dark: {
+        main: '#44195b', // Dark purple for footer
+        contrastText: '#ffffff', // White text on dark purple
+    }
   },
-    components: {
-        MuiButton: { styleOverrides: { root: { borderRadius: 20 } } },
-        MuiCard: {
-          styleOverrides: {
-            root: {
-              borderRadius: 12,
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            },
-          },
+  typography: {
+    fontFamily: 'Lato, sans-serif', // Default font
+    h1: {
+      fontFamily: 'Roboto Slab, serif',
+      fontWeight: 400, 
+    },
+    h2: {
+      fontFamily: 'Lato, sans-serif',
+      fontWeight: 100, 
+    },
+    h4: {
+      fontFamily: 'Lato, sans-serif',
+      fontWeight: 700, 
+    },
+    body1: {
+      fontSize: '1.2rem',
+      fontWeight: 500,
+  }
+    // Add other typography variants as needed
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none', // Prevent uppercase text
+          borderRadius: 20, // Rounded corners
+          padding: '10px', // Padding for buttons
         },
-        MuiSvgIcon: {
-          styleOverrides: {
-            root: {
-              color: "#39857F", // Change icon color to black
-            },
-          },
+        contained: {
+          backgroundColor: '#9537c7', // Primary button color
+          color: '#ffffff',
+        },
+        outlined: {
+          borderColor: '#3ec3ba', // Secondary outline
+          color: '#3ec3ba'
         }
       },
-      typography: {
-        fontFamily: [
-          "-apple-system",
-          "BlinkMacSystemFont",
-          '"Segoe UI"',
-          "Roboto",
-          '"Helvetica Neue"',
-          "Arial",
-          "sans-serif",
-        ].join(","),
-        h1: { fontSize: "2.5rem", fontWeight: 600 },
-        h2: { fontSize: "2rem", fontWeight: 600 },
-        h3: { fontSize: "1.75rem", fontWeight: 600 },
-        body1: { fontSize: "1.5rem", lineHeight: 1.5 },
-        button: { textTransform: "none" },
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          color: '#ffffff', // Link color
+        },
       },
-  });
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#ffffff'
+        }
+      }
+    },
+    MuiToolbar: {
+        styleOverrides: {
+            root: {
+                color: '#2a2a2a'
+            }
+        }
+    },
+    MuiPaper: {
+        styleOverrides: {
+            root: {
+                backgroundColor: '#ffffff'
+            }
+        }
+    },
+     /* MuiSvgIcon: {
+        styleOverrides: {
+          root: {
+            color: "#9537c7", // Change icon color to purple
+          },
+        },
+      } */
+  },
+});
 
+  // ignore for now
   export const darkTheme = createTheme({
     palette: {
       mode: "dark",
