@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Card,
   Container,
   // IconButton,
@@ -12,10 +13,11 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import TheaterComedyIcon from '@mui/icons-material/TheaterComedy';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 
-import image1 from "../images/image1.png";
+import image1 from "../images/ssspaju1.png";
 import image2 from "../images/image2.png";
 import image3 from "../images/image3.png";
-import image4 from "../images/image4.png";
+import image4 from "../images/amikoiranen.png";
+import image5 from "../images/image1.png";
 
 
 const LandingPage = () => {
@@ -44,27 +46,50 @@ const LandingPage = () => {
       <Container>
 
         {/* Image Transition */}
-      <Box position="relative" width="100%" height="10%" overflow="hidden">
+      <Box position="relative" width="100%" height="10%" overflow="hidden" >
 
-      <img src={images[currentImage]} alt="slideshow"  style={{width:"100%", height:"500px"}}/>
-
-      {/* Overlaying Text */}
-      <Typography
-        variant="h4"
-        color="white"
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          bgcolor: "rgba(104, 73, 73, 0.14)",
-          padding: "10px 20px",
-          borderRadius: 2,
-          textAlign: "center",
-        }}
-      >
-        Your Next Adventure Starts Here
+      <Typography variant="h4" align="center" sx={{ color: "#9c27b0" , marginTop: '40px', marginBottom: '20px'}}>
+            Welcome to Illusia ry – The Heart of Immersive LARP Experiences!
       </Typography>
+
+        
+      <Box sx={{ position: 'relative', width: '100%', height: '500px' }}>
+      <img src={images[currentImage]} alt="slideshow"  style={{width:"100%", height:"600px"}}/>
+
+        {/* Overlaying Text */}
+        <Typography
+          variant="h4"
+          color="white"
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "rgba(104, 73, 73, 0.14)",
+            padding: "10px 20px",
+            borderRadius: 2,
+            textAlign: "center",
+          }}
+        >
+          Your Next Adventure Starts Here
+        </Typography>
+
+        {/* Overlaying Button */}
+          <Button
+            variant="contained"
+            color="inherit"
+            sx={{
+              position: 'absolute',
+              bottom: '150px', // from bottom-> up
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 1, // Ensure it's above the image and text
+            }}
+          >
+            <Typography variant="body1">LOG IN / SIGN UP</Typography>
+          </Button>
+      </Box>
+      
     </Box>
 
         <Box
@@ -77,13 +102,11 @@ const LandingPage = () => {
           }}
         >
           <Box>
-          <Typography variant="h4" align="center" sx={{ color: "#9c27b0" }}>
-            Welcome to Illusia ry – The Heart of Immersive LARP Experiences!
-          </Typography>
+          
 
             <Box sx={{ display: "flex", alignItems: "center", gap: "50px" , marginTop: '0px'}}>
-              <img src={image1} alt="illusia-logo"  style={{ height: "500px", maxWidth: "600px", objectFit: "contain" }} />
-              <Typography variant="h6">
+              <img src={image5} alt="illusia-logo"  style={{ height: "300px", maxWidth: "700px", objectFit: "contain" }} />
+              <Typography variant="h6" justifyContent={"center"} align="center">
               Step into a world of boundless imagination with Illusia Ry, the creative force behind Odysseus and other unforgettable live-action role-playing (LARP) adventures. Whether you're a seasoned LARPer or new to the scene, we invite you to bring your stories to life with our expertly crafted props, set pieces, and immersive game design.
               </Typography>
             </Box>
@@ -92,27 +115,27 @@ const LandingPage = () => {
             sx={{
               display: "flex",
               justifyContent: "space-between",
-              marginTop: '0px',
+              marginTop: '10px',
               gap: "70px",
             }}                
           >
             <Box>
               <CalendarMonthIcon sx={{width:"70px", height:"70px"}} />
-              <Typography variant="h5" color="secondary">Booking</Typography>
+              <Typography variant="h5" color="secondary" >Booking</Typography>
               <Typography variant="h6">
-                Book your next event or use our porps 
+                Book your next event or use our props 
               </Typography>
             </Box>
             <Box>
               <TheaterComedyIcon sx={{width:"70px", height:"70px"}}/>
-              <Typography variant="h5">Events</Typography>
+              <Typography variant="h5" color="primary">Events</Typography>
               <Typography variant="h6">
                 Events and games for you to join
               </Typography>
             </Box>
             <Box>
               <HandshakeIcon sx={{width:"70px", height:"70px"}}/>
-              <Typography variant="h5">Location</Typography>
+              <Typography variant="h5" color="secondary">Location</Typography>
               <Typography variant="h6">
                 Real live events for you to join
               </Typography>
@@ -121,7 +144,7 @@ const LandingPage = () => {
         </Box>
 
         {/* user reviews */}
-        <Typography variant="h5" sx={{ mt: 10 }} align="center">USER REVIEWS</Typography>
+        <Typography variant="h5" sx={{ mt: 10 }} align="center" color="primary">User Reviews</Typography>
         <Box sx={{ mt: 2 }} display={"flex"} justifyContent={"space-between"}>
           <Card sx={{ width: 300, p: 2, mb: 2 }}>
             <Typography variant="h6">Review 1</Typography>
