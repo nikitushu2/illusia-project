@@ -1,0 +1,18 @@
+setup:
+  addons:
+    - plan: heroku-postgresql
+      as: DATABASE
+
+build:
+  docker:
+    backend: ./backend/Dockerfile
+    web: ./frontend/Dockerfile
+
+release:
+  command:
+    - cd backend && npm run build
+  image: web
+
+run:
+  backend: node dist/index.js
+  web: nginx -g 'daemon off;'
