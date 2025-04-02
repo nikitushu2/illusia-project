@@ -4,9 +4,19 @@ import LandingPage from "./components/LandingPage";
 import { Header } from "./components/Header";
 import SignUp from "./components/SignUp";
 import { Login } from "./components/login/Login";
+import { Box } from "@mui/system";
+
+
 
 function App() {
   return (
+    <Box
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      minHeight: "100vh", // Full viewport height
+    }}
+  >
     <BrowserRouter>
       <Header />
       <Routes>
@@ -16,6 +26,10 @@ function App() {
       </Routes>
       <Footer />
     </BrowserRouter>
+  </Box>
+ 
+ 
+  
   );
 }
 

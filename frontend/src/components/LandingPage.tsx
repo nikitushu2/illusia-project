@@ -13,7 +13,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import TheaterComedyIcon from "@mui/icons-material/TheaterComedy";
 import HandshakeIcon from "@mui/icons-material/Handshake";
 
-import image1 from "../images/image1.png";
+import image1 from "../images/ssspaju1.png";
 import image2 from "../images/image2.png";
 import image3 from "../images/image3.png";
 import image4 from "../images/image4.png";

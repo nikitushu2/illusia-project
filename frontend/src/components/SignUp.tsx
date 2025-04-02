@@ -26,7 +26,7 @@ const SignUp = () => {
           fullWidth
           required
         />
-        <TextField label="Address" variant="outlined" fullWidth required />
+
         <TextField
           label="Password"
           type="password"
