@@ -15,4 +15,4 @@ release:
 
 run:
   backend: node dist/index.js
-  web: nginx -g 'daemon off;'
+  web: /start.sh
