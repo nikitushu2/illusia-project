@@ -113,8 +113,10 @@ export const Login = () => {
 
       <Box>
         <Button
+
           component={Link}
-          to="/admin-login"
+          // to="/admin-login" // this shold take one to admin login page before the admin dashboard
+          to="/sideBar"
           sx={{ padding: 1, textTransform: "none" }}
         >
           Admin Login here

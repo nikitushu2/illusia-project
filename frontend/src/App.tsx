@@ -5,6 +5,7 @@ import { Header } from "./components/Header";
 import SignUp from "./components/SignUp";
 import { Login } from "./components/login/Login";
 import { Box } from "@mui/system";
+import SideBar from "./components/SideBar";
 
 
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/sideBar" element={<SideBar />} />
       </Routes>
       <Footer />
     </BrowserRouter>
