@@ -1,8 +1,9 @@
 import { Box, Link, Typography } from "@mui/material";
 
 export default function Footer() {
-  return (
-    <Box
+ return (
+      <Box
+
       component="footer"
       sx={{
         bottom: 0,
@@ -12,6 +13,7 @@ export default function Footer() {
         textAlign: "center",
         mt: "auto",
         backgroundColor: `#44195b !important`,
+
       }}
     >
       <Typography variant="body1" color="white">
@@ -27,6 +29,7 @@ export default function Footer() {
         <Link href="/privacy" underline="hover">
           Privacy Policy
         </Link>
+
       </Box>
     </Box>
   );

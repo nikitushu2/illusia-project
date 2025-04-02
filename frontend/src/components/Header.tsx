@@ -12,15 +12,21 @@ import {
   Typography,
 } from "@mui/material";
 import logo from "../images/logo-transparent.png";
+
 import { Link } from "react-router-dom";
 import { ThemeContext } from "../themes/themeContext";
 import { useContext } from "react";
 
+
+
+
 // import DarkModeIcon from "@mui/icons-material/DarkMode";
 // import LightModeIcon from "@mui/icons-material/LightMode";
 
-// const pages = ["HOME", "EVENTS/EXHIBITIONS", "INFO"];
-// const settings = ["Profile", "Account", "Dashboard", "Logout"];
+
+
+
+
 
 export const Header = () => {
   // concerning light and dark mode
@@ -30,15 +36,21 @@ export const Header = () => {
     throw new Error(
       "ThemeContext is undefined. Make sure you are using ThemeProvider."
     );
+
   }
 
+  
+
   // const { mode, toggleMode } = themeContext;
+
+  
 
   return (
     <>
       <AppBar position="static">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
+
             <Box
               sx={{
                 alignItems: "center",
@@ -61,7 +73,15 @@ export const Header = () => {
                 gap: "20px",
               }}
             >
-              <Button color="inherit" variant="text">
+            
+
+
+            
+
+           
+             
+
+               <Button color="inherit" variant="text" >
                 <Typography variant="body1">HOME</Typography>
               </Button>
               <Button color="inherit" variant="text">
@@ -71,6 +91,7 @@ export const Header = () => {
                 <Typography variant="body1">INFO</Typography>
               </Button>
             </Box>
+
 
             <Box sx={{ display: "flex", alignItems: "center", gap: "30px" }}>
               <Button
@@ -97,6 +118,11 @@ export const Header = () => {
             {/* <IconButton onClick={toggleMode} color="inherit"> */}
             {/* {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />} */}
             {/* </IconButton>*/}
+
+           
+
+           
+
           </Toolbar>
         </Container>
       </AppBar>
