@@ -10,8 +10,8 @@ build:
 
 release:
   command:
-    - cd backend && npm run build
-  image: web
+    - npm run build
+  image: backend
 
 run:
   backend: node dist/index.js
