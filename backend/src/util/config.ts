@@ -39,3 +39,4 @@ console.log(`Running in ${isProd ? "production" : "development"} mode`);
 console.log(
   `Using database: ${config.database.host}:${config.database.port}/${config.database.name}`
 );
+console.log(`DATABASE_URL: ${DATABASE_URL}`);

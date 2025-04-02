@@ -15,4 +15,4 @@ release:
 
 run:
   backend: node dist/index.js
-  web: /start.sh
+  web: /bin/sh -c "/start.sh"

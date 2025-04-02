@@ -25,9 +25,9 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # Copy nginx configuration
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
-# Copy startup script
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+RUN echo '#!/bin/sh\n\
+sed -i -e "s/\$PORT/'"$PORT"'/g" /etc/nginx/conf.d/default.conf\n\
+nginx -g "daemon off;"' > /start.sh && chmod +x /start.sh
 
 EXPOSE 8080
 
