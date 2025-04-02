@@ -9,10 +9,10 @@ build:
     web: ./frontend/Dockerfile
 
 release:
-  command:
-    - npm run build
   image: backend
+  command:
+    - echo "Database migrations would go here if needed"
 
 run:
   backend: node dist/index.js
-  web: /bin/sh -c "/start.sh"
+  web: nginx -g 'daemon off;

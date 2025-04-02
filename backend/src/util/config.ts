@@ -29,9 +29,9 @@ const prodConfig = {
 
 const config = isProd ? prodConfig : devConfig;
 
-export const DATABASE_URL =
-  process.env.DATABASE_URL ||
-  `postgres://${config.database.user}:${config.database.password}@${config.database.host}:${config.database.port}/${config.database.name}`;
+export const DATABASE_URL = process.env.NODE_ENV === 'production' 
+  ? process.env.DATABASE_URL 
+  : `postgres://${config.database.user}:${config.database.password}@${config.database.host}:${config.database.port}/${config.database.name}`;
 
 export const PORT = process.env.PORT || 3000;
 
@@ -39,4 +39,3 @@ console.log(`Running in ${isProd ? "production" : "development"} mode`);
 console.log(
   `Using database: ${config.database.host}:${config.database.port}/${config.database.name}`
 );
-console.log(`DATABASE_URL: ${DATABASE_URL}`);
