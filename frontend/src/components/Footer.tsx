@@ -1,11 +1,9 @@
-import { Box, Link, Typography } from "@mui/material"
-
+import { Box, Link, Typography } from "@mui/material";
 
 export default function Footer() {
- 
-
-    return (
+ return (
       <Box
+
       component="footer"
       sx={{
         bottom: 0,
@@ -15,17 +13,24 @@ export default function Footer() {
         textAlign: "center",
         mt: "auto",
         backgroundColor: `#44195b !important`,
-       
+
       }}
     >
-        <Typography variant="body1" color="white">
-          © {new Date().getFullYear()} Illusia RY
-        </Typography>
-        <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 1 }}>
-          <Link href="/contact" underline="hover">Contact Us</Link>
-          <Link href="/terms" underline="hover">Terms & Conditions</Link>
-          <Link href="/privacy" underline="hover">Privacy Policy</Link>
-        </Box>
+      <Typography variant="body1" color="white">
+        © {new Date().getFullYear()} Illusia RY
+      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 1 }}>
+        <Link href="/contact" underline="hover">
+          Contact Us
+        </Link>
+        <Link href="/terms" underline="hover">
+          Terms & Conditions
+        </Link>
+        <Link href="/privacy" underline="hover">
+          Privacy Policy
+        </Link>
+
       </Box>
-    );
-  }
+    </Box>
+  );
+}

@@ -1,34 +1,24 @@
 {
-    "name": "illusia-project",
-    "version": "1.0.0",
-    "private": true,
-    "scripts": {
-        "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-        "dev:backend": "cd backend && npm run dev",
-        "dev:frontend": "cd frontend && npm run dev",
-        "install:all": "concurrently \"npm run install:backend\" \"npm run install:frontend\"",
-        "install:backend": "cd backend && npm install",
-        "install:frontend": "cd frontend && npm install",
-        "build": "concurrently \"npm run build:backend\" \"npm run build:frontend\"",
-        "build:backend": "cd backend && npm run build",
-        "build:frontend": "cd frontend && npm run build",
-        "docker:dev": "docker-compose -f docker-compose.dev.yml up",
-        "docker:dev:build": "docker-compose -f docker-compose.dev.yml build --no-cache && docker-compose -f docker-compose.dev.yml up",
-        "docker:prod": "docker-compose up",
-        "docker:prod:build": "docker-compose build --no-cache && docker-compose up"
-    },
-    "devDependencies": {
-        "concurrently": "^8.2.2"
-    },
-    "dependencies": {
-        "@emotion/react": "^11.14.0",
-        "@emotion/styled": "^11.14.0",
-        "@fontsource/roboto": "^5.2.5",
-        "@mui/icons-material": "^6.4.8",
-        "@mui/material": "^6.4.8",
-        "@mui/styled-engine-sc": "^6.4.6",
-        "axios": "^1.7.9",
-        "react-router-dom": "^7.4.1",
-        "styled-components": "^6.1.16"
-    }
+  "name": "illusia-project",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "concurrently \"npm run install:backend\" \"npm run install:frontend\"",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "build": "concurrently \"npm run build:backend\" \"npm run build:frontend\"",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up",
+    "docker:dev:build": "docker-compose -f docker-compose.dev.yml build --no-cache && docker-compose -f docker-compose.dev.yml up",
+    "docker:prod": "docker-compose up",
+    "docker:prod:build": "docker-compose build --no-cache && docker-compose up"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+ 
 }
