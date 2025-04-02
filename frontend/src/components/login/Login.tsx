@@ -42,7 +42,10 @@ export const Login = () => {
       </Box>
 
       <Box>
-        <Button variant="contained" sx={{ padding: 1, width: 200, mb: 2 }}>
+        <Button variant="contained" 
+          component={Link}
+          to="/users"
+          sx={{ padding: 1, width: 200, mb: 2 }}>
           Login
         </Button>
       </Box>
