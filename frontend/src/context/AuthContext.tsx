@@ -60,7 +60,7 @@ export const AuthProvider = ({children}: AuthProviderProp) => {
         } finally {
             setLoading(false)  
         }
-    }
+    };
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -80,7 +80,7 @@ export const AuthProvider = ({children}: AuthProviderProp) => {
 
     const authenticateWithGoogle = () => {
         signInWithRedirect(auth, provider)
-    }
+    };
 
     const context = {
         applicationUser: applicationUser,
@@ -88,7 +88,7 @@ export const AuthProvider = ({children}: AuthProviderProp) => {
         error: error,
         authenticateWithGoogle: authenticateWithGoogle,
         isLoggedIn: !!applicationUser && applicationUser.isApproved,
-        signUpUser: signUpUser
+        signUpUser: signUpUser,
     }
 
     return (

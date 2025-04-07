@@ -2,12 +2,12 @@ import { Router } from "express";
 import { Request, Response } from "express";
 import admin from "../config/firebase";
 import { findByEmail } from "../services/userService";
-import { setSessionCookie } from "../util/cookieUtils";
+import { setSessionCookie, clearSessionCookie } from "../util/cookieUtils";
 import { signJWT } from "../util/jwtUtils";
 
-const router = Router();
+const authRouter = Router();
 
-router.post("/login", async (req: Request, res: Response) => {
+authRouter.post("/login", async (req: Request, res: Response) => {
     const { token } = req.body;
 
     try {
@@ -19,12 +19,15 @@ router.post("/login", async (req: Request, res: Response) => {
         const applicationUser = email ? await findByEmail(email) : null;
 
         if (applicationUser) {
-            // Generate JWT
-            const jwtToken = signJWT(applicationUser);
-            applicationUser.picture = picture;
+            
+            if (applicationUser.isApproved) {
+                // Generate JWT
+                const jwtToken = signJWT(applicationUser);
+                // Set JWT in HTTP-only cookie
+                setSessionCookie(res, jwtToken);
+            }
 
-            // Set JWT in HTTP-only cookie
-            setSessionCookie(res, jwtToken);
+            applicationUser.picture = picture;
 
             res.status(200).json(applicationUser);
         } else {
@@ -36,4 +39,4 @@ router.post("/login", async (req: Request, res: Response) => {
     }
 });
 
-export { router };
+export { authRouter };

@@ -11,3 +11,7 @@ export const setSessionCookie = (res: Response, token: string): void => {
         maxAge: SESSION_COOKIE_MAX_AGE,
     });
 };
+
+export const clearSessionCookie = (res: Response): void => {
+    res.clearCookie(SESSION_COOKIE_NAME);
+}

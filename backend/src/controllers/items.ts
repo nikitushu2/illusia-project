@@ -18,20 +18,20 @@ interface ItemUpdateRequest {
     location?: string;
   }
 
-const router = Router();
+const itemsRouter = Router();
 
 const itemFinder = async (req: ItemRequest, _res: Response, next: NextFunction) => {
   req.item = await itemService.findById(req.params.id);
   next();
 };
 
-router.post("/", async (_req: Request, res: Response) => {
+itemsRouter.post("/", async (_req: Request, res: Response) => {
   const items = await itemService.findAll();
   console.log(JSON.stringify(items));
   res.json(items);
 });
 
-router.post("/", async (req: Request<{}, {}, ItemCreationAttributes>, res: Response, next: NextFunction) => {
+itemsRouter.post("/", async (req: Request<{}, {}, ItemCreationAttributes>, res: Response, next: NextFunction) => {
   try {
     const item = await itemService.create(req.body);
     res.json(item);
@@ -40,7 +40,7 @@ router.post("/", async (req: Request<{}, {}, ItemCreationAttributes>, res: Respo
   }
 });
 
-router.get('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), (req, res) => {
+itemsRouter.get('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), (req, res) => {
     if ((req as ItemRequest).item) {
         res.json((req as ItemRequest).item);
     } else {
@@ -48,7 +48,7 @@ router.get('/:id', (req: Request, res: Response, next: NextFunction) => itemFind
     }
 });
 
-router.put('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req: Request<{id: string}, {}, ItemUpdateRequest>, res: Response, next: NextFunction): Promise<void> => {
+itemsRouter.put('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req: Request<{id: string}, {}, ItemUpdateRequest>, res: Response, next: NextFunction): Promise<void> => {
 
     try {
         const typedReq = req as unknown as ItemRequest;
@@ -96,7 +96,7 @@ router.put('/:id', (req: Request, res: Response, next: NextFunction) => itemFind
 
 });
 
-router.delete('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req, res) => {
+itemsRouter.delete('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req, res) => {
     const typedReq = req as unknown as ItemRequest;
     const item = typedReq.item;
 
@@ -108,4 +108,4 @@ router.delete('/:id', (req: Request, res: Response, next: NextFunction) => itemF
     }
 });
 
-export { router };
+export { itemsRouter };
