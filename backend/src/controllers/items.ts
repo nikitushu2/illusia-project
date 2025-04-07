@@ -25,7 +25,7 @@ const itemFinder = async (req: ItemRequest, _res: Response, next: NextFunction) 
   next();
 };
 
-router.get("/", async (_req: Request, res: Response) => {
+router.post("/", async (_req: Request, res: Response) => {
   const items = await itemService.findAll();
   console.log(JSON.stringify(items));
   res.json(items);
