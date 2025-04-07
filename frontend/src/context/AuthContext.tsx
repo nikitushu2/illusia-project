@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, onAuthStateChanged, signInWithRedirect } from "firebase/auth";
 import { auth, provider } from "../config/firebase";
-import { ApplicationUser } from "../../../types/applicationUser";
+import { ApplicationUser } from "../types/applicationUser";
 
 interface AuthProviderProp {
     children: React.ReactNode;
@@ -11,19 +11,12 @@ export enum AuthErrorType {
     LOGIN_FAILED = "Login failed",
 }
 
-export enum UserType {
-    ADMIN = "admin",
-    USER = "user",
-    SUPER_ADMIN = "super_admin"
-}
-
 interface AuthContextType {
     applicationUser?: ApplicationUser;
     loading: boolean;
     error?: AuthErrorType;
     authenticateWithGoogle: () => void;
     isLoggedIn: boolean;
-    userType?: UserType;
     signUpUser?: User;
 }
 
@@ -32,6 +25,8 @@ const authContextInitialValue = {
     authenticateWithGoogle: () => {},
     isLoggedIn: false,
 }
+
+const BACKEND_BASE_PATH = import.meta.env.VITE_BACKEND_ORIGIN + '/api'
 
 const AuthContext = createContext<AuthContextType>(authContextInitialValue);
 
@@ -45,10 +40,11 @@ export const AuthProvider = ({children}: AuthProviderProp) => {
         setLoading(true);
         try {
             const token = await firebaseUser.getIdToken();
-            const response = await fetch("http://localhost:3000/auth/google", {
+            const response = await fetch(`${BACKEND_BASE_PATH}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ token }),
+                credentials: 'include',
               });
             
             if (response.ok){
@@ -86,24 +82,11 @@ export const AuthProvider = ({children}: AuthProviderProp) => {
         signInWithRedirect(auth, provider)
     }
 
-    const getUserType = (role?: string): UserType | undefined => {
-        if (!role) return undefined;
-        
-        const roleMap: Record<string, UserType> = {
-            "admin": UserType.ADMIN,
-            "user": UserType.USER,
-            "super-admin": UserType.SUPER_ADMIN
-        };
-        
-        return roleMap[role];
-    };
-
     const context = {
         applicationUser: applicationUser,
         loading: loading,
         error: error,
         authenticateWithGoogle: authenticateWithGoogle,
-        userType: getUserType(applicationUser?.role),
         isLoggedIn: !!applicationUser && applicationUser.isApproved,
         signUpUser: signUpUser
     }

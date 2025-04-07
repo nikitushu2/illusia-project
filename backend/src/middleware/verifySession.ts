@@ -46,6 +46,7 @@ export const verifySession = async (req: RequestWithSession, res: Response, next
 
 export const verifySuperAdminSession = (req: RequestWithSession, res: Response, next: NextFunction): void => {
     const applicationUser = req.applicationUser;
+    // Allow only super admins
     if (!applicationUser || applicationUser.role === UserRole.ADMIN || applicationUser.role === UserRole.USER) {
         res.status(401).json({ message: 'Only Authorized for super admins' });
         return;
@@ -55,7 +56,7 @@ export const verifySuperAdminSession = (req: RequestWithSession, res: Response, 
 
 export const verifyAdminSession = (req: RequestWithSession, res: Response, next: NextFunction): void => {
         const applicationUser = req.applicationUser;
-        //! mark kyu lagaye
+        // Allow super admins and admins
         if (!applicationUser || applicationUser.role === UserRole.USER) {
             res.status(401).json({ message: 'Only Authorized for admins' });
             return;
