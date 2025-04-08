@@ -1,3 +1,6 @@
+//if you want to add or modify something in this file, please do it same in the backend/src/types/applicationUser.ts file
+
+
 export enum UserRole {
     SUPER_ADMIN = "SUPER_ADMIN",
     ADMIN = "ADMIN",
