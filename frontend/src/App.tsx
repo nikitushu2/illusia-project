@@ -5,10 +5,7 @@ import { Header } from "./components/Header";
 import SignUp from "./components/SignUp";
 import { Login } from "./components/login/Login";
 import { Box } from "@mui/system";
-import SideBar from "./components/SideBar";
-
-
-
+import SideBar from "../src/components/Sidebar";
 
 function App() {
   return (
