@@ -27,7 +27,7 @@ COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 RUN echo '#!/bin/sh' > /start.sh && \
     echo 'sed -i "s/\$PORT/$PORT/g" /etc/nginx/conf.d/default.conf' >> /start.sh && \
-    echo 'sed -i "s|http://backend:3000/|https://illusia-project-2947763ee03d.herokuapp.com/|g" /etc/nginx/conf.d/default.conf' >> /start.sh && \
+    echo 'sed -i "s|http://backend:3000/|$BACKEND_URL/|g" /etc/nginx/conf.d/default.conf' >> /start.sh && \
     echo 'nginx -g "daemon off;"' >> /start.sh && \
     chmod +x /start.sh
 
