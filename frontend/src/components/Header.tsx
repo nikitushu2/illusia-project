@@ -16,6 +16,8 @@ import logo from "../images/logo-transparent.png";
 import { Link } from "react-router-dom";
 import { ThemeContext } from "../themes/themeContext";
 import { useContext } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -24,13 +26,17 @@ import { useContext } from "react";
 // import LightModeIcon from "@mui/icons-material/LightMode";
 
 
-
-
-
-
 export const Header = () => {
   // concerning light and dark mode
   const themeContext = useContext(ThemeContext);
+  const { logout, isLoggedIn } = useAuth();
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/logout");
+  };
 
   if (!themeContext) {
     throw new Error(
@@ -103,15 +109,27 @@ export const Header = () => {
               >
                 Sign Up
               </Button>
-              <Button
-                to="/login"
-                component={Link}
-                color="inherit"
-                variant="contained"
-                sx={{ fontSize: "1rem", fontWeight: "bold" }}
-              >
-                Log In
+              {isLoggedIn 
+              ? <Button
+                  onClick={handleLogout}
+                  color="inherit"
+                  variant="contained"
+                  sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                >
+                  Logout
               </Button>
+             : <Button
+                  to="/login"
+                  component={Link}
+                  color="inherit"
+                  variant="contained"
+                  sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                >
+                  Log In
+              </Button>
+            
+              }
+             
             </Box>
 
             {/* toggleMode for light and dark mode */}

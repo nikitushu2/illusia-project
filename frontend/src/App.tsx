@@ -6,6 +6,7 @@ import SignUp from "./components/SignUp";
 import { Login } from "./components/login/Login";
 import { Box } from "@mui/system";
 import SideBar from "../src/components/Sidebar";
+import { Logout } from "../src/components/Logout";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/sideBar" element={<SideBar />} />
+        <Route path="/logout" element={<Logout />} />
       </Routes>
       <Footer />
     </BrowserRouter>
