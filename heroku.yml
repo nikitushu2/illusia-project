@@ -1,0 +1,18 @@
+setup:
+  addons:
+    - plan: heroku-postgresql
+      as: DATABASE
+
+build:
+  docker:
+    backend: ./backend/Dockerfile
+    web: ./frontend/Dockerfile
+
+release:
+  image: backend
+  command:
+    - echo "Database migrations would go here if needed"
+
+run:
+  backend: node dist/index.js
+  web: /start.sh

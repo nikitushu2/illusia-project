@@ -51,9 +51,9 @@ const prodConfig = {
 
 export const config = isProd ? prodConfig : devConfig;
 
-export const DATABASE_URL =
-  process.env.DATABASE_URL ||
-  `postgres://${config.database.user}:${config.database.password}@${config.database.host}:${config.database.port}/${config.database.name}`;
+export const DATABASE_URL = process.env.NODE_ENV === 'production' 
+  ? process.env.HEROKU_POSTGRESQL_IVORY_URL
+  : `postgres://${config.database.user}:${config.database.password}@${config.database.host}:${config.database.port}/${config.database.name}`;
 
 export const PORT = process.env.PORT || 3000;
 

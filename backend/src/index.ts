@@ -1,4 +1,4 @@
-// here application is configured and launched
+// here application is configured and launched.
 
 import express from "express";
 import { ErrorRequestHandler } from "express";
@@ -11,13 +11,18 @@ import cors from 'cors';
 import { verifySession, verifyAdminSession, verifySuperAdminSession } from "./middleware/verifySession";
 import cookieParser from "cookie-parser";
 
+
 const app = express();
 
 app.use(cors({
-  origin: config.frontendOrigin,
-  methods: "GET,POST,PUT,DELETE",
-  credentials: true,
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://illusia-project-2947763ee03d.herokuapp.com' 
+    : 'http://localhost:5173',
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
 }));
+
+app.use(express.json());
 
 
 // all the backend Api should start with /api
