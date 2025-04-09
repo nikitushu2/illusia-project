@@ -1,21 +1,23 @@
 {
-    "name": "illusia-project",
-    "version": "1.0.0",
-    "private": true,
-    "scripts": {
-        "install:all": "concurrently \"npm run install:backend\" \"npm run install:frontend\"",
-        "install:backend": "cd backend && npm install",
-        "install:frontend": "cd frontend && npm install",
-        "build": "concurrently \"npm run build:backend\" \"npm run build:frontend\"",
-        "build:backend": "cd backend && npm run build",
-        "build:frontend": "cd frontend && npm run build",
-        "docker:dev": "docker-compose -f docker-compose.dev.yml up",
-        "docker:dev:build": "docker-compose -f docker-compose.dev.yml build --no-cache && docker-compose -f docker-compose.dev.yml up",
-        "docker:prod": "docker-compose up",
-        "docker:prod:build": "docker-compose build --no-cache && docker-compose up"
-    },
-    "devDependencies": {
-    },
-    "dependencies": {
-    }
+  "name": "illusia-project",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "concurrently \"npm run install:backend\" \"npm run install:frontend\"",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "build": "concurrently \"npm run build:backend\" \"npm run build:frontend\"",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up",
+    "docker:postgres": "docker-compose -f docker-compose.dev.yml up postgres",
+    "docker:dev:build": "docker-compose -f docker-compose.dev.yml build --no-cache && docker-compose -f docker-compose.dev.yml up",
+    "docker:prod": "docker-compose up",
+    "docker:prod:build": "docker-compose build --no-cache && docker-compose up"
+  },
+  "devDependencies": {
+  }
 }
