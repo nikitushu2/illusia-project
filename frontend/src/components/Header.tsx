@@ -22,6 +22,10 @@ import { useNavigate } from "react-router-dom";
 
 
 
+
+
+
+
 // import DarkModeIcon from "@mui/icons-material/DarkMode";
 // import LightModeIcon from "@mui/icons-material/LightMode";
 
@@ -87,10 +91,10 @@ export const Header = () => {
            
              
 
-               <Button color="inherit" variant="text" >
+               <Button color="inherit" variant="text" component={Link} to="/">
                 <Typography variant="body1">HOME</Typography>
               </Button>
-              <Button color="inherit" variant="text">
+              <Button color="inherit" variant="text" component={Link} to="/events">
                 <Typography variant="body1">EVENTS</Typography>
               </Button>
               <Button color="inherit" variant="text">
