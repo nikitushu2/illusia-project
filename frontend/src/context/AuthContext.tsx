@@ -9,20 +9,23 @@ interface AuthProviderProp {
 export enum AuthErrorType {
     USER_NOT_FOUND = "User not found",
     LOGIN_FAILED = "Login failed",
+    LOGOUT_FAILED = "Logout failed",
 }
 
 interface AuthContextType {
     applicationUser?: ApplicationUser;
     loading: boolean;
     error?: AuthErrorType;
-    authenticateWithGoogle: () => void;
+    login: () => void;
+    logout: () => void;
     isLoggedIn: boolean;
     signUpUser?: User;
 }
 
 const authContextInitialValue = {
     loading: false,
-    authenticateWithGoogle: () => {},
+    login: () => {},
+    logout: () => {},
     isLoggedIn: false,
 }
 
@@ -62,11 +65,24 @@ export const AuthProvider = ({children}: AuthProviderProp) => {
         }
     };
 
+    const logout = async () => {
+        const response = await fetch(`${BACKEND_BASE_PATH}/auth/logout`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: 'include',
+        });
+        if (response.ok){
+            setApplicationUser(undefined);
+        } else {
+            setError(AuthErrorType.LOGOUT_FAILED);
+        }
+
+    }
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             if (firebaseUser) {
                 // User is signed in, get token and fetch application user
-                
                 await fetchApplicationUserAndSetState(firebaseUser);
             } else {
                 // User is signed out
@@ -78,7 +94,7 @@ export const AuthProvider = ({children}: AuthProviderProp) => {
         return () => unsubscribe();
     }, []);
 
-    const authenticateWithGoogle = () => {
+    const login = () => {
         signInWithRedirect(auth, provider)
     };
 
@@ -86,7 +102,8 @@ export const AuthProvider = ({children}: AuthProviderProp) => {
         applicationUser: applicationUser,
         loading: loading,
         error: error,
-        authenticateWithGoogle: authenticateWithGoogle,
+        login: login,
+        logout: logout,
         isLoggedIn: !!applicationUser && applicationUser.isApproved,
         signUpUser: signUpUser,
     }

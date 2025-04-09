@@ -4,7 +4,7 @@ import { Google as GoogleIcon } from "@mui/icons-material";
 import { useAuth } from "../../context/AuthContext";
 
 export const Login = () => {
-  const { authenticateWithGoogle } = useAuth();
+  const { login } = useAuth();
 
   return (
     <Box sx={{ margin: "auto", textAlign: "center", maxWidth: 600, px: 2 }}>
@@ -74,7 +74,7 @@ export const Login = () => {
 
       <Box>
         <Button
-          onClick={authenticateWithGoogle}
+          onClick={login}
           variant="outlined"
           sx={{
             textTransform: "none",
