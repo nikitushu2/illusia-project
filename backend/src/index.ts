@@ -1,4 +1,4 @@
-// here application is configured and launched
+// here application is configured and launched.
 
 import express from "express";
 import { ErrorRequestHandler } from "express";
