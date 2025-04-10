@@ -6,9 +6,8 @@ export type ItemCreationAttributes = InferCreationAttributes<Item>;
 export interface ItemUpdateAttributes {
   name?: string;
   description?: string;
-  quantity?: number;
-  categoryId?: number;
-  location?: string;
+  imageUrl?: string;
+  price?: number;
 }
 
 export const findAll = async (): Promise<Item[]> => {
@@ -32,16 +31,12 @@ export const update = async (item: Item, updates: ItemUpdateAttributes): Promise
     item.set('description', String(updates.description));
   }
   
-  if (updates.quantity !== undefined) {
-    item.set('quantity', Number(updates.quantity));
+  if (updates.imageUrl !== undefined) {
+    item.set('imageUrl', String(updates.imageUrl));
   }
   
-  if (updates.categoryId !== undefined) {
-    item.set('categoryId', Number(updates.categoryId));
-  }
-  
-  if (updates.location !== undefined) {
-    item.set('location', String(updates.location));
+  if (updates.price !== undefined) {
+    item.set('price', Number(updates.price));
   }
 
   await item.save();

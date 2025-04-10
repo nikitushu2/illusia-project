@@ -2,7 +2,7 @@ import { Router } from "express";
 import { Request, Response } from "express";
 import admin from "../config/firebase";
 import { findByEmail } from "../services/userService";
-import { setSessionCookie, clearSessionCookie } from "../util/cookieUtils";
+import { setSessionCookie } from "../util/cookieUtils";
 import { signJWT } from "../util/jwtUtils";
 
 const authRouter = Router();

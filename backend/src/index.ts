@@ -10,6 +10,7 @@ import { errorHandler, AppError } from "./middleware/errorHandler";
 import cors from 'cors';
 import { verifySession, verifyAdminSession, verifySuperAdminSession } from "./middleware/verifySession";
 import cookieParser from "cookie-parser";
+import { categoriesRouter } from "./controllers/categories";
 
 const app = express();
 
@@ -28,6 +29,9 @@ apiRouter.use(express.json());
 // all auth endpoint starts with /api/auth
 apiRouter.use('/auth', authRouter);
 
+// Public items route - no authentication required
+apiRouter.use('/items', itemsRouter);
+apiRouter.use('/categories', categoriesRouter);
 
 // all the private endpoint starts with /api/private
 // private endpoints are only for logged in users
@@ -54,10 +58,7 @@ adminApiRouter.use(verifyAdminSession);
 privateApiRouter.use('/admin', adminApiRouter);
 
 // all common endpoints for logged in user should use privateApiRouter
-// like /api/private/items
-privateApiRouter.use('/items', itemsRouter);
-
-
+// privateApiRouter.use('/items', itemsRouter);
 
 apiRouter.use('/private', privateApiRouter);
 

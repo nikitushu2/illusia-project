@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "password",
+    "database": "storage_app",
+    "host": "localhost",
+    "port": 5433,
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "password",
+    "database": "storage_app_test",
+    "host": "localhost",
+    "port": 5433,
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "password",
+    "database": "storage_app_production",
+    "host": "localhost",
+    "port": 5433,
+    "dialect": "postgres"
+  }
+}
