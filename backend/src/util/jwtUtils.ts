@@ -8,8 +8,9 @@ const JWT_PUBLIC_KEY = config.auth.jwtPublicKey;
 const JWT_ALGORITHM = 'RS256';
 const JWT_EXPIRATION = '1h'; // 1 hour
 
-interface JWTPayload {
-    payload: ApplicationUser;
+export interface VerifiedJWT {
+    user: ApplicationUser;
+    isAboutToExpire: boolean;
 }
 
 export const signJWT = (applicationUser: ApplicationUser): string => {
@@ -36,7 +37,7 @@ export const signJWT = (applicationUser: ApplicationUser): string => {
     }
 }
 
-export const verifyAndParseJWT = (token: string): ApplicationUser => {
+export const verifyAndParseJWT = (token: string): VerifiedJWT => {
     if (!JWT_PUBLIC_KEY || JWT_PUBLIC_KEY === '') {
         throw new Error('JWT_PUBLIC_KEY is not defined');
     }
@@ -52,10 +53,15 @@ export const verifyAndParseJWT = (token: string): ApplicationUser => {
     };
 
     try {
-        const decoded = jwt.verify(token, JWT_PUBLIC_KEY, options) as JWTPayload;
-        return decoded.payload;
+        const decoded = jwt.verify(token, JWT_PUBLIC_KEY, options) as jwt.JwtPayload;
+        const expiresAt = new Date(decoded.exp! * 1000); // Convert to milliseconds
+        const isAboutToExpire = expiresAt.getTime() - Date.now() < 15 * 60 * 1000; // 15 minutes
+        return {
+            user: decoded.payload,
+            isAboutToExpire: isAboutToExpire
+        };
     } catch (error: unknown) {
         console.error('JWT verification error:', error);
-        throw error instanceof Error;
+        throw error instanceof Error ? error : new Error('Unknown error');
     }
 }
