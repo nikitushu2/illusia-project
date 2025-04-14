@@ -1,10 +1,32 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Google as GoogleIcon } from "@mui/icons-material";
 import { useAuth } from "../../context/AuthContext";
+import { useEffect } from "react";
+
 
 export const Login = () => {
-  const { login } = useAuth();
+  //const { login } = useAuth();
+  const { login, isLoggedIn } = useAuth();
+
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    if(isLoggedIn){
+      navigate('/userDashboard')
+    }
+  }, [isLoggedIn, navigate]);
+
+  const googleLogin = async () => {
+    try {
+      await login(); 
+      navigate('/userDashboard'); 
+    } 
+    catch (error) {
+      console.error("Google login failed:", error);
+    }
+  };
 
   return (
     <Box sx={{ margin: "auto", textAlign: "center", maxWidth: 600, px: 2 }}>
@@ -13,6 +35,7 @@ export const Login = () => {
         <Typography variant="subtitle1">Log in to your account.</Typography>
       </Box>
 
+      {/* input fields */}
       <Box>
         <TextField
           fullWidth
@@ -29,6 +52,7 @@ export const Login = () => {
         />
       </Box>
 
+      {/* forgot password */}
       <Box textAlign="right" sx={{ maxWidth: 500, mx: "auto", mb: 2 }}>
         <Button
           component={Link}
@@ -39,8 +63,9 @@ export const Login = () => {
         </Button>
       </Box>
 
+      {/* normal login button */}
       <Box>
-        <Button variant="contained" sx={{ padding: 1, width: 200, mb: 2 }}>
+        <Button variant="contained" sx={{ padding: 1, width: 200, mb: 2 }} component={Link} to="/userDashboard"> 
           Login
         </Button>
       </Box>
@@ -74,7 +99,8 @@ export const Login = () => {
 
       <Box>
         <Button
-          onClick={login}
+          // onClick={login}
+          onClick={googleLogin}
           variant="outlined"
           sx={{
             textTransform: "none",
