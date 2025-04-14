@@ -1,4 +1,4 @@
-import { Paper, Table, TableContainer, TableHead, TableRow,TableCell, TableBody, Button, Box, Card, CardMedia, CardContent, CardActions} from "@mui/material";
+import { Paper, Table, TableContainer, TableHead, TableRow,TableCell, TableBody, Button, Box, Card, CardMedia, CardContent, CardActions, TextField} from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
 //import { useState } from "react";
@@ -169,14 +169,14 @@ const UserProducts = () => {
   const handleGridView = () => {
     return (
       <div>
-        <Paper sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4, flexDirection: { xs: "column", md: "row" },  gap: 2, }}>
+        <Paper sx={{ display: "flex",  mb: 4, flexDirection: { xs: "column", md: "row" },  gap: 4, }}>
           {products.map((product) => (
-            <Card  style={{height: "600px", width: "200px", display: "flex", flexDirection: "column", alignItems: "center", margin: "10px",}}
+            <Card  style={{height: "500px", width: "200px", display: "flex", flexDirection: "column", alignItems: "center", margin: "10px",}}
               key={product.id}>
                 <CardMedia  sx={{ height: 200, width: "100%" }} image={product.image || camera} />
                 <CardContent onClick={() => openModal(product)}>
                   {/* <Link to="/product/:id"> */} 
-                  <p>{product.description}</p>
+                  <p><strong>{product.description}</strong></p>
                   <p>{product.category}</p>
                   <p>{product.size}</p>
                   <p>{product.color}</p>
@@ -200,22 +200,24 @@ const UserProducts = () => {
 
     return (
     <div>
-      <Box>
-        {/* grid and list views */}
-        <Box sx={{ display: "flex", marginRight:"50px", justifyContent: "flex-end", marginTop: "10px" }}>
-          <AppsIcon sx={{ fontSize: 40, color: "primary.main" }} onClick={toggleDisplayMode} />
-          <TableRowsIcon sx={{ fontSize: 40, color: "primary.main" }} onClick={toggleDisplayMode} />
-        </Box>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "50px", marginTop: "50px", gap: "20px", paddingX: "20px" }}>
+      {/* grid and list views */}
+      <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
+        <TextField label="search item" sx={{ width: "50%" }}></TextField>
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "20px", marginRight: "20px" }}>
+        <AppsIcon sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }} onClick={toggleDisplayMode} />
+        <TableRowsIcon sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }} onClick={toggleDisplayMode} />
+      </Box>
       </Box>
 
       {modeDisplay === "table" ? handleListView() : handleGridView()}
 
       {isModalOpen && (
-        <div 
-        // style={{position:'absolute',top:'50%', left:'50%', transform: 'translate(-50%, -50%)', width: 900, background:'#fff', border: '2px solid #000',}}
+      <div 
         onClick={closeModal}>
-          <UserSingleProduct product={selectedProduct} onClose={closeModal} />
-        </div>
+        <UserSingleProduct product={selectedProduct} onClose={closeModal} />
+      </div>
       )}
     </div>
 

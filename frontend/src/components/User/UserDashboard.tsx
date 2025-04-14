@@ -1,13 +1,13 @@
 import {
     Box,
-    Button,
+    //Button,
     Divider,
     List,
     ListItem,
     ListItemButton,
     ListItemIcon,
     ListItemText,
-    TextField,
+    //TextField,
     // Typography,
     Collapse,
     Typography,
@@ -21,8 +21,9 @@ import {
   import DraftsIcon from "@mui/icons-material/Drafts";
   import ExpandLess from "@mui/icons-material/ExpandLess";
   import ExpandMore from "@mui/icons-material/ExpandMore";
-import { Link } from "react-router-dom";
+//import { Link } from "react-router-dom";
 
+// Admin side
 // import AdminUsersList from "./AdminUsersList";
 // import AdminBookings from "./UserBookings";
 // import AdminProducts from "./UserProducts";
@@ -36,11 +37,13 @@ import UserSettings from "./UserSettings";
 
   const UserDashboard = () => {
     const [sideLink, setsideLink] = useState<string | null>(null);
+
     // const [grid, setGrid] = useState<boolean>(false);
     // const [list, setList] = useState<boolean>(false);
+
     const [productsOpen, setProductsOpen] = useState(false);
     const [bookingsOpen, setBookingsOpen] = useState(false);
-    const[component, setComponent] = useState<JSX.Element | null>(null);
+    const [component, setComponent] = useState<JSX.Element | null>(<UserProducts />);
   
    
 
@@ -77,9 +80,9 @@ import UserSettings from "./UserSettings";
     };
 
     // handle add new item
-    const handleAddNew = () => {
-      console.log("add new item");
-    };
+    // const handleAddNew = () => {
+    //   console.log("add new item");
+    // };
   
     return (
       <div>
@@ -175,8 +178,8 @@ import UserSettings from "./UserSettings";
             <Box sx={{ margin: "10px" }}>
                 
               <Box sx={{ display: "flex", marginBottom: "20px", justifyContent: "center", marginTop: "50px", gap: "50px" }}>
-                <TextField label="search item" sx={{ width: "60%" }}></TextField>
-                <Button onClick={handleAddNew} component={Link} to="/adminNewProduct">ADD NEW ITEM</Button>
+                {/* <TextField label="search item" sx={{ width: "60%" }}></TextField> */}
+                {/* <Button onClick={handleAddNew} component={Link} to="/adminNewProduct">ADD NEW ITEM</Button> */}
 
 
                 {/* grid and list views */}

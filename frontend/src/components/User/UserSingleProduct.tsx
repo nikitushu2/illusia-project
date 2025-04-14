@@ -20,18 +20,17 @@ const UserSingleProduct: React.FC<UserSingleProductProps> = ({ product, onClose 
  
   return (
     <div >
-        <p>Show single product details here</p>
 
         <Card 
           onClick={onClose} 
           // style={{height: "600px", width: "200px", display: "flex", flexDirection: "column", alignItems: "center", margin: "10px",}}>
            style={{position:'absolute',top:'50%', left:'50%', transform: 'translate(-50%, -50%)', width: 900, background:'#fff', border: '2px solid #000',}}
           >
+
         <Box>
             <CardMedia  component="img" height="140" image="../images/box.svg" alt="Image" sx={{width:"20px", objectFit: "contain" }}/>
         </Box>
        
-
         <Box sx={{ padding: 2, textAlign: "center" }}>
             <Typography variant="h4">Product Name</Typography>
             <Typography variant="body1">Product Description</Typography>
