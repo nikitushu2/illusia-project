@@ -1,10 +1,34 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Google as GoogleIcon } from "@mui/icons-material";
 import { useAuth } from "../../context/AuthContext";
 
+import { useEffect } from "react";
+
 export const Login = () => {
-  const { login } = useAuth();
+  const { login , isLoggedIn, userRole} = useAuth();
+
+  const navigate = useNavigate();
+
+  //depending on the user role, navigate to the appropriate dashboard
+  useEffect(() => {
+    if(isLoggedIn){
+      if(userRole === 'admin'){navigate('/adminDashboard')}
+      else if (userRole === 'user'){navigate('/userDashboard')}
+      else if (userRole === 'superAdmin'){navigate('/superAdminDashboard')}
+      else {navigate('/')}
+    }
+  }, [isLoggedIn, navigate, userRole]);
+
+  const googleLogin = async () => {
+    try {
+      await login(); 
+      navigate('/adminDashboard'); 
+    } 
+    catch (error) {
+      console.error("Google login failed:", error);
+    }
+  };
 
   return (
     <Box sx={{ margin: "auto", textAlign: "center", maxWidth: 600, px: 2 }}>
@@ -74,7 +98,8 @@ export const Login = () => {
 
       <Box>
         <Button
-          onClick={login}
+          //onClick={login}
+          onClick={googleLogin}
           variant="outlined"
           sx={{
             textTransform: "none",
