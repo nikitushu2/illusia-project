@@ -5,7 +5,9 @@ import { Header } from "./components/Header";
 import SignUp from "./components/SignUp";
 import { Login } from "./components/login/Login";
 import { Box } from "@mui/system";
-import SideBar from "./components/SideBar";
+//import SideBar from "./components/SideBar";
+import Events from "./components/Events";
+import Shop from "./components/Shop";
 
 
 
@@ -23,9 +25,11 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/shop" element={<Shop />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/sideBar" element={<SideBar />} />
+        {/* <Route path="/sideBar" element={<SideBar />} /> */}
       </Routes>
       <Footer />
     </BrowserRouter>

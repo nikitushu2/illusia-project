@@ -58,11 +58,14 @@ export const Header = () => {
                 mr: 1,
               }}
             >
-              <img
-                src={logo}
-                alt="illusia-logo"
-                style={{ height: "120px", width: "auto", objectFit: "contain" }}
-              />
+              <Link to="/">
+                <img
+                  src={logo}
+                  alt="illusia-logo"
+                  style={{ height: "120px", width: "auto", objectFit: "contain" }}
+                />
+              </Link>
+              
             </Box>
 
             <Box
@@ -81,14 +84,17 @@ export const Header = () => {
            
              
 
-               <Button color="inherit" variant="text" >
-                <Typography variant="body1">HOME</Typography>
+               <Button color="inherit" variant="text" to="/" component={Link}>
+                <Typography variant="body1" >HOME</Typography>
               </Button>
-              <Button color="inherit" variant="text">
+              <Button color="inherit" variant="text" to="/events" component={Link}>
                 <Typography variant="body1">EVENTS</Typography>
               </Button>
               <Button color="inherit" variant="text">
                 <Typography variant="body1">INFO</Typography>
+              </Button>
+              <Button color="inherit" variant="text" to="/shop" component={Link}>
+                <Typography variant="body1">SHOP</Typography>
               </Button>
             </Box>
 
