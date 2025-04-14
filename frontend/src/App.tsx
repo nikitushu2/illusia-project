@@ -5,7 +5,7 @@ import ItemManagement from "./components/Items/ItemManagement";
 import "./App.css";
 import LandingPage from "./components/LandingPage";
 import Sidebar from "./components/Sidebar";
-import { Logout } from "./components/Logout";
+import { LogoutPage } from "./components/LogoutPage";
 import { Login } from "./components/login/Login";
 import SignUp from "./components/SignUp";
 import { Header } from "./components/Header";
@@ -22,7 +22,7 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/sideBar" element={<Sidebar />} />
-              <Route path="/logout" element={<Logout />} />
+              <Route path="/logoutPage" element={<LogoutPage />} />
               <Route path="/items" element={<ItemManagement />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/login" element={<Login />} />
