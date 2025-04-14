@@ -15,7 +15,7 @@ const devConfig = {
     port: process.env.DB_PORT_DEV || "5433",
     user: process.env.DB_USER_DEV || "postgres",
     password: process.env.DB_PASSWORD_DEV || "password",
-    name: process.env.DB_NAME_DEV || "storage_app_production",
+    name: process.env.DB_NAME_DEV || "storage_app",
   },
   auth: {
     jwtPrivateKey: process.env.JWT_PRIVATE_KEY_DEV || "",

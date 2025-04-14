@@ -2,7 +2,7 @@
   "development": {
     "username": "postgres",
     "password": "password",
-    "database": "storage_app_production",
+    "database": "storage_app",
     "host": "localhost",
     "port": 5433,
     "dialect": "postgres"
