@@ -1,48 +1,42 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../util/db";
 
-interface CategoryAttributes {
+export interface CategoryAttributes {
   id?: number;
   name: string;
   description?: string;
   createdAt?: Date;
+  updatedAt?: Date;
 }
 
 class Category extends Model<CategoryAttributes> implements CategoryAttributes {
   public id!: number;
   public name!: string;
   public description!: string;
-  public createdAt!: Date;
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
 Category.init(
   {
     id: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       autoIncrement: true,
+      primaryKey: true,
     },
     name: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
     description: {
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    createdAt: {
-      type: DataTypes.DATE,
-      field: "created_at",
-      defaultValue: DataTypes.NOW,
-    },
   },
   {
     sequelize,
-    underscored: true,
-    timestamps: false,
-    modelName: "category",
     tableName: "categories",
+    underscored: true,
   }
 );
 

@@ -2,7 +2,8 @@ import { Router } from "express";
 import { Request, Response } from "express";
 import admin from "../config/firebase";
 import { findByEmail } from "../services/userService";
-import { setSessionCookie } from "../util/cookieUtils";
+
+import { setSessionCookie, clearSessionCookie } from "../util/cookieUtils";
 import { signJWT } from "../util/jwtUtils";
 
 const authRouter = Router();
@@ -19,7 +20,7 @@ authRouter.post("/login", async (req: Request, res: Response) => {
         const applicationUser = email ? await findByEmail(email) : null;
 
         if (applicationUser) {
-            
+
             if (applicationUser.isApproved) {
                 // Generate JWT
                 const jwtToken = signJWT(applicationUser);
@@ -40,6 +41,7 @@ authRouter.post("/login", async (req: Request, res: Response) => {
 });
 
 authRouter.post("/logout", (_: Request, res: Response) => {
+    // Clear the session cookie to log the user out
     clearSessionCookie(res);
     res.status(200).json({ message: 'Logged out successfully' });
 });

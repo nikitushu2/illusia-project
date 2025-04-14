@@ -1,87 +1,104 @@
-import { useEffect, useState } from "react";
-import { Container, Typography, Box } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Table, Button, Space, message } from "antd";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import itemService, { Item } from "../../services/itemService";
 
-interface Item {
-  id: number;
-  name: string;
-  description: string;
-  imageUrl: string | null;
-  price: number;
+interface ItemListProps {
+  onEdit: (item: Item) => void;
 }
 
-const ItemList = () => {
+const ItemList: React.FC<ItemListProps> = ({ onEdit }) => {
   const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchItems = async () => {
+    try {
+      setLoading(true);
+      console.log("Fetching items...");
+      const data = await itemService.getAll();
+      console.log("Fetched items:", data);
+      setItems(data);
+    } catch (error) {
+      console.error("Error fetching items:", error);
+      message.error("Failed to fetch items");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_ORIGIN}/api/items`
-        );
-
-        if (!response.ok) {
-          throw new Error(`Error fetching items: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setItems(data);
-      } catch (err) {
-        console.error("Error fetching items:", err);
-        setError("Failed to load items. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchItems();
   }, []);
 
-  if (loading) {
-    return <Typography>Loading items...</Typography>;
-  }
+  const handleDelete = async (id: number) => {
+    try {
+      await itemService.delete(id);
+      message.success("Item deleted successfully");
+      fetchItems();
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      message.error("Failed to delete item");
+    }
+  };
 
-  if (error) {
-    return <Typography color="error">{error}</Typography>;
-  }
+  const columns = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+      render: (price: number | string) => {
+        const numericPrice =
+          typeof price === "string" ? parseFloat(price) : price;
+        return `$${isNaN(numericPrice) ? "0.00" : numericPrice.toFixed(2)}`;
+      },
+    },
+    {
+      title: "Quantity",
+      dataIndex: "quantity",
+      key: "quantity",
+      render: (quantity: number | string) => {
+        console.log("Quantity value:", quantity, "Type:", typeof quantity);
+        const numericQuantity =
+          typeof quantity === "string" ? parseInt(quantity, 10) : quantity;
+        return isNaN(numericQuantity) ? "0" : numericQuantity.toString();
+      },
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_: unknown, record: Item) => (
+        <Space>
+          <Button
+            type="primary"
+            icon={<EditOutlined />}
+            onClick={() => onEdit(record)}
+          >
+            Edit
+          </Button>
+          <Button
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record.id)}
+          >
+            Delete
+          </Button>
+        </Space>
+      ),
+    },
+  ];
 
   return (
-    <Container>
-      <Typography variant="h4" gutterBottom>
-        Our Items
-      </Typography>
-
-      {items.length === 0 ? (
-        <Typography>No items available.</Typography>
-      ) : (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-          {items.map((item) => (
-            <Box
-              key={item.id}
-              sx={{
-                width: 300,
-                padding: 2,
-                border: "1px solid #eee",
-                borderRadius: 2,
-                boxShadow: 1,
-              }}
-            >
-              <Typography variant="h5">{item.name}</Typography>
-              <Typography
-                variant="body2"
-                sx={{ mt: 1, color: "text.secondary" }}
-              >
-                {item.description}
-              </Typography>
-              <Typography variant="h6" sx={{ mt: 2, color: "primary.main" }}>
-                ${parseFloat(item.price.toString()).toFixed(2)}
-              </Typography>
-            </Box>
-          ))}
-        </div>
-      )}
-    </Container>
+    <Table dataSource={items} columns={columns} rowKey="id" loading={loading} />
   );
 };
 

@@ -2,7 +2,7 @@
 
 import express from "express";
 import { ErrorRequestHandler } from "express";
-import { config, PORT } from "./config/config";
+import { PORT } from "./config/config";
 import { connectToDatabase } from "./util/db";
 import { itemsRouter } from "./controllers/items";
 import { authRouter } from "./controllers/auth";
@@ -18,9 +18,9 @@ const app = express();
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? 'https://illusia-project-2947763ee03d.herokuapp.com' 
-    : 'http://localhost:5173',
-    methods: "GET,POST,PUT,DELETE",
-    credentials: true,
+    : ['http://localhost:5173', 'http://localhost:5174'],
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true,
 }));
 
 app.use(express.json());

@@ -9,7 +9,7 @@ module.exports = {
                 description: 'Sotilaskypärä musta, large',
                 image_url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc',
                 price: 99.99,
-                category_id: 15, // Helmets category
+                category_id: 1, // Helmets category
                 created_at: new Date()
             },
             {
@@ -17,7 +17,7 @@ module.exports = {
                 description: 'Taisteluliivi musta (uusi malli), EL-nauhoilla.',
                 image_url: 'https://images.unsplash.com/photo-1538688423619-a81d3f23454b',
                 price: 149.99,
-                category_id: 16, // Combat Vests category
+                category_id: 2, // Combat Vests category
                 created_at: new Date()
             },
             {
@@ -25,7 +25,7 @@ module.exports = {
                 description: 'Medbay supplies / wooden crate,Bedding, curtains, meds, instruments, manuals papers',
                 image_url: 'https://images.unsplash.com/photo-1503602642458-232111445657',
                 price: 199.99,
-                category_id: 17, // Medical Supplies category
+                category_id: 3, // Medical Supplies category
                 created_at: new Date()
             },
             {
@@ -33,7 +33,7 @@ module.exports = {
                 description: 'Suojalasit/-maski  EL-nauhaa (2x3m, 3x2m), Molle-kiinnitteinen kännykkäpidike',
                 image_url: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575',
                 price: 59.99,
-                category_id: 18, // Goggles/Masks category
+                category_id: 4, // Goggles/Masks category
                 created_at: new Date()
             },
 

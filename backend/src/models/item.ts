@@ -1,14 +1,16 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../util/db";
 
-interface ItemAttributes {
+export interface ItemAttributes {
   id?: number;
   name: string;
   description: string;
-  imageUrl: string;
+  imageUrl?: string;
   price: number;
-  categoryId?: number;
+  quantity: number;
+  categoryId: number;
   createdAt?: Date;
+  updatedAt?: Date;
 }
 
 class Item extends Model<ItemAttributes> implements ItemAttributes {
@@ -17,19 +19,21 @@ class Item extends Model<ItemAttributes> implements ItemAttributes {
   public description!: string;
   public imageUrl!: string;
   public price!: number;
+  public quantity!: number;
   public categoryId!: number;
-  public createdAt!: Date;
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
 Item.init(
   {
     id: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       autoIncrement: true,
+      primaryKey: true,
     },
     name: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING,
       allowNull: false,
     },
     description: {
@@ -37,7 +41,7 @@ Item.init(
       allowNull: false,
     },
     imageUrl: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING,
       allowNull: true,
       field: "image_url",
     },
@@ -45,27 +49,21 @@ Item.init(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
     categoryId: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       field: "category_id",
-      references: {
-        model: "categories",
-        key: "id"
-      }
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      field: "created_at",
-      defaultValue: DataTypes.NOW,
     },
   },
   {
     sequelize,
-    underscored: true,
-    timestamps: false,
-    modelName: "item",
     tableName: "items",
+    underscored: true,
   }
 );
 
