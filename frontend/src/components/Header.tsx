@@ -15,37 +15,37 @@ import logo from "../images/logo-transparent.png";
 
 import { Link } from "react-router-dom";
 import { ThemeContext } from "../themes/themeContext";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-
-
-
 
 // import DarkModeIcon from "@mui/icons-material/DarkMode";
 // import LightModeIcon from "@mui/icons-material/LightMode";
 
-
 export const Header = () => {
   // concerning light and dark mode
   const themeContext = useContext(ThemeContext);
-  const { logout, isLoggedIn } = useAuth();
+  const { logout, isLoggedIn, signUp, signUpUser } = useAuth();
 
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    navigate("/logout");
+    navigate("/logoutPage");
   };
+
+  useEffect(() => {
+    if (signUpUser) {
+        navigate('/signup')
+    }
+  }, [signUpUser]);
 
   if (!themeContext) {
     throw new Error(
       "ThemeContext is undefined. Make sure you are using ThemeProvider."
     );
   }
-
   // const { mode, toggleMode } = themeContext;
-
   return (
     <>
       <AppBar position="static">
@@ -93,15 +93,6 @@ export const Header = () => {
             </Box>
 
             <Box sx={{ display: "flex", alignItems: "center", gap: "30px" }}>
-              <Button
-                to="/signup"
-                component={Link}
-                color="inherit"
-                variant="contained"
-                sx={{ fontSize: "1rem", fontWeight: "bold" }}
-              >
-                Sign Up
-              </Button>
               {isLoggedIn 
               ? <Button
                   onClick={handleLogout}
@@ -111,24 +102,33 @@ export const Header = () => {
                 >
                   Logout
               </Button>
-             : <Button
-                  to="/login"
-                  component={Link}
-                  color="inherit"
-                  variant="contained"
-                  sx={{ fontSize: "1rem", fontWeight: "bold" }}
-                >
-                  Log In
-              </Button>
-            
+             : (<>
+                  <Button
+                    onClick={signUp}
+                    color="inherit"
+                    variant="contained"
+                    sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                  >
+                    Sign Up
+                  </Button>
+                  <Button
+                      to="/login"
+                      component={Link}
+                      color="inherit"
+                      variant="contained"
+                      sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                    >
+                      Log In
+                  </Button>
+                </>
+                  )
               }
-             
             </Box>
-
             {/* toggleMode for light and dark mode */}
             {/* <IconButton onClick={toggleMode} color="inherit"> */}
             {/* {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />} */}
             {/* </IconButton>*/}
+
           </Toolbar>
         </Container>
       </AppBar>
