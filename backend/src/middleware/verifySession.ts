@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyAndParseJWT } from '../util/jwtUtils';
+import { signJWT, verifyAndParseJWT } from '../util/jwtUtils';
 import { findByEmail } from '../services/userService';
 import { ApplicationUser, UserRole } from '../types/applicationUser';
 import jwt from 'jsonwebtoken';
-import { SESSION_COOKIE_NAME } from '../util/cookieUtils';
-
+import { SESSION_COOKIE_NAME, setSessionCookie } from '../util/cookieUtils';
 export interface RequestWithSession extends Request {
     applicationUser?: ApplicationUser; 
 }
@@ -18,13 +17,19 @@ export const verifySession = async (req: RequestWithSession, res: Response, next
             return;
         }
 
-        const sessionUser = verifyAndParseJWT(token);
-        if (sessionUser) {
+        const verifiedJwt = verifyAndParseJWT(token);
+        if (verifiedJwt) {
+            const sessionUser = verifiedJwt.user;
             // verify the user details from db to get instant approval status
             const applicationUser = await findByEmail(sessionUser.email);
             if (!applicationUser || !applicationUser.isApproved) {
                 res.status(401).json({ message: 'Unauthorized User' });
                 return;
+            }
+
+            if(verifiedJwt.isAboutToExpire) {
+                const newToken = signJWT(applicationUser);
+                setSessionCookie(res, newToken);
             }
             // Attach the applicationUser to the request object
             req.applicationUser = applicationUser;
@@ -47,7 +52,7 @@ export const verifySession = async (req: RequestWithSession, res: Response, next
 export const verifySuperAdminSession = (req: RequestWithSession, res: Response, next: NextFunction): void => {
     const applicationUser = req.applicationUser;
     // Allow only super admins
-    if (!applicationUser || applicationUser.role === UserRole.ADMIN || applicationUser.role === UserRole.USER) {
+    if (!applicationUser || applicationUser.role !== UserRole.SUPER_ADMIN) {
         res.status(401).json({ message: 'Only Authorized for super admins' });
         return;
     }
