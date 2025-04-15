@@ -11,8 +11,8 @@ const devConfig = {
   backendOrigin: process.env.BACKEND_ORIGIN_DEV || "http://localhost:3000",
   frontendOrigin: process.env.FRONTEND_ORIGIN_DEV || "http://localhost:5173",
   database: {
-    host: process.env.DB_HOST_DEV || "postgres",
-    port: process.env.DB_PORT_DEV || "5432",
+    host: process.env.DB_HOST_DEV || "localhost",
+    port: process.env.DB_PORT_DEV || "5433",
     user: process.env.DB_USER_DEV || "postgres",
     password: process.env.DB_PASSWORD_DEV || "password",
     name: process.env.DB_NAME_DEV || "storage_app",
@@ -38,7 +38,7 @@ const prodConfig = {
     password: process.env.DB_PASSWORD || "password",
     name: process.env.DB_NAME || "storage_app_production",
   },
-  auth:{
+  auth: {
     jwtPrivateKey: process.env.JWT_PRIVATE_KEY || "",
     jwtPublicKey: process.env.JWT_PUBLIC_KEY || "",
   },
@@ -51,7 +51,7 @@ const prodConfig = {
 
 export const config = isProd ? prodConfig : devConfig;
 
-export const DATABASE_URL = process.env.NODE_ENV === 'production' 
+export const DATABASE_URL = process.env.NODE_ENV === 'production'
   ? process.env.HEROKU_POSTGRESQL_IVORY_URL
   : `postgres://${config.database.user}:${config.database.password}@${config.database.host}:${config.database.port}/${config.database.name}`;
 

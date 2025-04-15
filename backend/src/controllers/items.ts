@@ -1,41 +1,77 @@
 import { Request, Response, NextFunction } from "express";
 import { Router } from "express";
-import { Item } from "../models/index";
-import { InferCreationAttributes } from "sequelize";
+import { Item } from "../models";
 import * as itemService from "../services/itemService";
 
 interface ItemRequest extends Request {
     item: Item | null;
   }
 
-type ItemCreationAttributes = InferCreationAttributes<Item>;
+type ItemCreationAttributes = {
+  name: string;
+  description: string;
+  imageUrl?: string;
+  price: number;
+  quantity: number;
+  categoryId: number;
+};
 
 interface ItemUpdateRequest {
     name?: string;
     description?: string;
+    imageUrl?: string;
+    price?: number;
     quantity?: number;
-    categoryId?: number;
-    location?: string;
   }
 
 const itemsRouter = Router();
 
 const itemFinder = async (req: ItemRequest, _res: Response, next: NextFunction) => {
-  req.item = await itemService.findById(req.params.id);
+  const id = parseInt(req.params.id, 10);
+  req.item = await itemService.findById(id);
   next();
 };
 
-itemsRouter.post("/", async (_req: Request, res: Response) => {
+itemsRouter.get("/", async (_req: Request, res: Response) => {
   const items = await itemService.findAll();
-  console.log(JSON.stringify(items));
   res.json(items);
+});
+
+// Get items by category
+itemsRouter.get("/category/:categoryId", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const categoryId = parseInt(req.params.categoryId, 10);
+    const items = await itemService.findByCategory(categoryId);
+    res.json(items);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Search items by name or description
+itemsRouter.get("/search", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const query = req.query.q as string;
+    if (!query) {
+      res.status(400).json({ error: "Search query is required" });
+      return;
+    }
+    
+    const items = await itemService.search(query);
+    res.json(items);
+  } catch (error) {
+    next(error);
+  }
 });
 
 itemsRouter.post("/", async (req: Request<{}, {}, ItemCreationAttributes>, res: Response, next: NextFunction) => {
   try {
+    console.log('Creating item with data:', req.body);
     const item = await itemService.create(req.body);
-    res.json(item);
+    console.log('Item created successfully:', item);
+    res.status(201).json(item);
   } catch (error) {
+    console.error('Error creating item:', error);
     next(error);
   }
 });
@@ -49,7 +85,6 @@ itemsRouter.get('/:id', (req: Request, res: Response, next: NextFunction) => ite
 });
 
 itemsRouter.put('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req: Request<{id: string}, {}, ItemUpdateRequest>, res: Response, next: NextFunction): Promise<void> => {
-
     try {
         const typedReq = req as unknown as ItemRequest;
         const item = typedReq.item;
@@ -59,52 +94,48 @@ itemsRouter.put('/:id', (req: Request, res: Response, next: NextFunction) => ite
             return;
         }
         
-        const typedItem = item as unknown as {
-            name?: string;
-            description?: string;
-            quantity?: number;
-            categoryId?: number;
-            location?: string;
-            save(): Promise<Item>;
-        };
-        
-        if (req.body.name !== undefined) {
-            typedItem.name = String(req.body.name);
-        }
-        
-        if (req.body.description !== undefined) {
-            typedItem.description = String(req.body.description);
-        }
-        
-        if (req.body.quantity !== undefined) {
-            typedItem.quantity = Number(req.body.quantity);
-        }
-        
-        if (req.body.categoryId !== undefined) {
-            typedItem.categoryId = Number(req.body.categoryId);
-        }
-        
-        if (req.body.location !== undefined) {
-            typedItem.location = String(req.body.location);
-        }
-
-        const updatedItem = await itemService.update(item, req.body);
+        const id = parseInt(req.params.id, 10);
+        const updatedItem = await itemService.update(id, req.body);
         res.json(updatedItem);
     } catch (error) {
         next(error);
     }
-
 });
 
-itemsRouter.delete('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req, res) => {
-    const typedReq = req as unknown as ItemRequest;
-    const item = typedReq.item;
+// New endpoint to update just the quantity
+itemsRouter.patch('/:id/quantity', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req: Request<{id: string}, {}, {quantity: number}>, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const typedReq = req as unknown as ItemRequest;
+        const item = typedReq.item;
+        
+        if (!item) {
+            res.status(404).end();
+            return;
+        }
+        
+        const id = parseInt(req.params.id, 10);
+        const updatedItem = await itemService.update(id, { quantity: req.body.quantity });
+        res.json(updatedItem);
+    } catch (error) {
+        next(error);
+    }
+});
 
-    if (item) {
-        await itemService.remove(item);
+itemsRouter.delete('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const typedReq = req as unknown as ItemRequest;
+        const item = typedReq.item;
+        
+        if (!item) {
+            res.status(404).end();
+            return;
+        }
+        
+        const id = parseInt(req.params.id, 10);
+        await itemService.remove(id);
         res.status(204).end();
-    } else {
-        res.status(404).json({ error: "Item not found" });
+    } catch (error) {
+        next(error);
     }
 });
 

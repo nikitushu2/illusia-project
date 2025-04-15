@@ -1,38 +1,40 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Footer from "./components/Footer";
+import React from "react";
+import { Layout } from "antd";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import ItemManagement from "./components/Items/ItemManagement";
+import "./App.css";
 import LandingPage from "./components/LandingPage";
-import { Header } from "./components/Header";
-import SignUp from "./components/SignUp";
+import Sidebar from "./components/Sidebar";
+import { Logout } from "./components/Logout";
 import { Login } from "./components/login/Login";
-import { Box } from "@mui/system";
-import SideBar from "../src/components/Sidebar";
-import { Logout } from "../src/components/Logout";
+import SignUp from "./components/SignUp";
+import { Header } from "./components/Header";
 
-function App() {
+const { Content, Footer } = Layout;
+
+const App: React.FC = () => {
   return (
-    <Box
-    sx={{
-      display: "flex",
-      flexDirection: "column",
-      minHeight: "100vh", // Full viewport height
-    }}
-  >
-    <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/sideBar" element={<SideBar />} />
-        <Route path="/logout" element={<Logout />} />
-      </Routes>
-      <Footer />
-    </BrowserRouter>
-  </Box>
- 
- 
-  
+    <Router>
+      <Layout className="layout" style={{ minHeight: "100vh" }}>
+        <Header />
+        <Content style={{ padding: "0 50px" }}>
+          <div className="site-layout-content" style={{ margin: "16px 0" }}>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/sideBar" element={<Sidebar />} />
+              <Route path="/logout" element={<Logout />} />
+              <Route path="/items" element={<ItemManagement />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/login" element={<Login />} />
+            </Routes>
+          </div>
+        </Content>
+        <Footer style={{ textAlign: "center" }}>
+          Illusia ©{new Date().getFullYear()} Created with ❤️
+        </Footer>
+      </Layout>
+    </Router>
   );
-}
+};
 
 export default App;

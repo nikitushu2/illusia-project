@@ -10,11 +10,9 @@ if (!DATABASE_URL) {
 const sequelize = new Sequelize(DATABASE_URL, {
   dialect: 'postgres',
   dialectOptions: {
-    ssl: {
-      require: process.env.NODE_ENV === 'production',
-      rejectUnauthorized: false
-    }
-  }
+    ssl: false
+  },
+  port: 5433
 });
 
 const connectToDatabase = async () => {

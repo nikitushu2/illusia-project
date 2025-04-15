@@ -2,7 +2,7 @@
 
 import express from "express";
 import { ErrorRequestHandler } from "express";
-import { config, PORT } from "./config/config";
+import { PORT } from "./config/config";
 import { connectToDatabase } from "./util/db";
 import { itemsRouter } from "./controllers/items";
 import { authRouter } from "./controllers/auth";
@@ -10,6 +10,7 @@ import { errorHandler, AppError } from "./middleware/errorHandler";
 import cors from 'cors';
 import { verifySession, verifyAdminSession, verifySuperAdminSession } from "./middleware/verifySession";
 import cookieParser from "cookie-parser";
+import { categoriesRouter } from "./controllers/categories";
 
 
 const app = express();
@@ -17,9 +18,9 @@ const app = express();
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? 'https://illusia-project-2947763ee03d.herokuapp.com' 
-    : 'http://localhost:5173',
-    methods: "GET,POST,PUT,DELETE",
-    credentials: true,
+    : ['http://localhost:5173', 'http://localhost:5174'],
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true,
 }));
 
 app.use(express.json());
@@ -33,6 +34,9 @@ apiRouter.use(express.json());
 // all auth endpoint starts with /api/auth
 apiRouter.use('/auth', authRouter);
 
+// Public items route - no authentication required
+apiRouter.use('/items', itemsRouter);
+apiRouter.use('/categories', categoriesRouter);
 
 // all the private endpoint starts with /api/private
 // private endpoints are only for logged in users
@@ -59,10 +63,7 @@ adminApiRouter.use(verifyAdminSession);
 privateApiRouter.use('/admin', adminApiRouter);
 
 // all common endpoints for logged in user should use privateApiRouter
-// like /api/private/items
-privateApiRouter.use('/items', itemsRouter);
-
-
+// privateApiRouter.use('/items', itemsRouter);
 
 apiRouter.use('/private', privateApiRouter);
 
