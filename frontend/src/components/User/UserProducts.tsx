@@ -13,11 +13,16 @@ import {
   CardContent,
   CardActions,
   TextField,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
 //import { useState } from "react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 //import { Link } from "react-router-dom";
 //import Helmet from "../../images/helmet.jpeg";
@@ -26,7 +31,13 @@ import UserSingleProduct from "./UserSingleProduct";
 import itemService from "../../services/itemService";
 import { Item } from "../../services/itemService";
 
-const UserProducts = () => {
+
+interface ItemListProps {
+  onEdit: (item: Item) => void;
+  categories?: { id: number; name: string }[];
+}
+
+const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const [modeDisplay, setModeDisplay] = React.useState("table"); // for table and grid view
 
   //modal view for single product
@@ -38,7 +49,12 @@ const UserProducts = () => {
   // fetching items from the backend
   const [items, setItems] = React.useState<Item[]>([]);
   const [loading, setLoading] = React.useState(false);
-  //const [products, setProducts] = React.useState([]); // for table and grid view
+  //const [products, setProducts] = React.useState([]); // for table and grid view'
+
+   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
+  //  const [page, setPage] = useState(0);
+  //  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const navigate = useNavigate();
 
@@ -129,6 +145,25 @@ const UserProducts = () => {
   useEffect(() => {
     fetchItems();
   }, []);
+
+  useEffect(() => {
+    if (categoryFilter === "all") {
+      setFilteredItems(items);
+    } else {
+      setFilteredItems(
+        items.filter((item) => item.categoryId === parseInt(categoryFilter))
+      );
+    }
+    // Reset to first page when filter changes
+    // setPage(0);
+  }, [categoryFilter, items]);
+
+  // Log when categories change to help debugging
+  useEffect(() => {
+    console.log("Categories in ItemList:", categories);
+  }, [categories]);
+
+
 
   //in case you want to move to a new page
  /*  const handleSingleProduct = () => {
@@ -274,19 +309,32 @@ const UserProducts = () => {
     );
   };
 
+  const handleCategoryFilterChange = (event: SelectChangeEvent) => {
+      setCategoryFilter(event.target.value);
+    };
+
+  // Pagination calculations
+  /* const paginatedItems = filteredItems.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+ */
+
+  
   return (
     <div>
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          // justifyContent: "space-between",
+          // alignItems: "center",
           marginBottom: "50px",
           marginTop: "50px",
           gap: "20px",
           paddingX: "20px",
         }}
       >
+        
      {/*    grid and list views  */}
         <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
           <TextField label="search item" sx={{ width: "50%" }}></TextField>
@@ -309,6 +357,32 @@ const UserProducts = () => {
           />
         </Box>
       </Box>
+
+
+      <Box>
+        <FormControl sx={{ width: 200 }}>
+          <InputLabel id="category-filter-label">Filter by Category</InputLabel>
+          <Select
+            labelId="category-filter-label"
+            value={categoryFilter}
+            label="Filter by Category"
+            onChange={handleCategoryFilterChange}
+          >
+            <MenuItem value="all">All Categories</MenuItem>
+            {categories && categories.length > 0 ? (
+              categories.map((category) => (
+                <MenuItem key={category.id} value={category.id.toString()}>
+                  {category.name}
+                </MenuItem>
+              ))
+            ) : (
+              <MenuItem disabled value="">
+                No categories available
+              </MenuItem>
+            )}
+          </Select>
+        </FormControl>
+        </Box>
 
       {modeDisplay === "table" ? handleListView() : handleGridView()}
 

@@ -94,6 +94,7 @@ import UserSettings from "./UserSettings";
                   <Typography variant="h5"  alignContent='center' justifyContent='center' sx={{ marginLeft: "50px", fontWeight: "bold" }}>
                     User Dashboard
                   </Typography>
+            
                 <Box sx={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "100px" }}>
                     <List>
                     <ListItem disablePadding>
@@ -101,7 +102,7 @@ import UserSettings from "./UserSettings";
                         <ListItemIcon>
                             <LeaderboardIcon />
                         </ListItemIcon>
-                        <ListItemText primary="Products" onClick={() => handleSideBar(<UserProducts/>)}/>
+                        <ListItemText primary="Products" onClick={() => handleSideBar(<UserProducts onEdit={(item) => console.log('Edit item:', item)} />)}/>
                         {/* <ListItemText primary="Products" onClick={() => handleSideBar("Display products")}/> */}
                         {/* {productsOpen ? <ExpandLess /> : <ExpandMore />} */} 
                         </ListItemButton>
