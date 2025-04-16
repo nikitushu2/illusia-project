@@ -10,6 +10,7 @@ import {
     TextField,
     // Typography,
     Collapse,
+    Typography,
   } from "@mui/material";
   // import AppsIcon from "@mui/icons-material/Apps";
   // import TableRowsIcon from "@mui/icons-material/TableRows";
@@ -33,7 +34,7 @@ import AdminProducts from "./AdminProducts";
     // const [list, setList] = useState<boolean>(false);
     const [productsOpen, setProductsOpen] = useState(false);
     const [bookingsOpen, setBookingsOpen] = useState(false);
-    const[component, setComponent] = useState<JSX.Element | null>(null);
+    const[component, setComponent] = useState<JSX.Element | null>(<AdminProducts />);
   
    
 
@@ -81,6 +82,10 @@ import AdminProducts from "./AdminProducts";
             <Box sx={{ display: "grid", gridTemplateColumns: "20% 80%", gap: "30px", margin: "10px" }}>
             {/* <h2>sidebar component</h2> */}
                 <Box sx={{ marginTop: "60px"}}>
+                <Typography variant="h5"  alignContent='center' justifyContent='center' sx={{ marginLeft: "50px", fontWeight: "bold" }}>
+                    Admin Dashboard
+                  </Typography>
+
                 <Box sx={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "100px" }}>
                     <List>
                     <ListItem disablePadding>

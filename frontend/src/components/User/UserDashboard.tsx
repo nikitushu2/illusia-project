@@ -23,12 +23,6 @@ import {
   import ExpandMore from "@mui/icons-material/ExpandMore";
 //import { Link } from "react-router-dom";
 
-// Admin side
-// import AdminUsersList from "./AdminUsersList";
-// import AdminBookings from "./UserBookings";
-// import AdminProducts from "./UserProducts";
-
-
 import UserProducts from "./UserProducts";
 import UserBookings from "./UserBookings";
 import UserSettings from "./UserSettings";

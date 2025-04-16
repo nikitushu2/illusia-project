@@ -2,12 +2,18 @@ import { Paper, Table, TableContainer, TableHead, TableRow,TableCell, TableBody,
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
 //import { useState } from "react";
-import React from "react";
+import React, { useEffect } from "react";
 // import box from "../images/box.png";
+
+import itemService from "../../services/itemService";
+import { Item } from "../../services/itemService";
 
 const AdminProducts = () => {
 
   const [modeDisplay, setModeDisplay] = React.useState("table");
+
+  const [items, setItems] = React.useState<Item[]>([]);
+  const [loading, setLoading] = React.useState(false);
 
   const toggleDisplayMode = () => {
     setModeDisplay(prevMode => (prevMode === "table" ? "grid" : "table"));
@@ -17,6 +23,7 @@ const AdminProducts = () => {
   // const [grid, setGrid] = useState<boolean>(false);
   // const [list, setList] = useState<boolean>(false);
 
+/* 
   const products = [
     {
       "id": 2,
@@ -63,6 +70,7 @@ const AdminProducts = () => {
       "storageLocation": "shelf entrance side"
     }
   ]
+   */
 
   const handleListView = () => {
     return (
@@ -83,16 +91,16 @@ const AdminProducts = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {products.map((product) => (
-            <TableRow key={product.id}>
-              <TableCell>{product.id}</TableCell>
-              <TableCell>{product.description}</TableCell>
-              <TableCell>{product.category}</TableCell>
-              <TableCell>{product.size}</TableCell> 
-              <TableCell>{product.color}</TableCell> 
-              <TableCell>{product.totalStorage}</TableCell> 
-              <TableCell>{product.storageDetails}</TableCell> 
-              <TableCell>{product.storageLocation}</TableCell> 
+          {items.map((item) => (
+            <TableRow key={item.id}>
+              <TableCell>{item.id}</TableCell>
+              <TableCell>{item.description}</TableCell>
+              {/* <TableCell>{item.category}</TableCell> */}
+              {/* <TableCell>{item.size}</TableCell>  */}
+              {/* <TableCell>{item.color}</TableCell>  */}
+              {/* <TableCell>{item.totalStorage}</TableCell>  */}
+              {/* <TableCell>{item.storageDetails}</TableCell>  */}
+              {/* <TableCell>{item.storageLocation}</TableCell>  */}
               <Button>edit</Button>
               <Button>delete</Button>
             </TableRow>
@@ -106,23 +114,54 @@ const AdminProducts = () => {
   const handleGridView = () => {
     return (
       <div>
-        <Paper sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4, flexDirection: { xs: "column", md: "row" },  gap: 2, }}>
-          {products.map((product) => (
-            <Card  style={{height: "350px", width: "250px", display: "flex", flexDirection: "column", alignItems: "center", margin: "10px",}}
-              key={product.id}>
-                <CardMedia></CardMedia>
-                <CardContent>
-                  <h4>{product.description}</h4>
-                  <p>{product.category}</p>
-                  <p>{product.size}</p>
-                  <p>{product.color}</p>
-                  <p>{product.totalStorage}</p>
-                  <p>{product.storageDetails}</p>
-                  <p>{product.storageLocation}</p>
-                </CardContent>
-                <CardActions>
-                  <Button>edit</Button>
-                  <Button>delete</Button>
+      <Paper
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: 4,
+            padding: 2,
+          }}
+        >
+          {items.map((item) => (
+            <Card
+              key={item.id}
+              sx={{
+                height: 400,
+                width: 250,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                alignItems: "center",
+                boxShadow: 3,
+                borderRadius: 2,
+                overflow: "hidden",
+              }}
+            >
+              <CardMedia
+                sx={{ height: 200, width: "100%", objectFit: "cover" }}
+                //image={item.imageUrl || camera}
+                image={item.imageUrl }
+                title={item.description}
+              />
+              <CardContent
+                sx={{ textAlign: "center", cursor: "pointer" }}
+                //onClick={() => openModal(item)}
+              >
+                <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
+                <p style={{ margin: 0 }}>{item.description}</p>
+              </CardContent>
+              <CardActions>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={(event) => {
+                    event.stopPropagation(); // Prevent row click when clicking the button
+                    //navigate(`/product/${item.id}`);
+                  }}
+                >
+                  Book
+                </Button>
               </CardActions>
             </Card>
           ))}
@@ -130,6 +169,27 @@ const AdminProducts = () => {
       </div>
     )
   }
+
+  const fetchItems = async () => {
+    try {
+      setLoading(true);
+      console.log("Fetching items...");
+      const data = await itemService.getAll();
+      console.log("Fetched items:", data);
+      setItems(data);
+    } catch (error) {
+      console.error("Error fetching items:", error);
+      // message.error("Failed to fetch items");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+   useEffect(() => {
+      fetchItems();
+    }, []);
+  
+
 
      // grid view
     //  const handleGridView = () => {
@@ -155,6 +215,7 @@ const AdminProducts = () => {
         <AppsIcon sx={{ fontSize: 40, color: "primary.main" }} onClick={toggleDisplayMode} />
         <TableRowsIcon sx={{ fontSize: 40, color: "primary.main" }} onClick={toggleDisplayMode} />
       </Box>
+
       </Box>
 
       {modeDisplay === "table" ? handleListView() : handleGridView()}
