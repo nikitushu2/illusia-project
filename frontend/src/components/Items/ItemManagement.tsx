@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-import React, { useState } from "react";
-import { Button, Modal, Typography, Space } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-=======
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -19,7 +14,6 @@ import {
   Alert,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
->>>>>>> main
 import ItemList from "./ItemList";
 import ItemForm from "./ItemForm";
 import itemService, {
@@ -27,15 +21,6 @@ import itemService, {
   CreateItemData,
   UpdateItemData,
 } from "../../services/itemService";
-<<<<<<< HEAD
-
-const { Title } = Typography;
-
-const ItemManagement: React.FC = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<Item | undefined>(undefined);
-  const [key, setKey] = useState(0); // Used to force ItemList to refresh
-=======
 import categoryService, { Category } from "../../services/categoryService";
 import { API_URL } from "../../config";
 
@@ -137,33 +122,20 @@ const ItemManagement: React.FC = () => {
 
     fetchCategories();
   }, []);
->>>>>>> main
 
   const handleCreate = () => {
     console.log("Opening create modal");
     setSelectedItem(undefined);
-<<<<<<< HEAD
-    setIsModalVisible(true);
-=======
     setIsModalOpen(true);
->>>>>>> main
   };
 
   const handleEdit = (item: Item) => {
     setSelectedItem(item);
-<<<<<<< HEAD
-    setIsModalVisible(true);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-=======
     setIsModalOpen(true);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
->>>>>>> main
     setSelectedItem(undefined);
   };
 
@@ -179,17 +151,10 @@ const ItemManagement: React.FC = () => {
         console.log("Creating new item");
         await itemService.create(values as CreateItemData);
       }
-<<<<<<< HEAD
-      setIsModalVisible(false);
-      setSelectedItem(undefined);
-      // Force ItemList to refresh
-      setKey((prevKey) => prevKey + 1);
-=======
       setIsModalOpen(false);
       setSelectedItem(undefined);
       // Force ItemList to refresh
       setRefreshKey((prevKey) => prevKey + 1);
->>>>>>> main
     } catch (error) {
       console.error("Error submitting item:", error);
       throw error; // Re-throw to let the form handle the error
@@ -197,40 +162,6 @@ const ItemManagement: React.FC = () => {
   };
 
   return (
-<<<<<<< HEAD
-    <div style={{ padding: "24px" }}>
-      <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Title level={2}>Item Management</Title>
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-            Add New Item
-          </Button>
-        </div>
-
-        <ItemList key={key} onEdit={handleEdit} />
-
-        <Modal
-          title={selectedItem ? "Edit Item" : "Create New Item"}
-          open={isModalVisible}
-          onCancel={handleCancel}
-          footer={null}
-          width={600}
-        >
-          <ItemForm
-            initialValues={selectedItem}
-            onSubmit={handleSubmit}
-            onCancel={handleCancel}
-          />
-        </Modal>
-      </Space>
-    </div>
-=======
     <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
       <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
         <Box
@@ -303,7 +234,6 @@ const ItemManagement: React.FC = () => {
         </Dialog>
       </Paper>
     </Container>
->>>>>>> main
   );
 };
 
