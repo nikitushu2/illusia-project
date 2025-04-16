@@ -1,19 +1,25 @@
 // here database is initialized
 
-import { Sequelize } from "sequelize";
+import { Sequelize, Options } from "sequelize";
 import { DATABASE_URL } from "../config/config";
 
 if (!DATABASE_URL) {
   throw new Error("DATABASE_URL is not defined in environment variables");
 }
 
-const sequelize = new Sequelize(DATABASE_URL, {
+const sequelizeOptions: Options = {
   dialect: 'postgres',
-  dialectOptions: {
-    ssl: false
-  },
-  port: 5433
-});
+  ...(process.env.NODE_ENV === 'production' && {
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    }
+  })
+};
+
+const sequelize = new Sequelize(DATABASE_URL, sequelizeOptions);
 
 const connectToDatabase = async () => {
   try {
