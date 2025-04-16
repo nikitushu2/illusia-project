@@ -178,7 +178,7 @@ const ItemManagement: React.FC = () => {
             color="primary"
             fontWeight="bold"
           >
-            Item Management
+           Inventory
           </Typography>
           <Button
             variant="contained"

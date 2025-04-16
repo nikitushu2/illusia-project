@@ -19,6 +19,12 @@ import {
   MenuItem,
   SelectChangeEvent,
   TablePagination,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import itemService, { Item } from "../../services/itemService";
@@ -34,7 +40,9 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const [loading, setLoading] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<number | null>(null);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -85,9 +93,18 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     console.log("Categories in ItemList:", categories);
   }, [categories]);
 
-  const handleDelete = async (id: number) => {
+  // Show delete confirmation dialog
+  const confirmDelete = (id: number) => {
+    setItemToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  // Handle actual deletion when confirmed
+  const handleDelete = async () => {
+    if (itemToDelete === null) return;
+
     try {
-      await itemService.delete(id);
+      await itemService.delete(itemToDelete);
       setSnackbar({
         open: true,
         message: "Item deleted successfully",
@@ -101,7 +118,16 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
         message: "Failed to delete item",
         severity: "error",
       });
+    } finally {
+      setDeleteConfirmOpen(false);
+      setItemToDelete(null);
     }
+  };
+
+  // Close confirmation dialog without deleting
+  const handleCancelDelete = () => {
+    setDeleteConfirmOpen(false);
+    setItemToDelete(null);
   };
 
   const handleCategoryFilterChange = (event: SelectChangeEvent) => {
@@ -139,7 +165,7 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
           mb: 2,
         }}
       >
-        <Typography variant="h6">Items List</Typography>
+        {/* <Typography variant="h6">Items List</Typography> */}
         <FormControl sx={{ width: 200 }}>
           <InputLabel id="category-filter-label">Filter by Category</InputLabel>
           <Select
@@ -174,25 +200,67 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
             <Table>
               <TableHead sx={{ bgcolor: "primary.main" }}>
                 <TableRow>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "1.1rem",
+                    }}
+                  >
                     Name
                   </TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "1.1rem",
+                    }}
+                  >
                     Image
                   </TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "1.1rem",
+                    }}
+                  >
                     Description
                   </TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "1.1rem",
+                    }}
+                  >
                     Price
                   </TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "1.1rem",
+                    }}
+                  >
                     Quantity
                   </TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "1.1rem",
+                    }}
+                  >
                     Category
                   </TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                  <TableCell
+                    sx={{
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "1.1rem",
+                    }}
+                  >
                     Actions
                   </TableCell>
                 </TableRow>
@@ -205,7 +273,9 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                     );
                     return (
                       <TableRow key={item.id} hover>
-                        <TableCell>{item.name}</TableCell>
+                        <TableCell sx={{ fontSize: "1rem" }}>
+                          {item.name}
+                        </TableCell>
                         <TableCell>
                           <img
                             src={item.imageUrl}
@@ -213,29 +283,33 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                             style={{ width: 50, height: 50 }}
                           />
                         </TableCell>
-                        <TableCell>{item.description}</TableCell>
-                        <TableCell>
+                        <TableCell sx={{ fontSize: "1rem" }}>
+                          {item.description}
+                        </TableCell>
+                        <TableCell sx={{ fontSize: "1rem" }}>
                           €
                           {typeof item.price === "string"
                             ? parseFloat(item.price).toFixed(2)
                             : item.price.toFixed(2)}
                         </TableCell>
-                        <TableCell>{item.quantity}</TableCell>
-                        <TableCell>
+                        <TableCell sx={{ fontSize: "1rem" }}>
+                          {item.quantity}
+                        </TableCell>
+                        <TableCell sx={{ fontSize: "1rem" }}>
                           {category ? category.name : item.categoryId}
                         </TableCell>
                         <TableCell>
                           <IconButton
                             color="primary"
                             onClick={() => onEdit(item)}
-                            size="small"
+                            size="medium"
                           >
                             <EditIcon />
                           </IconButton>
                           <IconButton
                             color="error"
-                            onClick={() => handleDelete(item.id)}
-                            size="small"
+                            onClick={() => confirmDelete(item.id)}
+                            size="medium"
                           >
                             <DeleteIcon />
                           </IconButton>
@@ -245,8 +319,11 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} align="center">
-                      <Typography variant="body1" sx={{ py: 3 }}>
+                    <TableCell colSpan={7} align="center">
+                      <Typography
+                        variant="body1"
+                        sx={{ py: 3, fontSize: "1rem" }}
+                      >
                         No items found
                       </Typography>
                     </TableCell>
@@ -267,6 +344,25 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
           />
         </>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onClose={handleCancelDelete}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this item? This action cannot be
+            undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={snackbar.open}
