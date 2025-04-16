@@ -2,11 +2,35 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { Google as GoogleIcon } from "@mui/icons-material";
 import { useAuth } from "../../context/AuthContext";
+
+import { useEffect } from "react";
 import { useEffect } from "react";
 
 
 export const Login = () => {
-  //const { login } = useAuth();
+  //const { login , isLoggedIn, userRole} = useAuth();
+
+  const navigate = useNavigate();
+
+  //depending on the user role, navigate to the appropriate dashboard
+  useEffect(() => {
+    if(isLoggedIn){
+      if(userRole === 'admin'){navigate('/adminDashboard')}
+      else if (userRole === 'user'){navigate('/userDashboard')}
+      else if (userRole === 'superAdmin'){navigate('/superAdminDashboard')}
+      else {navigate('/')}
+    }
+  }, [isLoggedIn, navigate, userRole]);
+
+  const googleLogin = async () => {
+    try {
+      await login(); 
+      navigate('/adminDashboard'); 
+    } 
+    catch (error) {
+      console.error("Google login failed:", error);
+    }
+  };
   const { login, isLoggedIn } = useAuth();
 
   const navigate = useNavigate();
@@ -99,7 +123,7 @@ export const Login = () => {
 
       <Box>
         <Button
-          // onClick={login}
+          //onClick={login}
           onClick={googleLogin}
           variant="outlined"
           sx={{
@@ -140,7 +164,8 @@ export const Login = () => {
 
           component={Link}
           // to="/admin-login" // this shold take one to admin login page before the admin dashboard
-          to="/userDashboard"
+          // to="/userDashboard"
+          to="/adminDashboard" 
           sx={{ padding: 1, textTransform: "none" }}
         >
           Admin Login here
