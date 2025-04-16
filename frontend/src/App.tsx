@@ -4,17 +4,12 @@ import { Box, Container, CssBaseline } from "@mui/material";
 import ItemManagement from "./components/Items/ItemManagement";
 
 import LandingPage from "./components/LandingPage";
-//import Sidebar from "./components/Sidebar";
+import Sidebar from "./components/Sidebar";
 import { LogoutPage } from "./components/LogoutPage";
 import { Login } from "./components/login/Login";
 import SignUp from "./components/SignUp";
 import { Header } from "./components/Header";
 import Footer from "./components/Footer";
-
-import UserDashboard from "./components/User/UserDashboard";
-import UserBookings from "./components/User/UserBookings";
-
-
 
 const App: React.FC = () => {
   return (
@@ -27,15 +22,11 @@ const App: React.FC = () => {
         <Container component="main" sx={{ flexGrow: 1, py: 3 }}>
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            {/* <Route path="/sideBar" element={<Sidebar />} /> */}
+            <Route path="/sideBar" element={<Sidebar />} />
             <Route path="/logoutPage" element={<LogoutPage />} />
             <Route path="/items" element={<ItemManagement />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
-
-            <Route path="/userDashboard" element={<UserDashboard />} />
-            <Route path="/userBookings" element={<UserBookings />} />
-       
           </Routes>
         </Container>
         <Footer />
