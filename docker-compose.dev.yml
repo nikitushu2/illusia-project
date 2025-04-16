@@ -13,7 +13,7 @@ services:
     env_file:
       - .env
     environment:
-      - VITE_API_URL=http://localhost:5173
+      - VITE_API_URL=http://localhost:3000/api
     depends_on:
       - backend
 

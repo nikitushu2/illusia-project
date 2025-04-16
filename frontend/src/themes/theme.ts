@@ -1,5 +1,21 @@
 import { createTheme } from '@mui/material/styles';
 
+declare module '@mui/material/styles' {
+  interface PaletteOptions {
+    dark?: {
+      main: string;
+      contrastText: string;
+    };
+  }
+  
+  interface Palette {
+    dark: {
+      main: string;
+      contrastText: string;
+    };
+  }
+}
+
 export const lightTheme = createTheme({
   palette: {
     primary: {

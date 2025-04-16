@@ -19,6 +19,5 @@
     "docker:prod:build": "docker-compose build --no-cache && docker-compose up"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
   }
 }

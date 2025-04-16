@@ -42,21 +42,15 @@ export const Header = () => {
     throw new Error(
       "ThemeContext is undefined. Make sure you are using ThemeProvider."
     );
-
   }
 
-  
-
   // const { mode, toggleMode } = themeContext;
-
-  
 
   return (
     <>
       <AppBar position="static">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-
             <Box
               sx={{
                 alignItems: "center",
@@ -79,16 +73,16 @@ export const Header = () => {
                 gap: "20px",
               }}
             >
-            
-
-
-            
-
-           
-             
-
-               <Button color="inherit" variant="text" >
+              <Button color="inherit" variant="text" component={Link} to="/">
                 <Typography variant="body1">HOME</Typography>
+              </Button>
+              <Button
+                color="inherit"
+                variant="text"
+                component={Link}
+                to="/items"
+              >
+                <Typography variant="body1">ITEMS</Typography>
               </Button>
               <Button color="inherit" variant="text">
                 <Typography variant="body1">EVENTS</Typography>
@@ -97,7 +91,6 @@ export const Header = () => {
                 <Typography variant="body1">INFO</Typography>
               </Button>
             </Box>
-
 
             <Box sx={{ display: "flex", alignItems: "center", gap: "30px" }}>
               <Button
@@ -136,11 +129,6 @@ export const Header = () => {
             {/* <IconButton onClick={toggleMode} color="inherit"> */}
             {/* {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />} */}
             {/* </IconButton>*/}
-
-           
-
-           
-
           </Toolbar>
         </Container>
       </AppBar>
