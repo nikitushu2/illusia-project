@@ -2,7 +2,7 @@ import { Box, Button, Typography } from "@mui/material"
 import { useNavigate } from "react-router-dom";
 
 
-export const Logout = () => {
+export const LogoutPage = () => {
     const navigate = useNavigate();
 
     const backToLogin = () => {
