@@ -131,15 +131,15 @@ const UserProducts = () => {
   }, []);
 
   //in case you want to move to a new page
-  const handleSingleProduct = () => {
+ /*  const handleSingleProduct = () => {
     console.log("single product");
-    //navigate(<UserProducts/>); // wrong way. only strings are accecpted with navigate
-  };
+    navigate(<UserProducts/>); // wrong way. only strings are accecpted with navigate
+  }; */
 
-  const handleBooking = () => {
+  /* const handleBooking = () => {
     console.log("Booking");
-    // navigate("/product/:id");
-  };
+     navigate("/product/:id");
+  }; */
 
   //handle list view
   const handleListView = () => {
@@ -287,8 +287,7 @@ const UserProducts = () => {
           paddingX: "20px",
         }}
       >
-        grid and list views 
-        <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}></Box>
+     {/*    grid and list views  */}
         <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
           <TextField label="search item" sx={{ width: "50%" }}></TextField>
         </Box>
