@@ -80,12 +80,15 @@ import AdminProducts from "./AdminProducts";
         <Box>
           {/* whole container for dashboard  with 2 sections sidebar and main dashboard component*/}
             <Box sx={{ display: "grid", gridTemplateColumns: "20% 80%", gap: "30px", margin: "10px" }}>
+              
+              
             {/* <h2>sidebar component</h2> */}
                 <Box sx={{ marginTop: "60px"}}>
                 <Typography variant="h5"  alignContent='center' justifyContent='center' sx={{ marginLeft: "50px", fontWeight: "bold" }}>
                     Admin Dashboard
                   </Typography>
 
+                {/* sidebar */}
                 <Box sx={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "100px" }}>
                     <List>
                     <ListItem disablePadding>

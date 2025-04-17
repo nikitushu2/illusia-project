@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Box, Container, CssBaseline } from "@mui/material";
+import { Box, CssBaseline } from "@mui/material";
 import ItemManagement from "./components/Items/ItemManagement";
 
 import LandingPage from "./components/LandingPage";
@@ -9,24 +9,22 @@ import { LogoutPage } from "./components/LogoutPage";
 import { Login } from "./components/login/Login";
 import SignUp from "./components/SignUp";
 import { Header } from "./components/Header";
-//import Footer from "./components/Footer";
+import Footer from "./components/Footer";
+
+
 import UserDashboard from "./components/User/UserDashboard";
-
-
 
 import AdminNewProductForm from "./components/Admin/AdminNewProductForm";
 import AdminDashboard from "./components/Admin/AdminDashboard";
+
 
 const App: React.FC = () => {
   return (
     <Router>
       <CssBaseline />
-      <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
-      >
+      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}> 
         <Header />
-        <Container component="main" sx={{ flexGrow: 1, py: 3 }}>
-          <Routes>
+         <Routes>
             <Route path="/" element={<LandingPage />} />
             {/* <Route path="/sideBar" element={<Sidebar />} /> */}
             <Route path="/logoutPage" element={<LogoutPage />} />
@@ -34,14 +32,14 @@ const App: React.FC = () => {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
 
-            {/* <Route path="/userDashboard" element={<UserDashboard />} /> */}
+            {/* User Routes */}
+            <Route path="/userDashboard" element={<UserDashboard />} />
 
-        {/* Admin Routes */}
-        <Route path="/adminDashboard" element={<AdminDashboard/>} />
-        <Route path="/adminNewProduct" element={<AdminNewProductForm/>} />
+            {/* Admin Routes */}
+            <Route path="/adminDashboard" element={<AdminDashboard/>} />
+            <Route path="/adminNewProduct" element={<AdminNewProductForm/>} />
             
           </Routes>
-        </Container>
         <Footer />
       </Box>
     </Router>
