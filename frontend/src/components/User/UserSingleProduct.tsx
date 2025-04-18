@@ -46,10 +46,10 @@ const UserSingleProduct: React.FC<UserSingleProductProps> = ({ item, onClose }) 
         <Box>
           <CardMedia
             component="img"
-            height="auto"
+            // height="auto"
             image={item.imageUrl || camera}
             alt={item.description}
-            sx={{ width: "50%", objectFit: "contain", padding: 2 }}
+            sx={{ display: "block",margin: "0 auto", maxWidth: "400px", maxHeight:"400px",  objectFit: "contain", padding: 2 }}
           />
         </Box>
 

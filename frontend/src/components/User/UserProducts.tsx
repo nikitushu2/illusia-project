@@ -120,15 +120,15 @@ const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => 
         <TableHead>
           <TableRow>
             {/* <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>ID</TableCell>  not needed for user */}
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>Image</TableCell>
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>Description</TableCell>
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>Category</TableCell>
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>Size</TableCell>
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>Color</TableCell>
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>Item Location</TableCell>
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Image</TableCell>
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Description</TableCell>
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Category</TableCell>
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Size</TableCell>
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Color</TableCell>
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Item Location</TableCell>
             {/* <TableCell>Storage Details</TableCell> */}
             {/* <TableCell>Storage Location</TableCell> */}
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>Action</TableCell>
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold" }}>Action</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
