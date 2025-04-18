@@ -11,6 +11,7 @@ import {
     // Typography,
     Collapse,
     Typography,
+    TextField,
   } from "@mui/material";
   // import AppsIcon from "@mui/icons-material/Apps";
   // import TableRowsIcon from "@mui/icons-material/TableRows";
@@ -82,98 +83,85 @@ import UserSettings from "./UserSettings";
       <div>
         <Box>
           {/* whole container for dashboard  with 2 sections sidebar and main dashboard component*/}
-            <Box sx={{ display: "grid", gridTemplateColumns: "20% 80%", gap: "30px", margin: "10px" }}>
+            <Box sx={{ display: "grid", gridTemplateColumns: "15% 85%", gap: "30px", margin: "10px" }}>
             {/* <h2>sidebar component</h2> */}
-                <Box sx={{ marginTop: "60px"}}>
-                  <Typography variant="h5"  alignContent='center' justifyContent='center' sx={{ marginLeft: "50px", fontWeight: "bold" }}>
-                    User Dashboard
+            <Box sx={{ 
+                  minHeight: "100vh", 
+                  backgroundColor: "#f5f5f5", 
+                  padding: "20px", 
+                  borderRadius: "8px 0 0 8px" // Rounded corners only on the right side
+                }}>
+                  <Typography variant="h5" alignContent='center' justifyContent='center' sx={{ marginLeft: "50px", fontWeight: "bold" , marginTop: "50px", marginBottom: "50px"}}>
+                  User Dashboard
                   </Typography>
-            
+              
                 <Box sx={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "100px" }}>
-                    <List>
-                    <ListItem disablePadding>
-                        <ListItemButton onClick={handleProductsClick}>
-                        <ListItemIcon>
-                            <LeaderboardIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Products" onClick={() => handleSideBar(<UserProducts onEdit={(item) => console.log('Edit item:', item)} />)}/>
-                        {/* <ListItemText primary="Products" onClick={() => handleSideBar("Display products")}/> */}
-                        {/* {productsOpen ? <ExpandLess /> : <ExpandMore />} */} 
-                        </ListItemButton>
-                    </ListItem>
+                  <List>
+                  <ListItem disablePadding>
+                    <ListItemButton onClick={handleProductsClick}>
+                    <ListItemIcon>
+                      <LeaderboardIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Products" onClick={() => handleSideBar(<UserProducts onEdit={(item) => console.log('Edit item:', item)} />)}/>
+                    </ListItemButton>
+                  </ListItem>
 
-                   {/* collapsable button for products */}
-                    {/* <Collapse in={productsOpen} timeout="auto" unmountOnExit>
-                        <ListItem disablePadding>
-                        <List component="div" disablePadding>
-                            <ListItemButton sx={{ pl: 6 }}>
-                            <ListItemIcon>
-                                <LeaderboardIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Inventory" onClick={() => handleSideBar("Display inventory")} />
-                            </ListItemButton>
-                        </List>
-                        </ListItem>
-                    </Collapse>
-                     */}
-
-                    <Divider />
+                  <Divider />
+                  <ListItem disablePadding>
+                    <ListItemButton onClick={handleBookingsClick}>
+                    <ListItemIcon>
+                      <BookmarksIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Bookings" />
+                    {bookingsOpen ? <ExpandLess /> : <ExpandMore />}
+                    </ListItemButton>
+                  </ListItem>
+                  <Collapse in={bookingsOpen} timeout="auto" unmountOnExit>
                     <ListItem disablePadding>
-                        <ListItemButton onClick={handleBookingsClick}>
-                        <ListItemIcon>
-                            <BookmarksIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Bookings" />
-                        {bookingsOpen ? <ExpandLess /> : <ExpandMore />}
-                        </ListItemButton>
-                    </ListItem>
-                    <Collapse in={bookingsOpen} timeout="auto" unmountOnExit>
-                        <ListItem disablePadding>
-                        <List component="div" disablePadding>
-                            <ListItemButton sx={{ pl: 6 }}>
-                            <ListItemIcon>
-                                <DraftsIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Pending" onClick={() => handleSideBar(<UserBookings/>)} />
-                            {/* <ListItemText primary="Pending" onClick={() => handleSideBar("Display bookings pending")} /> */}
-                            </ListItemButton>
-                            <ListItemButton sx={{ pl: 6 }}>
-                            <ListItemIcon>
-                                <DraftsIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Reservations" onClick={() => handleSideBar("<UserSingleProduct/> in case we want to remove modal view")} />   
-                            </ListItemButton>
-                        </List>
-                        </ListItem>
-                    </Collapse>
-                    <Divider />
-    
-                    <ListItem disablePadding>
-                        <ListItemButton>
-                        <ListItemIcon>
-                            <DraftsIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Messages" onClick={() => handleSideBar("Display messages")} />
-                        </ListItemButton>
-                    </ListItem>
-                    <Divider />
-                    <ListItem disablePadding>
-                        <ListItemButton>
-                        <ListItemIcon>
-                            <SettingsIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Settings" onClick={() => handleSideBar(<UserSettings/>)} />
-                        </ListItemButton>
-                    </ListItem>
+                    <List component="div" disablePadding>
+                      <ListItemButton sx={{ pl: 6 }}>
+                      <ListItemIcon>
+                        <DraftsIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Pending" onClick={() => handleSideBar(<UserBookings/>)} />
+                      </ListItemButton>
+                      <ListItemButton sx={{ pl: 6 }}>
+                      <ListItemIcon>
+                        <DraftsIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Reservations" onClick={() => handleSideBar("<UserSingleProduct/> in case we want to remove modal view")} />   
+                      </ListItemButton>
                     </List>
+                    </ListItem>
+                  </Collapse>
+                  <Divider />
+          
+                  <ListItem disablePadding>
+                    <ListItemButton>
+                    <ListItemIcon>
+                      <DraftsIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Messages" onClick={() => handleSideBar("Display messages")} />
+                    </ListItemButton>
+                  </ListItem>
+                  <Divider />
+                  <ListItem disablePadding>
+                    <ListItemButton>
+                    <ListItemIcon>
+                      <SettingsIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Settings" onClick={() => handleSideBar(<UserSettings/>)} />
+                    </ListItemButton>
+                  </ListItem>
+                  </List>
                 </Box>
                 </Box>
     
             {/* <h2>(main dashboard component)</h2> */}
             <Box sx={{ margin: "10px" }}>
                 
-              <Box sx={{ display: "flex", marginBottom: "20px", justifyContent: "center", marginTop: "50px", gap: "50px" }}>
-                {/* <TextField label="search item" sx={{ width: "60%" }}></TextField> */}
+              <Box sx={{ display: "flex", marginBottom: "20px", justifyContent: "center", marginTop: "10px", gap: "50px" }}>
+               
                 {/* <Button onClick={handleAddNew} component={Link} to="/adminNewProduct">ADD NEW ITEM</Button> */}
 
 
@@ -185,7 +173,7 @@ import UserSettings from "./UserSettings";
               </Box>
   
                 {/* data here */}
-              <Box sx={{ marginTop: "50px" }}> 
+                <Box sx={{ marginTop: "50px" ,marginRight:"50px"}}> 
               {/* DISPLAY DATA HERE    */}
               {/* {sideLink && <Typography variant="body1" style={{ marginTop: "20px" }}>{sideLink}</Typography>} */}
               {component || sideLink}

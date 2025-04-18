@@ -21,15 +21,15 @@ import {
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
-//import { useState } from "react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-//import { Link } from "react-router-dom";
-//import Helmet from "../../images/helmet.jpeg";
 import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
 import itemService from "../../services/itemService";
 import { Item } from "../../services/itemService";
+
+//import { Link } from "react-router-dom";
+//import Helmet from "../../images/helmet.jpeg";
 
 
 interface ItemListProps {
@@ -40,19 +40,20 @@ interface ItemListProps {
 const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const [modeDisplay, setModeDisplay] = React.useState("table"); // for table and grid view
 
+    // fetching items from the backend
+    const [items, setItems] = React.useState<Item[]>([]);
+    const [loading, setLoading] = React.useState(false);
+   
+
   //modal view for single product
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [selectedProduct, setSelectedProduct] = React.useState<Item | null>(
-    null
-  );
+  const [selectedProduct, setSelectedProduct] = React.useState<Item | null>(null);
+  const [searchInput, setSearchInput] = useState<string>(""); // for search bar
 
-  // fetching items from the backend
-  const [items, setItems] = React.useState<Item[]>([]);
-  const [loading, setLoading] = React.useState(false);
-  //const [products, setProducts] = React.useState([]); // for table and grid view'
 
    const [categoryFilter, setCategoryFilter] = useState<string>("all");
    const [filteredItems, setFilteredItems] = useState<Item[]>([]);
+
   //  const [page, setPage] = useState(0);
   //  const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -72,61 +73,7 @@ const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => 
     setIsModalOpen(false);
   };
 
-  // const [grid, setGrid] = useState<boolean>(false);
-  // const [list, setList] = useState<boolean>(false);
-
-  //products/items manuually added
-  /* const products = [
-    {
-      "id": 2,
-      "description": "military helmet",
-      "category": "helmet",
-      "model": "old",
-      "size": null,
-      "image": Helmet,
-      "color": "black",
-      "totalStorage": 6,
-      "storageDetails": "storage bag",
-      "storageLocation": "shelf entrance side"
-    },
-    {
-      "id": 5,
-      "description": "combat vest",
-      "category": "vest",
-      "model": "new with EL strips",
-      "size": null,
-      "image": Helmet,
-      "color": "black",
-      "totalStorage": 5,
-      "storageDetails": "storage bag",
-      "storageLocation": "shelf entrance side"
-    },
-     {
-      "id": 6,
-      "description": "combat vest",
-      "category": "vest",
-      "model": "old",
-      "size": null,
-      "image": null,
-      "color": "black",
-      "totalStorage": 5,
-      "storageDetails": "storage bag",
-      "storageLocation": "shelf entrance side"
-    },
-    {
-      "id": 7,
-      "description": "combat vest",
-      "category": "vest",
-      "model": "old",
-      "size": null,
-      "image": null,
-      "color": "light black",
-      "totalStorage": 3,
-      "storageDetails": "storage bag",
-      "storageLocation": "shelf entrance side"
-    }
-  ] */
-
+  //FETCH ALL ITEMS
   const fetchItems = async () => {
     try {
       setLoading(true);
@@ -146,6 +93,7 @@ const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => 
     fetchItems();
   }, []);
 
+//FILTER ITEMS BY CATEGORY
   useEffect(() => {
     if (categoryFilter === "all") {
       setFilteredItems(items);
@@ -154,8 +102,9 @@ const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => 
         items.filter((item) => item.categoryId === parseInt(categoryFilter))
       );
     }
-    // Reset to first page when filter changes
-    // setPage(0);
+
+    //Reset to first page when filter changes
+    //setPage(0);
   }, [categoryFilter, items]);
 
   // Log when categories change to help debugging
@@ -163,6 +112,141 @@ const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => 
     console.log("Categories in ItemList:", categories);
   }, [categories]);
 
+ //HANDLE TABLE VIEW
+ const handleListView = () => {
+  return (
+    <TableContainer sx= {{ maxHeight: 800 }}>
+      <Table stickyHeader>{/* Added stickyHeader for better UX */}
+        <TableHead>
+          <TableRow>
+            {/* <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>ID</TableCell>  not needed for user */}
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>Image</TableCell>
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>Description</TableCell>
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>Category</TableCell>
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>Size</TableCell>
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>Color</TableCell>
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>Item Location</TableCell>
+            {/* <TableCell>Storage Details</TableCell> */}
+            {/* <TableCell>Storage Location</TableCell> */}
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>Action</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {filteredItems.map((item) => (
+            <TableRow
+              key={item.id}
+              // component={Link}
+              // to={`/product/${product.id}`}
+              onClick={() => openModal(item)}
+            >
+              {/* <TableCell>{item.id}</TableCell> */}
+             <TableCell>
+                {item.imageUrl ? (
+                  <img
+                    src={item.imageUrl}
+                    alt={item.description}
+                    style={{
+                      width: "150px",
+                      height: "150px",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={camera} // Use the camera variable here
+                    alt="No Image Available"
+                    style={{
+                      width: "150px",
+                      height: "150px",
+                      objectFit: "cover",
+                    }}
+                  />
+                )}
+              </TableCell>
+              <TableCell>{item.description}</TableCell>
+              <TableCell>{item.name}</TableCell>
+              <TableCell>{item.size}</TableCell> 
+              <TableCell>{item.color}</TableCell> 
+              <TableCell>{item.itemLocation}</TableCell> 
+              {/* <TableCell>{item.storageLocation}</TableCell>  */}
+              {/* <TableCell>{item.storageLocation}</TableCell>  */}
+              {/* <TableCell><Button onClick={handleBooking}>Book</Button></TableCell> */}
+              <TableCell>
+                <Button
+                  onClick={(event) => {
+                    event.stopPropagation(); // Prevent row click when clicking the button
+                    navigate(`/product/${item.id}`);
+                  }}
+                >
+                  Book
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
+
+// HANDLE GRID VIEW
+const handleGridView = () => {
+  return (
+    <div>
+      <Paper
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 4,
+          padding: 2,
+        }}
+      >
+        {filteredItems.map((item) => (
+          <Card
+            key={item.id}
+            sx={{
+              height: 400,
+              width: 250,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: 3,
+              borderRadius: 2,
+              overflow: "hidden",
+            }}
+          >
+            <CardMedia
+              sx={{ height: 200, width: "100%", objectFit: "cover" }}
+              image={item.imageUrl || camera}
+              title={item.description}
+            />
+            <CardContent
+              sx={{ textAlign: "center", cursor: "pointer" }}
+              onClick={() => openModal(item)}
+            >
+              <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
+              <p style={{ margin: 0 }}>{item.description}</p>
+            </CardContent>
+            <CardActions>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={(event) => {
+                  event.stopPropagation(); // Prevent row click when clicking the button
+                  navigate(`/product/${item.id}`);
+                }}
+              >
+                Book
+              </Button>
+            </CardActions>
+          </Card>
+        ))}
+      </Paper>
+    </div>
+  );
+};
 
 
   //in case you want to move to a new page
@@ -176,140 +260,9 @@ const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => 
      navigate("/product/:id");
   }; */
 
-  //handle list view
-  const handleListView = () => {
-    return (
-      <TableContainer sx={{ maxHeight: 440 }}>
-        <Table stickyHeader>
-          {" "}
-          {/* Added stickyHeader for better UX */}
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Image</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Category</TableCell>
-              <TableCell>Size</TableCell>
-              <TableCell>Color</TableCell>
-              <TableCell>Total Storage</TableCell>
-              <TableCell>Storage Details</TableCell>
-              <TableCell>Storage Location</TableCell>
-              <TableCell>Action</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {items.map((item) => (
-              <TableRow
-                key={item.id}
-                // component={Link}
-                // to={`/product/${product.id}`}
-                onClick={() => openModal(item)}
-              >
-                <TableCell>{item.id}</TableCell>
-                {/* <TableCell>{product.image}</TableCell> */}
-
-                <TableCell>
-                  {item.imageUrl ? (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.description}
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        objectFit: "cover",
-                      }}
-                    />
-                  ) : (
-                    "No Image"
-                  )}
-                </TableCell>
-
-                <TableCell>{item.description}</TableCell>
-                <TableCell>{item.name}</TableCell>
-                {/* <TableCell>{item.size}</TableCell>  */}
-                {/* <TableCell>{item.color}</TableCell>  */}
-                {/* <TableCell>{item.totalStorage}</TableCell>  */}
-                {/* <TableCell>{item.storageDetails}</TableCell>  */}
-                {/* <TableCell>{item.storageLocation}</TableCell>  */}
-                {/* <TableCell><Button onClick={handleBooking}>Book</Button></TableCell> */}
-                <TableCell>
-                  <Button
-                    onClick={(event) => {
-                      event.stopPropagation(); // Prevent row click when clicking the button
-                      navigate(`/product/${item.id}`);
-                    }}
-                  >
-                    Book
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
-  };
-
-  // handle grid view
-  const handleGridView = () => {
-    return (
-      <div>
-        <Paper
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: 4,
-            padding: 2,
-          }}
-        >
-          {items.map((item) => (
-            <Card
-              key={item.id}
-              sx={{
-                height: 400,
-                width: 250,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                alignItems: "center",
-                boxShadow: 3,
-                borderRadius: 2,
-                overflow: "hidden",
-              }}
-            >
-              <CardMedia
-                sx={{ height: 200, width: "100%", objectFit: "cover" }}
-                image={item.imageUrl || camera}
-                title={item.description}
-              />
-              <CardContent
-                sx={{ textAlign: "center", cursor: "pointer" }}
-                onClick={() => openModal(item)}
-              >
-                <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
-                <p style={{ margin: 0 }}>{item.description}</p>
-              </CardContent>
-              <CardActions>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={(event) => {
-                    event.stopPropagation(); // Prevent row click when clicking the button
-                    navigate(`/product/${item.id}`);
-                  }}
-                >
-                  Book
-                </Button>
-              </CardActions>
-            </Card>
-          ))}
-        </Paper>
-      </div>
-    );
-  };
-
-  const handleCategoryFilterChange = (event: SelectChangeEvent) => {
+ 
+  //HANDLE CATEGORY FILTER
+  const handleByCategory = (event: SelectChangeEvent) => {
       setCategoryFilter(event.target.value);
     };
 
@@ -320,53 +273,59 @@ const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => 
   );
  */
 
+  // SEARCH MANUALLY TYPED ITEMS
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("searching");
+    event.preventDefault();
+
+    const searchInput = event.target.value;
+    setSearchInput(searchInput);
+    console.log("searchInput", searchInput);
+
+    if (searchInput === "") {
+      setFilteredItems(items);
+    }
+    else {
+      const filteredItems = items.filter((item) =>
+        item.description.toLowerCase().includes(searchInput.toLowerCase())
+      );
+      setFilteredItems(filteredItems);
+    }
+  }
   
   return (
     <div>
       <Box
         sx={{
           display: "flex",
-          // justifyContent: "space-between",
-          // alignItems: "center",
           marginBottom: "50px",
-          marginTop: "50px",
+          marginTop: "10px",
           gap: "20px",
           paddingX: "20px",
         }}
       >
         
-     {/*    grid and list views  */}
+        {/* grid and list views  + search bar */}
         <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
-          <TextField label="search item" sx={{ width: "50%" }}></TextField>
+          <TextField onChange={handleSearch} value={searchInput} label="search item" sx={{ width: "50%" }}></TextField>
         </Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: "20px",
-            marginRight: "20px",
-          }}
-        >
-          <AppsIcon
-            sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }}
-            onClick={toggleDisplayMode}
-          />
-          <TableRowsIcon
-            sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }}
-            onClick={toggleDisplayMode}
-          />
+
+        <Box sx={{
+            display: "flex",justifyContent: "flex-end",gap: "20px", marginRight: "20px", }}>
+          <AppsIcon sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }} onClick={toggleDisplayMode} />
+          <TableRowsIcon sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }} onClick={toggleDisplayMode} />
         </Box>
-      </Box>
+    </Box>
 
-
-      <Box>
+        {/* filter by category */}
+      <Box sx={{marginBottom: "20px" }}>
         <FormControl sx={{ width: 200 }}>
           <InputLabel id="category-filter-label">Filter by Category</InputLabel>
           <Select
             labelId="category-filter-label"
             value={categoryFilter}
             label="Filter by Category"
-            onChange={handleCategoryFilterChange}
+            onChange={handleByCategory}
           >
             <MenuItem value="all">All Categories</MenuItem>
             {categories && categories.length > 0 ? (
@@ -383,6 +342,8 @@ const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => 
           </Select>
         </FormControl>
         </Box>
+
+     
 
       {modeDisplay === "table" ? handleListView() : handleGridView()}
 

@@ -2,6 +2,7 @@ import { CardMedia, Typography, Box, Button, IconButton, Modal } from "@mui/mate
 import React from "react";
 import { Item } from "../../services/itemService";
 import CloseIcon from '@mui/icons-material/Close';
+import camera from "../../images/camera.png";
 
 interface UserSingleProductProps {
   item: Item;
@@ -46,9 +47,9 @@ const UserSingleProduct: React.FC<UserSingleProductProps> = ({ item, onClose }) 
           <CardMedia
             component="img"
             height="auto"
-            image={item.imageUrl}
+            image={item.imageUrl || camera}
             alt={item.description}
-            sx={{ width: "100%", objectFit: "contain", padding: 2 }}
+            sx={{ width: "50%", objectFit: "contain", padding: 2 }}
           />
         </Box>
 
@@ -56,6 +57,9 @@ const UserSingleProduct: React.FC<UserSingleProductProps> = ({ item, onClose }) 
           <Typography variant="h4">{item.name}</Typography>
           <Typography variant="body1">Description: {item.description}</Typography>
           <Typography variant="body1">Quantity: {item.quantity}</Typography>
+          <Typography variant="body1">Price: ${item.price}</Typography>
+          <Typography variant="body1">Location: {item.itemLocation}</Typography>
+        
         </Box>
 
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mt: 2 }}>
