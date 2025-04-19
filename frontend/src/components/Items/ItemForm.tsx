@@ -273,7 +273,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
               onClick={onCancel}
               disabled={isSubmitting}
             >
-              Cancel
+              Cancel or
             </Button>
             <Button
               type="submit"

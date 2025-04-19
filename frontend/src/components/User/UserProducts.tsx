@@ -40,22 +40,17 @@ interface ItemListProps {
 const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const [modeDisplay, setModeDisplay] = React.useState("table"); // for table and grid view
 
-    // fetching items from the backend
-    const [items, setItems] = React.useState<Item[]>([]);
-    const [loading, setLoading] = React.useState(false);
+  // fetching items from the backend
+  const [items, setItems] = React.useState<Item[]>([]);
+  const [loading, setLoading] = React.useState(false);
    
-
   //modal view for single product
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [selectedProduct, setSelectedProduct] = React.useState<Item | null>(null);
   const [searchInput, setSearchInput] = useState<string>(""); // for search bar
 
-
-   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
-
-  //  const [page, setPage] = useState(0);
-  //  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [filteredItems, setFilteredItems] = useState<Item[]>([]);
 
   const navigate = useNavigate();
 
@@ -121,8 +116,8 @@ const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => 
           <TableRow>
             {/* <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>ID</TableCell>  not needed for user */}
             <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Image</TableCell>
+            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Name</TableCell>
             <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Description</TableCell>
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Category</TableCell>
             <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Size</TableCell>
             <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Color</TableCell>
             <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Item Location</TableCell>
@@ -163,8 +158,8 @@ const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => 
                   />
                 )}
               </TableCell>
-              <TableCell>{item.description}</TableCell>
               <TableCell>{item.name}</TableCell>
+              <TableCell>{item.description}</TableCell>
               <TableCell>{item.size}</TableCell> 
               <TableCell>{item.color}</TableCell> 
               <TableCell>{item.itemLocation}</TableCell> 

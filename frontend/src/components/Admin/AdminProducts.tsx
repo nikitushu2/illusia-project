@@ -20,7 +20,7 @@ import {
   DialogActions,
   Snackbar,
   Alert,
-  CircularProgress,
+  //CircularProgress,
   FormControl,
   InputLabel,
   Select,
@@ -38,21 +38,20 @@ import itemService, { UpdateItemData } from "../../services/itemService";
 import { Item } from "../../services/itemService";
 import camera from "../../images/camera.png";
 import ItemForm from "../Items/ItemForm";
-import ItemList from "../Items/ItemList";
 
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-// import ToogleVisibility from "../functions";
 
+
+//import categoryService, { Category } from "../../services/categoryService";
+//import ItemList from "../Items/ItemList";
 interface ItemListProps {
   onEdit: (item: Item) => void;
   categories?: { id: number; name: string }[];
 }
 
-// const AdminProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
 
-const AdminProducts: React.FC<ItemListProps> = ({
-  onEdit , categories = []}) => {
+const AdminProducts: React.FC<ItemListProps> = ({ onEdit , categories = []}) => {
 
   const [modeDisplay, setModeDisplay] = React.useState("table");
 
@@ -61,16 +60,17 @@ const AdminProducts: React.FC<ItemListProps> = ({
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | undefined>(undefined);
+
   //const [refreshKey, setRefreshKey] = useState(0); // Used to force ItemList to refresh
- // const [categoriesLoading, setCategoriesLoading] = useState(false);
-   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
+
+  const [filteredItems, setFilteredItems] = useState<Item[]>([]);
+  const [searchInput, setSearchInput] = useState<string>(""); // for search bar
 
 
   const [itemVisibility, setItemVisibility] = useState<{ [itemId: number]: boolean }>({}); // State to track visibility per item
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
 
-  const [searchInput, setSearchInput] = useState<string>(""); // for search bar
 
   const [itemToDelete, setItemToDelete] = useState<number | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -168,9 +168,7 @@ const AdminProducts: React.FC<ItemListProps> = ({
     }));
   };
 
-  // const toggleDisplayMode = () => {
-  //   setModeDisplay(prevMode => (prevMode === "table" ? "grid" : "table"));
-  // };
+ 
 
   //HANDLE TABLE VIEW
   const handleListView = () => {
@@ -194,7 +192,7 @@ const AdminProducts: React.FC<ItemListProps> = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {items.map((item) => (
+            {filteredItems.map((item) => (
               <TableRow key={item.id} style={{opacity: itemVisibility[item.id] ? 1 : 0.5}}>
                 <TableCell>{item.id}</TableCell>
                 <TableCell>
@@ -257,7 +255,7 @@ const AdminProducts: React.FC<ItemListProps> = ({
             padding: 2,
           }}
         >
-          {items.map((item) => (
+          {filteredItems.map((item) => (
             <Card
               key={item.id}
               sx={{
@@ -285,6 +283,7 @@ const AdminProducts: React.FC<ItemListProps> = ({
               >
                 <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
                 <p style={{ margin: 0 }}>{item.description}</p>
+                <p style={{ margin: 0 }}>ID: {item.id}</p>
               </CardContent>
               <CardActions>
                 <Button>Edit</Button>
@@ -307,12 +306,14 @@ const AdminProducts: React.FC<ItemListProps> = ({
       const data = await itemService.getAll();
       console.log("Fetched items:", data);
       setItems(data);
+      setFilteredItems(data);
 
-      const initialVisibility:{[itemId: number]: boolean} = {};
-      data.forEach((item) => {
-        initialVisibility[item.id] = true; // Set initial visibility to true for all items
+      const initialVisibility: { [itemId: number]: boolean } = {};
+      data.forEach(item => {
+        initialVisibility[item.id] = true;
       });
       setItemVisibility(initialVisibility);
+      
     } catch (error) {
       console.error("Error fetching items:", error);
       // message.error("Failed to fetch items");
@@ -320,6 +321,10 @@ const AdminProducts: React.FC<ItemListProps> = ({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
 
   useEffect(() => {
     fetchItems();
@@ -335,6 +340,10 @@ const AdminProducts: React.FC<ItemListProps> = ({
         setCategoryFilter(event.target.value);
       };
 
+   // const toggleDisplayMode = () => {
+  //   setModeDisplay(prevMode => (prevMode === "table" ? "grid" : "table"));
+  // };
+  
   // grid view
   //  const handleGridView = () => {
   //   console.log("grid");
@@ -346,31 +355,35 @@ const AdminProducts: React.FC<ItemListProps> = ({
   //   console.log("list");
   //   setList(!list);
   // };
+    
+   // handle add new item
+   const handleCreate = () => {
+    console.log("Opening create modal");
+    //setSelectedItem(undefined);
+    setIsModalOpen(true);
+  };
 
-    // handle add new item
-    const handleAddNew = () => {
-      console.log("add new item");
-    };
-
-    // SEARCH MANUALLY TYPED ITEMS
+   // SEARCH MANUALLY TYPED ITEMS
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log("searching");
-        event.preventDefault();
-    
-        const searchInput = event.target.value;
-        setSearchInput(searchInput);
-        console.log("searchInput", searchInput);
-    
-        if (searchInput === "") {
-          setFilteredItems(items);
-        }
-        else {
-          const filteredItems = items.filter((item) =>
-            item.description.toLowerCase().includes(searchInput.toLowerCase())
-          );
-          setFilteredItems(filteredItems);
-        }
+      console.log("searching");
+      event.preventDefault();
+  
+      const searchInput = event.target.value;
+      setSearchInput(searchInput);
+      console.log("searchInput", searchInput);
+  
+      if (searchInput === "") {
+        setFilteredItems(items);
       }
+      else {
+        const filteredItems = items.filter((item) =>
+          item.description.toLowerCase().includes(searchInput.toLowerCase())
+        );
+        setFilteredItems(filteredItems);
+      }
+    }
+
+   
     
 
   return (
@@ -379,7 +392,7 @@ const AdminProducts: React.FC<ItemListProps> = ({
 
         <Box sx={{ display: "flex", justifyContent: "center", marginTop: "50px", gap: "50px" }}>
           <TextField onChange={handleSearch} value={searchInput} label="search item" sx={{ width: "50%" }}></TextField>
-          <Button onClick={handleAddNew}>ADD NEW ITEM</Button>
+          <Button onClick={handleCreate}>ADD NEW ITEM</Button>
         </Box>
 
           {/* filter by category */}
@@ -482,6 +495,30 @@ const AdminProducts: React.FC<ItemListProps> = ({
           {snackbar.message}
         </Alert>
       </Snackbar>
+      
+
+      {/* create a new item */}
+      <Dialog
+          open={isModalOpen}
+          onClose={handleCancel}
+          maxWidth="md"
+          fullWidth
+        >
+          {/* <DialogTitle>
+            {selectedItem ? "Edit Item" : "Create New Item"}
+          </DialogTitle> */}
+          <DialogContent dividers>
+            <ItemForm
+              initialValues={selectedItem}
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
+              categories={categories}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCancel}>Cancel</Button>
+          </DialogActions>
+        </Dialog>
     </div>
   );
 };
