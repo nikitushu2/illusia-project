@@ -39,6 +39,11 @@ const ItemForm: React.FC<ItemFormProps> = ({
       price: 0,
       quantity: 0,
       categoryId: 0,
+
+      size: "",
+      color: "",
+      itemLocation: "",
+      storageLocation: "",
     }
   );
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -113,6 +118,11 @@ const ItemForm: React.FC<ItemFormProps> = ({
           price: 0,
           quantity: 0,
           categoryId: 0,
+
+          size: "",
+          color: "",
+          itemLocation: "",
+          storageLocation: "",
         });
       }
     } catch (err) {
@@ -206,6 +216,23 @@ const ItemForm: React.FC<ItemFormProps> = ({
             helperText={errors.quantity}
             required
           />
+        </Grid>
+
+        <Grid>
+            <TextField
+              fullWidth
+              label="Item Location"
+              name="itemLocation"
+              value={formValues.itemLocation || ""}
+              onChange={handleChange}
+            />
+          {/*   <TextField
+              fullWidth
+              label="Storage Location"
+              name="storageLocation"
+              value={formValues.storageLocation || ""}
+              onChange={handleChange}
+            /> */}
         </Grid>
 
         <Grid item xs={12}>

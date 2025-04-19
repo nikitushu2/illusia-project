@@ -11,6 +11,11 @@ export interface Item {
   categoryId: number;
   createdAt: string;
   updatedAt: string;
+
+  size: string;
+  color: string;
+  itemLocation: string;
+  storageLocation: string;
 }
 
 export interface CreateItemData {
@@ -20,6 +25,11 @@ export interface CreateItemData {
   price: number;
   quantity: number;
   categoryId: number;
+
+  size: string;
+  color: string;
+  itemLocation: string;
+  storageLocation: string;
 }
 
 export interface UpdateItemData {
@@ -29,6 +39,11 @@ export interface UpdateItemData {
   price?: number;
   quantity?: number;
   categoryId?: number;
+
+  size: string;
+  color: string;
+  itemLocation: string;
+  storageLocation: string;
 }
 
 const itemService = {

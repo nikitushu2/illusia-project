@@ -53,23 +53,38 @@ const ItemManagement: React.FC = () => {
             {
               id: 1,
               name: "Helmets",
-              description: "Military helmets and accessories",
+              description: "Military helmets",
               createdAt: "",
               updatedAt: "",
+
+              // size: "L",
+              // color: "red",
+              // itemLocation: "Helsinki",
+              // storageLocation: "Storage Room 1",
             },
             {
               id: 2,
               name: "Combat Vests",
-              description: "Tactical vests and gear",
+              description: "Tactical vests",
               createdAt: "",
               updatedAt: "",
+
+              // size: "L",
+              // color: "black",
+              // itemLocation: "Helsinki",
+              // storageLocation: "Storage Room 2",
             },
             {
               id: 3,
-              name: "Medical Supplies",
-              description: "First aid kits and medical equipment",
+              name: "Gloves (Disposable)",
+              description: "First aid kits",
               createdAt: "",
               updatedAt: "",
+
+              // size: "L",
+              // color: "white",
+              // itemLocation: "Helsinki",
+              // storageLocation: "Storage Room 3"
             },
             {
               id: 4,
@@ -77,6 +92,11 @@ const ItemManagement: React.FC = () => {
               description: "Protective eyewear and masks",
               createdAt: "",
               updatedAt: "",
+
+              // size: "",
+              // color: "black",
+              // itemLocation: "Helsinki",
+              // storageLocation: "Storage Room 2",
             },
           ]);
         }
@@ -89,21 +109,21 @@ const ItemManagement: React.FC = () => {
           {
             id: 1,
             name: "Helmets",
-            description: "Military helmets and accessories",
+            description: "Military helmets",
             createdAt: "",
             updatedAt: "",
           },
           {
             id: 2,
             name: "Combat Vests",
-            description: "Tactical vests and gear",
+            description: "Tactical vests",
             createdAt: "",
             updatedAt: "",
           },
           {
             id: 3,
-            name: "Medical Supplies",
-            description: "First aid kits and medical equipment",
+            name: "Gloves (Disposable)",
+            description: "First aid kits",
             createdAt: "",
             updatedAt: "",
           },
@@ -139,6 +159,7 @@ const ItemManagement: React.FC = () => {
     setSelectedItem(undefined);
   };
 
+  // update edit item not working
   const handleSubmit = async (values: CreateItemData | UpdateItemData) => {
     try {
       console.log("Submitting form with values:", values);
@@ -178,7 +199,7 @@ const ItemManagement: React.FC = () => {
             color="primary"
             fontWeight="bold"
           >
-           Inventory
+           Item display for All
           </Typography>
           <Button
             variant="contained"

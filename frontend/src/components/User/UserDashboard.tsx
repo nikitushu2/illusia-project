@@ -11,7 +11,7 @@ import {
     // Typography,
     Collapse,
     Typography,
-    TextField,
+    //TextField,
   } from "@mui/material";
   // import AppsIcon from "@mui/icons-material/Apps";
   // import TableRowsIcon from "@mui/icons-material/TableRows";
@@ -91,7 +91,7 @@ import UserSettings from "./UserSettings";
                   padding: "20px", 
                   borderRadius: "8px 0 0 8px" // Rounded corners only on the right side
                 }}>
-                  <Typography variant="h5" alignContent='center' justifyContent='center' sx={{ marginLeft: "50px", fontWeight: "bold" , marginTop: "50px", marginBottom: "50px"}}>
+                  <Typography variant="h5" alignContent='center' justifyContent='center' sx={{ marginLeft: "50px", fontWeight: "bold" , marginTop: "50px", marginBottom: "20px"}}>
                   User Dashboard
                   </Typography>
               
