@@ -11,6 +11,7 @@ import cors from 'cors';
 import { verifySession, verifyAdminSession, verifySuperAdminSession } from "./middleware/verifySession";
 import cookieParser from "cookie-parser";
 import { categoriesRouter } from "./controllers/categories";
+import { admin } from "./controllers/admin"
 
 
 const app = express();
@@ -29,7 +30,6 @@ app.use(express.json());
 // all the backend Api should start with /api
 const apiRouter = express.Router();
 apiRouter.use(cookieParser());
-apiRouter.use(express.json());
 
 // all auth endpoint starts with /api/auth
 apiRouter.use('/auth', authRouter);
@@ -57,7 +57,7 @@ privateApiRouter.use('/superadmin', superAdminApiRouter);
 const adminApiRouter = express.Router();
 adminApiRouter.use(verifyAdminSession);
 
-
+adminApiRouter.use('/', admin)
 // admin related endpoints goes here
 
 privateApiRouter.use('/admin', adminApiRouter);
