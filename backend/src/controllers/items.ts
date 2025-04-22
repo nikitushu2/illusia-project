@@ -24,7 +24,9 @@ interface ItemUpdateRequest {
     quantity?: number;
   }
 
-const itemsRouter = Router();
+const privateItemsRouter = Router();
+const publicItemsRouter = Router();
+const adminItemsRouter = Router();
 
 const itemFinder = async (req: ItemRequest, _res: Response, next: NextFunction) => {
   const id = parseInt(req.params.id, 10);
@@ -32,13 +34,13 @@ const itemFinder = async (req: ItemRequest, _res: Response, next: NextFunction) 
   next();
 };
 
-itemsRouter.get("/", async (_req: Request, res: Response) => {
+publicItemsRouter.get("/", async (_req: Request, res: Response) => {
   const items = await itemService.findAll();
   res.json(items);
 });
 
 // Get items by category
-itemsRouter.get("/category/:categoryId", async (req: Request, res: Response, next: NextFunction) => {
+publicItemsRouter.get("/category/:categoryId", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const categoryId = parseInt(req.params.categoryId, 10);
     const items = await itemService.findByCategory(categoryId);
@@ -49,7 +51,7 @@ itemsRouter.get("/category/:categoryId", async (req: Request, res: Response, nex
 });
 
 // Search items by name or description
-itemsRouter.get("/search", async (req: Request, res: Response, next: NextFunction) => {
+publicItemsRouter.get("/search", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const query = req.query.q as string;
     if (!query) {
@@ -64,7 +66,7 @@ itemsRouter.get("/search", async (req: Request, res: Response, next: NextFunctio
   }
 });
 
-itemsRouter.post("/", async (req: Request<{}, {}, ItemCreationAttributes>, res: Response, next: NextFunction) => {
+privateItemsRouter.post("/", async (req: Request<{}, {}, ItemCreationAttributes>, res: Response, next: NextFunction) => {
   try {
     console.log('Creating item with data:', req.body);
     const item = await itemService.create(req.body);
@@ -76,7 +78,7 @@ itemsRouter.post("/", async (req: Request<{}, {}, ItemCreationAttributes>, res: 
   }
 });
 
-itemsRouter.get('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), (req, res) => {
+privateItemsRouter.get('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), (req, res) => {
     if ((req as ItemRequest).item) {
         res.json((req as ItemRequest).item);
     } else {
@@ -84,7 +86,7 @@ itemsRouter.get('/:id', (req: Request, res: Response, next: NextFunction) => ite
     }
 });
 
-itemsRouter.put('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req: Request<{id: string}, {}, ItemUpdateRequest>, res: Response, next: NextFunction): Promise<void> => {
+adminItemsRouter.put('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req: Request<{id: string}, {}, ItemUpdateRequest>, res: Response, next: NextFunction): Promise<void> => {
     try {
         const typedReq = req as unknown as ItemRequest;
         const item = typedReq.item;
@@ -103,7 +105,7 @@ itemsRouter.put('/:id', (req: Request, res: Response, next: NextFunction) => ite
 });
 
 // New endpoint to update just the quantity
-itemsRouter.patch('/:id/quantity', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req: Request<{id: string}, {}, {quantity: number}>, res: Response, next: NextFunction): Promise<void> => {
+adminItemsRouter.patch('/:id/quantity', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req: Request<{id: string}, {}, {quantity: number}>, res: Response, next: NextFunction): Promise<void> => {
     try {
         const typedReq = req as unknown as ItemRequest;
         const item = typedReq.item;
@@ -121,7 +123,7 @@ itemsRouter.patch('/:id/quantity', (req: Request, res: Response, next: NextFunct
     }
 });
 
-itemsRouter.delete('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+adminItemsRouter.delete('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const typedReq = req as unknown as ItemRequest;
         const item = typedReq.item;
@@ -139,4 +141,4 @@ itemsRouter.delete('/:id', (req: Request, res: Response, next: NextFunction) => 
     }
 });
 
-export { itemsRouter };
+export { privateItemsRouter, publicItemsRouter, adminItemsRouter };
