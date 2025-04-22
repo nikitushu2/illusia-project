@@ -12,7 +12,6 @@ export enum AuthErrorType {
   LOGOUT_FAILED = "Logout failed",
 }
 
-
 interface AuthContextType {
     applicationUser?: ApplicationUser;
     loading: boolean;
@@ -42,7 +41,6 @@ export const AuthProvider = ({ children }: AuthProviderProp) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<AuthErrorType>();
 
-
     const fetchApplicationUserAndSetState = async (firebaseUser: User) => {
         try {
             setLoading(true);
@@ -57,7 +55,6 @@ export const AuthProvider = ({ children }: AuthProviderProp) => {
             if (response.ok){
                 const user = await response.json() as ApplicationUser;
                 setApplicationUser(user);
-               // setUserRole(user.role as unknown as UserRole);
             } else if(response.status === 404) {
                 setError(AuthErrorType.USER_NOT_FOUND);
                 setSignUpUser(firebaseUser);
@@ -144,4 +141,4 @@ export const AuthProvider = ({ children }: AuthProviderProp) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext); 
+export const useAuth = () => useContext(AuthContext);

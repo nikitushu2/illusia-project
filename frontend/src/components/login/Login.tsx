@@ -1,63 +1,10 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
-import GoogleIcon from "@mui/icons-material/Google";
+import { Link } from "react-router-dom";
+import { Google as GoogleIcon } from "@mui/icons-material";
 import { useAuth } from "../../context/AuthContext";
-import { useEffect, useState } from "react";
-
-import { UserRole } from "../../types/applicationUser";
 
 export const Login = () => {
-  const { login, isLoggedIn, applicationUser, error } = useAuth();
-  const navigate = useNavigate();
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('');
-   const [loginError, setLoginError] = useState('');
-
-  useEffect(() => {
-  
-     if (isLoggedIn) {
-      if (applicationUser?.role === UserRole.ADMIN) {
-        navigate('/adminDashboard');
-      } else if (applicationUser?.role === UserRole.USER) {
-        navigate('/userDashboard');
-      } else if (applicationUser?.role === UserRole.SUPER_ADMIN) {
-        navigate('/superAdminDashboard');
-      } else {
-        navigate('/');
-      }
-    } 
-
-   
-
-    /* if (error) {
-      if (error === 'User not found') {
-        setLoginError('User not found. Please sign up.');
-      } else if (error === 'Login failed') {
-        setLoginError('Login failed. Please check your credentials or try Google login.');
-      } else {
-        setLoginError('An error occurred during login.');
-      }
-    } else {
-      setLoginError(''); // Clear any previous error on successful state change
-    } */
-  }, [isLoggedIn, navigate, applicationUser?.role, error]);
-
- /*  const handleManualLogin = () => {
-    // Implement your manual login logic here, using email and password
-    console.log('Manual Login:', { email, password });
-   navigate('/userDashboard'); // Redirect to home or dashboard after login
-  }; */
-
-  const googleLogin = async () => {
-    try {
-      setLoginError(''); // Clear any previous error before attempting login
-      await login();
-      // Navigation is handled by the useEffect hook
-    } catch (err) {
-      console.error("Google login failed:", err);
-      setLoginError('Google login failed. Please try again.');
-    }
-  };
+  const { login } = useAuth();
 
   return (
     <Box sx={{ margin: "auto", textAlign: "center", maxWidth: 600, px: 2 }}>
@@ -66,19 +13,12 @@ export const Login = () => {
         <Typography variant="subtitle1">Log in to your account.</Typography>
       </Box>
 
-      {loginError && (
-        <Typography color="error" sx={{ mb: 2 }}>{loginError}</Typography>
-      )}
-
-      {/* input fields */}
       <Box>
         <TextField
           fullWidth
           label="Username/Email"
           variant="outlined"
           sx={{ mb: 2, maxWidth: 500 }}
-          // value={email}
-          // onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
           fullWidth
@@ -86,12 +26,9 @@ export const Login = () => {
           type="password"
           variant="outlined"
           sx={{ mb: 2, maxWidth: 500 }}
-          // value={password}
-          // onChange={(e) => setPassword(e.target.value)}
         />
       </Box>
 
-      {/* forgot password */}
       <Box textAlign="right" sx={{ maxWidth: 500, mx: "auto", mb: 2 }}>
         <Button
           component={Link}
@@ -102,14 +39,8 @@ export const Login = () => {
         </Button>
       </Box>
 
-      {/* normal login button */}
       <Box>
-        <Button
-          variant="contained"
-          sx={{ padding: 1, width: 200, mb: 2 }}
-          //onClick={handleManualLogin} // Use your manual login function here
-          // disabled={!email || !password}
-        >
+        <Button variant="contained" sx={{ padding: 1, width: 200, mb: 2 }}>
           Login
         </Button>
       </Box>
@@ -143,7 +74,7 @@ export const Login = () => {
 
       <Box>
         <Button
-          onClick={googleLogin}
+          onClick={login}
           variant="outlined"
           sx={{
             textTransform: "none",
@@ -180,8 +111,10 @@ export const Login = () => {
 
       <Box>
         <Button
+
           component={Link}
-          to="/adminDashboard" // Adjust this route as needed
+          // to="/admin-login" // this shold take one to admin login page before the admin dashboard
+          to="/sideBar"
           sx={{ padding: 1, textTransform: "none" }}
         >
           Admin Login here
