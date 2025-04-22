@@ -4,21 +4,23 @@ import GoogleIcon from "@mui/icons-material/Google";
 import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from "react";
 
+import { UserRole } from "../../types/applicationUser";
+
 export const Login = () => {
   const { login, isLoggedIn, applicationUser, error } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
+  // const [email, setEmail] = useState('');
+  // const [password, setPassword] = useState('');
+   const [loginError, setLoginError] = useState('');
 
   useEffect(() => {
   
      if (isLoggedIn) {
-      if (applicationUser?.role === 'admin') {
+      if (applicationUser?.role === UserRole.ADMIN) {
         navigate('/adminDashboard');
-      } else if (applicationUser?.role === 'user') {
+      } else if (applicationUser?.role === UserRole.USER) {
         navigate('/userDashboard');
-      } else if (applicationUser?.role === 'superAdmin') {
+      } else if (applicationUser?.role === UserRole.SUPER_ADMIN) {
         navigate('/superAdminDashboard');
       } else {
         navigate('/');
@@ -27,7 +29,7 @@ export const Login = () => {
 
    
 
-    if (error) {
+    /* if (error) {
       if (error === 'User not found') {
         setLoginError('User not found. Please sign up.');
       } else if (error === 'Login failed') {
@@ -37,14 +39,14 @@ export const Login = () => {
       }
     } else {
       setLoginError(''); // Clear any previous error on successful state change
-    }
+    } */
   }, [isLoggedIn, navigate, applicationUser?.role, error]);
 
-  const handleManualLogin = () => {
+ /*  const handleManualLogin = () => {
     // Implement your manual login logic here, using email and password
     console.log('Manual Login:', { email, password });
    navigate('/userDashboard'); // Redirect to home or dashboard after login
-  };
+  }; */
 
   const googleLogin = async () => {
     try {
@@ -75,8 +77,8 @@ export const Login = () => {
           label="Username/Email"
           variant="outlined"
           sx={{ mb: 2, maxWidth: 500 }}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          // value={email}
+          // onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
           fullWidth
@@ -84,8 +86,8 @@ export const Login = () => {
           type="password"
           variant="outlined"
           sx={{ mb: 2, maxWidth: 500 }}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          // value={password}
+          // onChange={(e) => setPassword(e.target.value)}
         />
       </Box>
 
@@ -105,7 +107,7 @@ export const Login = () => {
         <Button
           variant="contained"
           sx={{ padding: 1, width: 200, mb: 2 }}
-          onClick={handleManualLogin} // Use your manual login function here
+          //onClick={handleManualLogin} // Use your manual login function here
           // disabled={!email || !password}
         >
           Login

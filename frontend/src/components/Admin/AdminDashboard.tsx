@@ -29,11 +29,11 @@ import AdminProducts from "./AdminProducts";
 
   const AdminDashboard = () => {
     const [sideLink, setsideLink] = useState<string | null>(null);
-    // const [grid, setGrid] = useState<boolean>(false);
-    // const [list, setList] = useState<boolean>(false);
+
     const [productsOpen, setProductsOpen] = useState(false);
     const [bookingsOpen, setBookingsOpen] = useState(false);
-    const[component, setComponent] = useState<JSX.Element | null>(<AdminProducts/>);
+    //const[component, setComponent] = useState<JSX.Element | null>(<AdminProducts/>);
+    const [component, setComponent] = useState<React.ReactElement | null>(<AdminProducts onEdit={() => {}} />);
 
   
    

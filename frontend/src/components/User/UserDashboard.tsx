@@ -38,7 +38,8 @@ import UserSettings from "./UserSettings";
 
     const [productsOpen, setProductsOpen] = useState(false);
     const [bookingsOpen, setBookingsOpen] = useState(false);
-    const [component, setComponent] = useState<JSX.Element | null>(<UserProducts />);
+    //const [component, setComponent] = useState<JSX.Element | null>(<UserProducts />);
+    const [component, setComponent] = useState<React.ReactElement | null>(<UserProducts onEdit={() => {}} />);
   
    
 
