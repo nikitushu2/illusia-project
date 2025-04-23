@@ -1,38 +1,38 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const { parse } = require('csv-parse/sync');
-
 /** @type {import('sequelize-cli').Seeder} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const csvFilePath = path.join(__dirname, '../data/Test-Data-Eng.csv'); // Updated file name
+    const items = [{
+      name: 'Halloween Mask',
+      description: 'Superhero mask for Halloween.',
+      size: null,
+      color: 'Green',
+      item_location: 'Helsinki',
+      storage_location: 'Room 1',
+      availability: true,
+      price: 99.99,
+      created_at: new Date(),
+      updated_at: new Date(),
+    },
+    {
+      name: 'Batman Costume',
+      description: 'Tactical vest for combat situations.',
+      size: null,
+      color: 'Black',
+      item_location: 'Helsinki',
+      storage_location: 'Room 2',
+      availability: true,
+      price: 149.99,
+      created_at: new Date(),
+      updated_at: new Date(),
+    }];
 
     try {
-      const csvFile = fs.readFileSync(csvFilePath, { encoding: 'utf8' });
-      const records = parse(csvFile, {
-        delimiter: ';',
-        columns: true,
-        skip_empty_lines: true,
-      });
-
-      const itemsData = records.map(record => ({
-        name: record.name,
-        description: record.description,
-        size: record.size === '' ? null : record.size,
-        color: record.color === '' ? null : record.color,
-        item_location: record.itemLocation,
-        storage_location: record.storageLocation,
-        availability: record.availability === 'true', // Convert string to boolean
-        price: 0, // <-- Add this line to set default price
-        created_at: new Date(),
-        updated_at: new Date(),
-      }));
-
-      await queryInterface.bulkInsert('items', itemsData, {});
+      await queryInterface.bulkInsert('items', items, {});
+      console.log(`Added ${items.length} items to database`);
     } catch (error) {
-      console.error('Error reading or processing CSV file:', error);
+      console.error('Error inserting items:', error);
     }
   },
 
