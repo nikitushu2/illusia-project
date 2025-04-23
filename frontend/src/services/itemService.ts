@@ -1,6 +1,12 @@
 import axios from 'axios';
 import { API_URL } from '../config';
 
+// Create an authenticated axios instance that includes credentials
+const authAxios = axios.create({
+  baseURL: API_URL,
+  withCredentials: true
+});
+
 export interface Item {
   id: number;
   name: string;
@@ -16,6 +22,7 @@ export interface Item {
   color: string;
   itemLocation: string;
   storageLocation: string;
+  storage_location?: string;
 }
 
 export interface CreateItemData {
@@ -58,17 +65,20 @@ const itemService = {
   },
 
   create: async (data: CreateItemData): Promise<Item> => {
-    const response = await axios.post(`${API_URL}/items`, data);
+    // Use authenticated axios for protected routes
+    const response = await authAxios.post(`/private/items`, data);
     return response.data;
   },
 
   update: async (id: number, data: UpdateItemData): Promise<Item> => {
-    const response = await axios.put(`${API_URL}/items/${id}`, data);
+    // Use authenticated axios for protected routes
+    const response = await authAxios.put(`/private/admin/items/${id}`, data);
     return response.data;
   },
 
   delete: async (id: number): Promise<void> => {
-    await axios.delete(`${API_URL}/items/${id}`);
+    // Use authenticated axios for protected routes
+    await authAxios.delete(`/private/admin/items/${id}`);
   }
 };
 

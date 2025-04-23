@@ -31,22 +31,23 @@ import { Item } from "../../services/itemService";
 //import { Link } from "react-router-dom";
 //import Helmet from "../../images/helmet.jpeg";
 
-
 interface ItemListProps {
   onEdit: (item: Item) => void;
   categories?: { id: number; name: string }[];
 }
 
-const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
+const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const [modeDisplay, setModeDisplay] = React.useState("table"); // for table and grid view
 
   // fetching items from the backend
   const [items, setItems] = React.useState<Item[]>([]);
   const [loading, setLoading] = React.useState(false);
-   
+
   //modal view for single product
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [selectedProduct, setSelectedProduct] = React.useState<Item | null>(null);
+  const [selectedProduct, setSelectedProduct] = React.useState<Item | null>(
+    null
+  );
   const [searchInput, setSearchInput] = useState<string>(""); // for search bar
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
@@ -88,7 +89,7 @@ const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => 
     fetchItems();
   }, []);
 
-//FILTER ITEMS BY CATEGORY
+  //FILTER ITEMS BY CATEGORY
   useEffect(() => {
     if (categoryFilter === "all") {
       setFilteredItems(items);
@@ -107,145 +108,239 @@ const UserProducts : React.FC<ItemListProps> = ({ onEdit, categories = [] }) => 
     console.log("Categories in ItemList:", categories);
   }, [categories]);
 
- //HANDLE TABLE VIEW
- const handleListView = () => {
-  return (
-    <TableContainer sx= {{ maxHeight: 800 }}>
-      <Table stickyHeader>{/* Added stickyHeader for better UX */}
-        <TableHead>
-          <TableRow>
-            {/* <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>ID</TableCell>  not needed for user */}
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Image</TableCell>
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Name</TableCell>
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Description</TableCell>
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Size</TableCell>
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Color</TableCell>
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold"}}>Item Location</TableCell>
-            {/* <TableCell>Storage Details</TableCell> */}
-            {/* <TableCell>Storage Location</TableCell> */}
-            <TableCell sx={{ backgroundColor: "primary.main", color: "white", fontSize:"1.1rem", fontWeight:"bold" }}>Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {filteredItems.map((item) => (
-            <TableRow
-              key={item.id}
-              // component={Link}
-              // to={`/product/${product.id}`}
-              onClick={() => openModal(item)}
-            >
-              {/* <TableCell>{item.id}</TableCell> */}
-             <TableCell>
-                {item.imageUrl ? (
-                  <img
-                    src={item.imageUrl}
-                    alt={item.description}
-                    style={{
-                      width: "150px",
-                      height: "150px",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  <img
-                    src={camera} // Use the camera variable here
-                    alt="No Image Available"
-                    style={{
-                      width: "150px",
-                      height: "150px",
-                      objectFit: "cover",
-                    }}
-                  />
-                )}
-              </TableCell>
-              <TableCell>{item.name}</TableCell>
-              <TableCell>{item.description}</TableCell>
-              <TableCell>{item.size}</TableCell> 
-              <TableCell>{item.color}</TableCell> 
-              <TableCell>{item.itemLocation}</TableCell> 
-              {/* <TableCell>{item.storageLocation}</TableCell>  */}
-              {/* <TableCell>{item.storageLocation}</TableCell>  */}
-              {/* <TableCell><Button onClick={handleBooking}>Book</Button></TableCell> */}
-              <TableCell>
-                <Button
-                  onClick={(event) => {
-                    event.stopPropagation(); // Prevent row click when clicking the button
-                    navigate(`/product/${item.id}`);
-                  }}
-                >
-                  Book
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
-};
-
-// HANDLE GRID VIEW
-const handleGridView = () => {
-  return (
-    <div>
-      <Paper
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: 4,
-          padding: 2,
-        }}
-      >
-        {filteredItems.map((item) => (
-          <Card
-            key={item.id}
-            sx={{
-              height: 400,
-              width: 250,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              alignItems: "center",
-              boxShadow: 3,
-              borderRadius: 2,
-              overflow: "hidden",
-            }}
-          >
-            <CardMedia
-              sx={{ height: 200, width: "100%", objectFit: "cover" }}
-              image={item.imageUrl || camera}
-              title={item.description}
-            />
-            <CardContent
-              sx={{ textAlign: "center", cursor: "pointer" }}
-              onClick={() => openModal(item)}
-            >
-              <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
-              <p style={{ margin: 0 }}>{item.description}</p>
-            </CardContent>
-            <CardActions>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={(event) => {
-                  event.stopPropagation(); // Prevent row click when clicking the button
-                  navigate(`/product/${item.id}`);
+  //HANDLE TABLE VIEW
+  const handleListView = () => {
+    return (
+      <TableContainer sx={{ maxHeight: 800 }}>
+        <Table stickyHeader>
+          {/* Added stickyHeader for better UX */}
+          <TableHead>
+            <TableRow>
+              {/* <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>ID</TableCell>  not needed for user */}
+              <TableCell
+                sx={{
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  fontSize: "1.1rem",
+                  fontWeight: "bold",
                 }}
               >
-                Book
-              </Button>
-            </CardActions>
-          </Card>
-        ))}
-      </Paper>
-    </div>
-  );
-};
+                Image
+              </TableCell>
+              <TableCell
+                sx={{
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  fontSize: "1.1rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Name
+              </TableCell>
+              <TableCell
+                sx={{
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  fontSize: "1.1rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Description
+              </TableCell>
+              <TableCell
+                sx={{
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  fontSize: "1.1rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Size
+              </TableCell>
+              <TableCell
+                sx={{
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  fontSize: "1.1rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Color
+              </TableCell>
+              <TableCell
+                sx={{
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  fontSize: "1.1rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Item Location
+              </TableCell>
+              <TableCell
+                sx={{
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  fontSize: "1.1rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Category
+              </TableCell>
+              {/* <TableCell>Storage Details</TableCell> */}
+              {/* <TableCell>Storage Location</TableCell> */}
+              <TableCell
+                sx={{
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  fontSize: "1.1rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Action
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredItems.map((item) => {
+              const category = categories.find((c) => c.id === item.categoryId);
+              return (
+                <TableRow
+                  key={item.id}
+                  // component={Link}
+                  // to={`/product/${product.id}`}
+                  onClick={() => openModal(item)}
+                >
+                  {/* <TableCell>{item.id}</TableCell> */}
+                  <TableCell>
+                    {item.imageUrl ? (
+                      <img
+                        src={item.imageUrl}
+                        alt={item.description}
+                        style={{
+                          width: "150px",
+                          height: "150px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <img
+                        src={camera} // Use the camera variable here
+                        alt="No Image Available"
+                        style={{
+                          width: "150px",
+                          height: "150px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.description}</TableCell>
+                  <TableCell>{item.size}</TableCell>
+                  <TableCell>{item.color}</TableCell>
+                  <TableCell>{item.itemLocation}</TableCell>
+                  <TableCell>
+                    {category
+                      ? category.name
+                      : item.categoryId
+                      ? `Category ${item.categoryId}`
+                      : "N/A"}
+                  </TableCell>
+                  {/* <TableCell>{item.storageLocation}</TableCell>  */}
+                  {/* <TableCell>{item.storageLocation}</TableCell>  */}
+                  {/* <TableCell><Button onClick={handleBooking}>Book</Button></TableCell> */}
+                  <TableCell>
+                    <Button
+                      onClick={(event) => {
+                        event.stopPropagation(); // Prevent row click when clicking the button
+                        navigate(`/product/${item.id}`);
+                      }}
+                    >
+                      Book
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  };
 
+  // HANDLE GRID VIEW
+  const handleGridView = () => {
+    return (
+      <div>
+        <Paper
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: 4,
+            padding: 2,
+          }}
+        >
+          {filteredItems.map((item) => {
+            const category = categories.find((c) => c.id === item.categoryId);
+            return (
+              <Card
+                key={item.id}
+                sx={{
+                  height: 400,
+                  width: 250,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  boxShadow: 3,
+                  borderRadius: 2,
+                  overflow: "hidden",
+                }}
+              >
+                <CardMedia
+                  sx={{ height: 200, width: "100%", objectFit: "cover" }}
+                  image={item.imageUrl || camera}
+                  title={item.description}
+                />
+                <CardContent
+                  sx={{ textAlign: "center", cursor: "pointer" }}
+                  onClick={() => openModal(item)}
+                >
+                  <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
+                  <p style={{ margin: 0 }}>{item.description}</p>
+                  <p style={{ margin: 0, color: "gray" }}>
+                    Category:{" "}
+                    {category
+                      ? category.name
+                      : item.categoryId
+                      ? `Category ${item.categoryId}`
+                      : "N/A"}
+                  </p>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={(event) => {
+                      event.stopPropagation(); // Prevent row click when clicking the button
+                      navigate(`/product/${item.id}`);
+                    }}
+                  >
+                    Book
+                  </Button>
+                </CardActions>
+              </Card>
+            );
+          })}
+        </Paper>
+      </div>
+    );
+  };
 
   //in case you want to move to a new page
- /*  const handleSingleProduct = () => {
+  /*  const handleSingleProduct = () => {
     console.log("single product");
     navigate(<UserProducts/>); // wrong way. only strings are accecpted with navigate
   }; */
@@ -255,11 +350,10 @@ const handleGridView = () => {
      navigate("/product/:id");
   }; */
 
- 
   //HANDLE CATEGORY FILTER
   const handleByCategory = (event: SelectChangeEvent) => {
-      setCategoryFilter(event.target.value);
-    };
+    setCategoryFilter(event.target.value);
+  };
 
   // Pagination calculations
   /* const paginatedItems = filteredItems.slice(
@@ -279,15 +373,14 @@ const handleGridView = () => {
 
     if (searchInput === "") {
       setFilteredItems(items);
-    }
-    else {
+    } else {
       const filteredItems = items.filter((item) =>
         item.description.toLowerCase().includes(searchInput.toLowerCase())
       );
       setFilteredItems(filteredItems);
     }
-  }
-  
+  };
+
   return (
     <div>
       <Box
@@ -299,21 +392,37 @@ const handleGridView = () => {
           paddingX: "20px",
         }}
       >
-        
         {/* grid and list views  + search bar */}
         <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
-          <TextField onChange={handleSearch} value={searchInput} label="search item" sx={{ width: "50%" }}></TextField>
+          <TextField
+            onChange={handleSearch}
+            value={searchInput}
+            label="search item"
+            sx={{ width: "50%" }}
+          ></TextField>
         </Box>
 
-        <Box sx={{
-            display: "flex",justifyContent: "flex-end",gap: "20px", marginRight: "20px", }}>
-          <AppsIcon sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }} onClick={toggleDisplayMode} />
-          <TableRowsIcon sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }} onClick={toggleDisplayMode} />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "20px",
+            marginRight: "20px",
+          }}
+        >
+          <AppsIcon
+            sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }}
+            onClick={toggleDisplayMode}
+          />
+          <TableRowsIcon
+            sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }}
+            onClick={toggleDisplayMode}
+          />
         </Box>
-    </Box>
+      </Box>
 
-        {/* filter by category */}
-      <Box sx={{marginBottom: "20px" }}>
+      {/* filter by category */}
+      <Box sx={{ marginBottom: "20px" }}>
         <FormControl sx={{ width: 200 }}>
           <InputLabel id="category-filter-label">Filter by Category</InputLabel>
           <Select
@@ -336,9 +445,7 @@ const handleGridView = () => {
             )}
           </Select>
         </FormControl>
-        </Box>
-
-     
+      </Box>
 
       {modeDisplay === "table" ? handleListView() : handleGridView()}
 
