@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { TableCell, TableContainer, TableHead, TableRow, Paper, TableBody, Checkbox, Table, Button, Box, useMediaQuery, Typography, Grid, Popover, Stack, Pagination } from "@mui/material";
+import { TableCell, TableContainer, TableHead, TableRow, Paper, TableBody, Table, Button, Box, useMediaQuery, Typography, Grid, Popover, Stack, Pagination, OutlinedInput, InputAdornment } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 import { ApplicationUser } from '../../types/applicationUser';
+import SearchIcon from '@mui/icons-material/Search';
 
 interface UserRowView {
     email: React.ReactNode, 
@@ -24,7 +25,9 @@ const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState
     const [approveAnchorEl, setApproveAnchorEl] = React.useState<HTMLButtonElement | null>(null);
     const [deleteAnchorEl, setDeleteAnchorEl] = React.useState<HTMLButtonElement | null>(null);
     const [clickedUser, setClickedUser] = React.useState<ApplicationUser | null>(null);
-    const [page, setPage] = useState(1); 
+    const [page, setPage] = useState(1);
+    const [searchValue, setSearchValue] = useState("");
+    const [searchResults, setSearchResults] = useState<ApplicationUser[]>(applicationUsers);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm')); 
     const ITEMS_PER_PAGE = 8;
@@ -38,6 +41,19 @@ const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState
         setApproveAnchorEl(null);
         setDeleteAnchorEl(null);
     };
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+            const searchText = event.target.value.trim();
+            setSearchValue(searchText);
+            if (searchText === "") {
+                setSearchResults(applicationUsers);
+            }
+            else {
+                const filteredUsers = applicationUsers.filter((user) =>
+                    user.email.toLowerCase().includes(searchText.toLowerCase()) || user.displayName.toLowerCase().includes(searchText.toLowerCase()));
+                setSearchResults(filteredUsers);
+            }
+        };
 
     const handleApproveClick = async () => {
         try {
@@ -90,10 +106,10 @@ const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState
 
     // Pagination and sorting 
 
-    const numberOfPages = Math.ceil(applicationUsers.length / ITEMS_PER_PAGE);
+    const numberOfPages = Math.ceil(searchResults.length / ITEMS_PER_PAGE);
     const startIndex = (page - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    const paginatedUsers = applicationUsers.slice(startIndex, endIndex);
+    const paginatedUsers = searchResults.slice(startIndex, endIndex);
 
     const users: UserRowView[] = paginatedUsers.map((user) => ({
         email: <Typography variant='body2'>{user.email}</Typography>,
@@ -180,6 +196,20 @@ const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState
 
   return (
     <Box>
+        <Box sx={{ width: '70%', m: 1, mx: 'auto', display: 'flex', justifyContent: 'center' }}>
+            <OutlinedInput
+                fullWidth
+                value={searchValue}
+                onChange={handleSearchChange}
+                placeholder={"Search user by email"}
+                startAdornment={
+                <InputAdornment position="start">
+                    <SearchIcon />
+                </InputAdornment>
+                }
+                sx={{ borderRadius: 2, height: '40px' }}
+            />
+        </Box>
         <TableContainer component={Paper}>
             <Table aria-label="responsive table">
                 <TableHead>
