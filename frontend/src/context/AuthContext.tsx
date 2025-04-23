@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
 import { auth, provider } from "../config/firebase";
-import { ApplicationUser } from "../types/applicationUser";
+import { ApplicationUser, UserRole } from "../types/applicationUser";
 
 interface AuthProviderProp {
   children: React.ReactNode;
@@ -19,6 +19,8 @@ interface AuthContextType {
     login: () => void;
     logout: () => void;
     isLoggedIn: boolean;
+    isAdmin: boolean;
+    isSuperAdmin: boolean;
     signUpUser?: User;
     signUp: () => void;
 }
@@ -28,6 +30,8 @@ const authContextInitialValue = {
     login: () => {},
     logout: () => {},
     isLoggedIn: false,
+    isAdmin: false,
+    isSuperAdmin: false,
     signUp: () => {},
 }
 
@@ -132,6 +136,8 @@ export const AuthProvider = ({ children }: AuthProviderProp) => {
         login: login,
         logout: logout,
         isLoggedIn: !!applicationUser && applicationUser.isApproved,
+        isAdmin: !!applicationUser && applicationUser.isApproved && applicationUser.role !== UserRole.USER,
+        isSuperAdmin: !!applicationUser && applicationUser.isApproved && applicationUser.role === UserRole.SUPER_ADMIN,
         signUpUser: signUpUser,
         signUp: signUp
     }
