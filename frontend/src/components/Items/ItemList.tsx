@@ -8,7 +8,7 @@ import {
   TableHead,
   TableRow,
   Paper,
-  IconButton,
+  //IconButton,
   Typography,
   CircularProgress,
   Snackbar,
@@ -26,7 +26,7 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
+//import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import itemService, { Item } from "../../services/itemService";
 
 interface ItemListProps {
@@ -94,10 +94,10 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   }, [categories]);
 
   // Show delete confirmation dialog
-  const confirmDelete = (id: number) => {
+ /*  const confirmDelete = (id: number) => {
     setItemToDelete(id);
     setDeleteConfirmOpen(true);
-  };
+  }; */
 
   // Handle actual deletion when confirmed
   const handleDelete = async () => {
@@ -254,6 +254,7 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                   >
                     Category
                   </TableCell>
+                  
                   <TableCell
                     sx={{
                       color: "white",
@@ -261,8 +262,18 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                       fontSize: "1.1rem",
                     }}
                   >
-                    Actions
+                    location
                   </TableCell>
+
+                 {/*  <TableCell
+                    sx={{
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "1.1rem",
+                    }}
+                  >
+                    Actions
+                  </TableCell> */}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -298,13 +309,19 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                         <TableCell sx={{ fontSize: "1rem" }}>
                           {category ? category.name : item.categoryId}
                         </TableCell>
-                        <TableCell>
+
+                        <TableCell sx={{ fontSize: "1rem" }}>
+                          {item.itemLocation}
+                        </TableCell>
+
+                    {/*     <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <IconButton
                             color="primary"
                             onClick={() => onEdit(item)}
                             size="medium"
                           >
-                            <EditIcon />
+                            <EditIcon/>
                           </IconButton>
                           <IconButton
                             color="error"
@@ -313,7 +330,8 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                           >
                             <DeleteIcon />
                           </IconButton>
-                        </TableCell>
+                        </Box>
+                        </TableCell>  */}
                       </TableRow>
                     );
                   })

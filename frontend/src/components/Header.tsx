@@ -19,6 +19,10 @@ import { useContext, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+
+
+
+
 // import DarkModeIcon from "@mui/icons-material/DarkMode";
 // import LightModeIcon from "@mui/icons-material/LightMode";
 
@@ -73,7 +77,15 @@ export const Header = () => {
                 gap: "20px",
               }}
             >
-              <Button color="inherit" variant="text" component={Link} to="/">
+            
+
+
+            
+
+           
+             
+
+               <Button color="inherit" variant="text" component={Link} to="/">
                 <Typography variant="body1">HOME</Typography>
               </Button>
               <Button
