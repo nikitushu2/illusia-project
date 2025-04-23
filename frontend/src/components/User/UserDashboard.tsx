@@ -146,14 +146,9 @@ import UserSettings from "./UserSettings";
                     </ListItemButton>
                   </ListItem>
                   <Divider />
-                  <ListItem disablePadding>
-                    <ListItemButton>
-                    <ListItemIcon>
-                      <SettingsIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Settings" onClick={() => handleSideBar(<UserSettings/>)} />
-                    </ListItemButton>
-                  </ListItem>
+
+                
+
                   </List>
                 </Box>
                 </Box>

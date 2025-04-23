@@ -88,6 +88,14 @@ export const Header = () => {
                <Button color="inherit" variant="text" component={Link} to="/">
                 <Typography variant="body1">HOME</Typography>
               </Button>
+              <Button
+                color="inherit"
+                variant="text"
+                component={Link}
+                to="/items"
+              >
+                <Typography variant="body1">ITEMS</Typography>
+              </Button>
               <Button color="inherit" variant="text">
                 <Typography variant="body1">EVENTS</Typography>
               </Button>
