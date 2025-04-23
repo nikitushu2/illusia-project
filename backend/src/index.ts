@@ -4,7 +4,7 @@ import express from "express";
 import { ErrorRequestHandler } from "express";
 import { PORT } from "./config/config";
 import { connectToDatabase } from "./util/db";
-import { itemsRouter } from "./controllers/items";
+import { adminItemsRouter, privateItemsRouter, publicItemsRouter } from "./controllers/items";
 import { authRouter } from "./controllers/auth";
 import { errorHandler, AppError } from "./middleware/errorHandler";
 import cors from 'cors';
@@ -35,7 +35,7 @@ apiRouter.use(cookieParser());
 apiRouter.use('/auth', authRouter);
 
 // Public items route - no authentication required
-apiRouter.use('/items', itemsRouter);
+apiRouter.use('/items', publicItemsRouter);
 apiRouter.use('/categories', categoriesRouter);
 
 // all the private endpoint starts with /api/private
@@ -57,15 +57,17 @@ privateApiRouter.use('/superadmin', superAdminApiRouter);
 const adminApiRouter = express.Router();
 adminApiRouter.use(verifyAdminSession);
 
-adminApiRouter.use('/', admin)
 // admin related endpoints goes here
+adminApiRouter.use('/items', adminItemsRouter);
 
 privateApiRouter.use('/admin', adminApiRouter);
 
 // all common endpoints for logged in user should use privateApiRouter
-// privateApiRouter.use('/items', itemsRouter);
+privateApiRouter.use('/items', privateItemsRouter);
 
 apiRouter.use('/private', privateApiRouter);
+
+
 
 const errorHandlerMiddleware: ErrorRequestHandler = (err, req, res, next) => {
   errorHandler(err as AppError, req, res, next);
