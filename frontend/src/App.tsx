@@ -9,7 +9,9 @@ import { LogoutPage } from "./components/LogoutPage";
 import { Login } from "./components/login/Login";
 import SignUp from "./components/SignUp";
 import { Header } from "./components/Header";
+import { UserManagement } from "./components/userManagement/UserManagement";
 import Footer from "./components/Footer";
+
 
 const App: React.FC = () => {
   return (
@@ -27,6 +29,8 @@ const App: React.FC = () => {
             <Route path="/items" element={<ItemManagement />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
+            { /* TODO: show error page for /users if user is not admin, once the error page is created */}
+            <Route path="/users" element={<UserManagement />} />
           </Routes>
         </Container>
         <Footer />

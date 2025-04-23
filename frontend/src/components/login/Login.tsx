@@ -1,6 +1,6 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import { Google as GoogleIcon } from "@mui/icons-material";
+import GoogleIcon from "@mui/icons-material/Google";
 import { useAuth } from "../../context/AuthContext";
 
 export const Login = () => {
