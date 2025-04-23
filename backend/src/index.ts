@@ -58,6 +58,7 @@ const adminApiRouter = express.Router();
 adminApiRouter.use(verifyAdminSession);
 
 // admin related endpoints goes here
+adminApiRouter.use('/', admin); 
 adminApiRouter.use('/items', adminItemsRouter);
 
 privateApiRouter.use('/admin', adminApiRouter);
@@ -66,8 +67,6 @@ privateApiRouter.use('/admin', adminApiRouter);
 privateApiRouter.use('/items', privateItemsRouter);
 
 apiRouter.use('/private', privateApiRouter);
-
-
 
 const errorHandlerMiddleware: ErrorRequestHandler = (err, req, res, next) => {
   errorHandler(err as AppError, req, res, next);
