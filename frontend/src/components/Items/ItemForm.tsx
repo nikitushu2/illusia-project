@@ -4,10 +4,11 @@ import {
   Button,
   TextField,
   Typography,
-  Grid,
+  // Grid,
   MenuItem,
   Snackbar,
   Alert,
+  Grid,
 } from "@mui/material";
 import {
   Item,
@@ -38,6 +39,11 @@ const ItemForm: React.FC<ItemFormProps> = ({
       price: 0,
       quantity: 0,
       categoryId: 0,
+
+      size: "",
+      color: "",
+      itemLocation: "",
+      storageLocation: "",
     }
   );
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -112,6 +118,11 @@ const ItemForm: React.FC<ItemFormProps> = ({
           price: 0,
           quantity: 0,
           categoryId: 0,
+
+          size: "",
+          color: "",
+          itemLocation: "",
+          storageLocation: "",
         });
       }
     } catch (err) {
@@ -207,6 +218,23 @@ const ItemForm: React.FC<ItemFormProps> = ({
           />
         </Grid>
 
+        <Grid>
+            <TextField
+              fullWidth
+              label="Item Location"
+              name="itemLocation"
+              value={formValues.itemLocation || ""}
+              onChange={handleChange}
+            />
+          {/*   <TextField
+              fullWidth
+              label="Storage Location"
+              name="storageLocation"
+              value={formValues.storageLocation || ""}
+              onChange={handleChange}
+            /> */}
+        </Grid>
+
         <Grid item xs={12}>
           <TextField
             select
@@ -245,7 +273,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
               onClick={onCancel}
               disabled={isSubmitting}
             >
-              Cancel
+              Cancel or
             </Button>
             <Button
               type="submit"

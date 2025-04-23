@@ -7,6 +7,11 @@ export interface Category {
   description: string;
   createdAt: string;
   updatedAt: string;
+
+  // size: string;
+  // color: string;
+  // itemLocation: string;
+  // storageLocation: string;
 }
 
 const categoryService = {
