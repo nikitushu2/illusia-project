@@ -1,7 +1,13 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../util/db";
 
-class User extends Model {}
+class User extends Model {
+    public id!: number;
+    public email!: string;
+    public displayName!: string;
+    public role!: string;
+    public isApproved!: boolean;
+}
 
 User.init(
     {
