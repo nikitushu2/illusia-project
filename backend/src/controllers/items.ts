@@ -52,7 +52,7 @@ publicItemsRouter.get("/category/:categoryId", async (req: Request, res: Respons
   } catch (error) {
     next(error);
   }
-);
+});
 
 // Search items by name or description
 publicItemsRouter.get("/search", async (req: Request, res: Response, next: NextFunction) => {
