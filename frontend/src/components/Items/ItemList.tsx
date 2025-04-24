@@ -29,6 +29,8 @@ import {
 //import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import itemService, { Item } from "../../services/itemService";
 
+import UserSingleProduct from "../User/UserSingleProduct";
+
 interface ItemListProps {
   onEdit: (item: Item) => void;
   categories?: { id: number; name: string }[];
@@ -52,6 +54,9 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     message: "",
     severity: "success",
   });
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Item | null>(null);
 
   const fetchItems = async () => {
     try {
@@ -154,6 +159,16 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
+
+  const openModal = (item: Item) => {
+      setSelectedProduct(item);
+      setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+      setSelectedProduct(null);
+      setIsModalOpen(false);
+    };
 
   return (
     <Box>
@@ -283,7 +298,7 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                       (c) => c.id === item.categoryId
                     );
                     return (
-                      <TableRow key={item.id} hover>
+                      <TableRow key={item.id} hover onClick={() => openModal(item)}>
                         <TableCell sx={{ fontSize: "1rem" }}>
                           {item.name}
                         </TableCell>
@@ -396,6 +411,12 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+        {isModalOpen && selectedProduct && (
+          <div>
+            <UserSingleProduct item={selectedProduct} onClose={closeModal} />
+          </div>
+        )}
     </Box>
   );
 };

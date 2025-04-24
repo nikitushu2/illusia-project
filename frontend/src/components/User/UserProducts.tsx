@@ -45,9 +45,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
 
   //modal view for single product
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [selectedProduct, setSelectedProduct] = React.useState<Item | null>(
-    null
-  );
+  const [selectedProduct, setSelectedProduct] = React.useState<Item | null>(null);
   const [searchInput, setSearchInput] = useState<string>(""); // for search bar
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
