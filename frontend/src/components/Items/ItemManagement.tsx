@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  Button,
   Container,
   Typography,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
+  Button,
   Paper,
   Divider,
   CircularProgress,
   Alert,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
 import ItemList from "./ItemList";
 import ItemForm from "./ItemForm";
 import itemService, {
@@ -143,12 +142,6 @@ const ItemManagement: React.FC = () => {
     fetchCategories();
   }, []);
 
-  const handleCreate = () => {
-    console.log("Opening create modal");
-    setSelectedItem(undefined);
-    setIsModalOpen(true);
-  };
-
   const handleEdit = (item: Item) => {
     setSelectedItem(item);
     setIsModalOpen(true);
@@ -168,9 +161,9 @@ const ItemManagement: React.FC = () => {
         console.log("Updating item:", selectedItem.id);
         await itemService.update(selectedItem.id, values as UpdateItemData);
       } else {
-        // Create new item
-        console.log("Creating new item");
-        await itemService.create(values as CreateItemData);
+        // Create new item is removed as it's not needed here
+        console.log("Creating items is not supported in this component");
+        return;
       }
       setIsModalOpen(false);
       setSelectedItem(undefined);
@@ -199,17 +192,9 @@ const ItemManagement: React.FC = () => {
             color="primary"
             fontWeight="bold"
           >
-           Item display for All
+            Item display for All
           </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={handleCreate}
-            sx={{ borderRadius: 2 }}
-          >
-            Add New Item
-          </Button>
+          {/* Add New Item button removed */}
         </Box>
 
         <Divider sx={{ mb: 3 }} />
@@ -238,9 +223,7 @@ const ItemManagement: React.FC = () => {
           maxWidth="md"
           fullWidth
         >
-          <DialogTitle>
-            {selectedItem ? "Edit Item" : "Create New Item"}
-          </DialogTitle>
+          <DialogTitle>Edit Item</DialogTitle>
           <DialogContent dividers>
             <ItemForm
               initialValues={selectedItem}

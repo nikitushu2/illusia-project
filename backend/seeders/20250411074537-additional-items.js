@@ -1,5 +1,5 @@
 'use strict';
- 
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -57,16 +57,16 @@ module.exports = {
           updated_at: new Date()
         }
       ];
- 
+
       // Insert the data into the items table
       await queryInterface.bulkInsert('items', items, {});
- 
+
       console.log(`Added ${items.length} hardcoded items to database`);
     } catch (error) {
       console.error('Error inserting seed data:', error);
     }
   },
- 
+
   async down(queryInterface, Sequelize) {
     // You might want to be more specific about which items to delete
     // For example, you could store the IDs of added items somewhere

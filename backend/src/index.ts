@@ -11,14 +11,14 @@ import cors from 'cors';
 import { verifySession, verifyAdminSession, verifySuperAdminSession } from "./middleware/verifySession";
 import cookieParser from "cookie-parser";
 import { categoriesRouter } from "./controllers/categories";
-import { admin } from "./controllers/admin"
+import { admin } from "./controllers/admin";
 
 
 const app = express();
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://illusia-project-2947763ee03d.herokuapp.com' 
+  origin: process.env.NODE_ENV === 'production'
+    ? 'https://illusia-project-2947763ee03d.herokuapp.com'
     : ['http://localhost:5173', 'http://localhost:5174'],
   methods: "GET,POST,PUT,DELETE",
   credentials: true,
@@ -59,7 +59,7 @@ adminApiRouter.use(verifyAdminSession);
 
 // admin related endpoints goes here
 adminApiRouter.use('/items', adminItemsRouter);
-
+adminApiRouter.use('/', admin);
 privateApiRouter.use('/admin', adminApiRouter);
 
 // all common endpoints for logged in user should use privateApiRouter
