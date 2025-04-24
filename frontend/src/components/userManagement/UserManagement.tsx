@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
 import { ApplicationUser } from "../../types/applicationUser";
-import { Box, Tabs, Tab } from "@mui/material";
+import { Box, Tabs, Tab, Badge, Typography } from "@mui/material";
 import UserTable from "./UserTable";
 import { useAuth } from "../../context/AuthContext";
 
-
 const BACKEND_BASE_PATH = import.meta.env.VITE_BACKEND_ORIGIN + '/api/private'
-
-
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -29,7 +26,6 @@ const CustomTabPanel = (props: TabPanelProps) =>{
     );
   }
 
-
 export const UserManagement = () => {
     const [users, setUsers] = useState<ApplicationUser[]>([]);
     const [tabValue, setTabValue] = useState(0);
@@ -38,6 +34,7 @@ export const UserManagement = () => {
     const handleTabChange = (newValue: number) => {
         setTabValue(newValue);
     };
+    
     useEffect(() => {
         const fetchUsers = async () => {  
             try {
@@ -75,33 +72,62 @@ export const UserManagement = () => {
 
     const needApprovalUsers = users.filter((user) => !user.isApproved && user.role === "USER");
     const adminUsers = users.filter((user) => user.role === "ADMIN");
-    const approvedUsers = users.filter((user) => user.isApproved);
+    const approvedUsers = users.filter((user) => user.isApproved && user.role === "USER");
 
   return (
     <Box sx={{ padding: 2, backgroundColor: "#f5f5f5", textAlign: "center" }}>
         <h2>User Management</h2>
         <p>Manage user roles and approval status.</p>
-        <Tabs
-            value={tabValue}
-            onChange={(_, value) => handleTabChange(value)}
-            indicatorColor="primary"
-            textColor="inherit"
-            variant="fullWidth"
-            aria-label="full width tabs example"
-        >
-            {isSuperAdmin && <Tab label="Admin Management" id="admin-need-approval-list" aria-controls="fill-admin-width-need-approval-list"/>}
-            <Tab label="User Needs Approval" id="user-need-approval-list" aria-controls="fill-width-user-need-approval-list"/>
-            <Tab label="Approved Users" id="approved-users-list" aria-controls="fill-width-approved-users-list"/>
-        </Tabs>
-        {isSuperAdmin && <CustomTabPanel value={tabValue} index={0}>
-            <UserTable applicationUsers={adminUsers} updateUserApprovalState={updateUserApprovalState} showDeleteButton={true} deleteUserFromState={deleteUserFromState} /> 
-        </CustomTabPanel>}
-        <CustomTabPanel value={tabValue} index={isSuperAdmin ? 1 : 0}>
-            <UserTable applicationUsers={needApprovalUsers} updateUserApprovalState={updateUserApprovalState} /> 
-        </CustomTabPanel>
-        <CustomTabPanel value={tabValue} index={isSuperAdmin ? 2 : 1}>
-            <UserTable applicationUsers={approvedUsers} showDeleteButton={true} updateUserApprovalState={updateUserApprovalState} deleteUserFromState={deleteUserFromState} /> 
-        </CustomTabPanel>
+        <Box sx={{ mt: 3 }}>  
+            <Tabs
+                value={tabValue}
+                onChange={(_, value) => handleTabChange(value)}
+                indicatorColor="primary"
+                textColor="inherit"
+                variant="fullWidth"
+                aria-label="full width tabs example"
+            >
+                {isSuperAdmin && <Tab 
+                    label={
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Badge color="primary" badgeContent={adminUsers.length}/>
+                            <Typography variant="body2" sx={{ ml: 2 }}>Admin Management</Typography>
+                        </Box>
+                    } 
+                    id="admin-need-approval-list" 
+                    aria-controls="fill-admin-width-need-approval-list"
+                />}
+                <Tab 
+                    label={
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Badge color="primary" badgeContent={needApprovalUsers.length}/>
+                            <Typography variant="body2" sx={{ ml: 2 }}>User Needs Approval</Typography>
+                        </Box>  
+                    }  
+                    id="user-need-approval-list" 
+                    aria-controls="fill-width-user-need-approval-list"
+                />
+                <Tab 
+                    label={
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Badge color="primary" badgeContent={approvedUsers.length}/>
+                            <Typography variant="body2" sx={{ ml: 2 }}>Approved Users</Typography>
+                        </Box>
+                    } 
+                    id="approved-users-list" 
+                    aria-controls="fill-width-approved-users-list"
+                />
+            </Tabs>
+            {isSuperAdmin && <CustomTabPanel value={tabValue} index={0}>
+                <UserTable applicationUsers={adminUsers} updateUserApprovalState={updateUserApprovalState} showDeleteButton={true} deleteUserFromState={deleteUserFromState} /> 
+            </CustomTabPanel>}
+            <CustomTabPanel value={tabValue} index={isSuperAdmin ? 1 : 0}>
+                <UserTable applicationUsers={needApprovalUsers} updateUserApprovalState={updateUserApprovalState} /> 
+            </CustomTabPanel>
+            <CustomTabPanel value={tabValue} index={isSuperAdmin ? 2 : 1}>
+                <UserTable applicationUsers={approvedUsers} showDeleteButton={true} updateUserApprovalState={updateUserApprovalState} deleteUserFromState={deleteUserFromState} /> 
+            </CustomTabPanel>
+        </Box>  
     </Box>
   );
 };
