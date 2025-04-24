@@ -1,0 +1,60 @@
+import { Model, DataTypes } from "sequelize";
+import { sequelize } from "../util/db";
+
+export interface BookingAttributes {
+  id?: number;
+  userId: number;
+  startDate: Date;
+  endDate: Date;
+  statusId: number;
+  createdAt?: Date;
+}
+
+class Booking extends Model<BookingAttributes> implements BookingAttributes {
+  public id!: number;
+  public userId!: number;
+  public startDate!: Date;
+  public endDate!: Date;
+  public statusId!: number;
+  public readonly createdAt!: Date;
+}
+
+Booking.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: "users", key: "id" },
+    },
+    startDate: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    endDate: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    statusId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: "statuses", key: "id" },
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    sequelize,
+    tableName: "bookings",
+    underscored: true,
+  }
+);
+
+export default Booking;

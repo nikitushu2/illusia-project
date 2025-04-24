@@ -12,6 +12,8 @@ import { verifySession, verifyAdminSession, verifySuperAdminSession } from "./mi
 import cookieParser from "cookie-parser";
 import { categoriesRouter } from "./controllers/categories";
 import { admin } from "./controllers/admin";
+import { bookingsRouter } from "./controllers/bookings";
+import { bookingItemsRouter } from "./controllers/bookingItems";
 
 
 const app = express();
@@ -67,6 +69,9 @@ privateApiRouter.use('/admin', adminApiRouter);
 privateApiRouter.use('/items', privateItemsRouter);
 
 apiRouter.use('/private', privateApiRouter);
+
+apiRouter.use("/bookings", bookingsRouter);
+apiRouter.use("/booking-items", bookingItemsRouter);
 
 const errorHandlerMiddleware: ErrorRequestHandler = (err, req, res, next) => {
   errorHandler(err as AppError, req, res, next);
