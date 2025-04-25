@@ -45,7 +45,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const [items, setItems] = React.useState<Item[]>([]);
   const [loading, setLoading] = React.useState(false);
 
-  const [isModalOpen, setIsModalOpen] = React.useState(false);  //modal view for single product
+  const [isModalOpen, setIsModalOpen] = React.useState(false); //modal view for single product
   const [selectedProduct, setSelectedProduct] = React.useState<Item | null>(
     null
   );
@@ -111,7 +111,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     console.log("Categories in ItemList:", categories);
   }, [categories]);
 
-   // Pagination
+  // Pagination
   const ITEMS_PER_PAGE = 12;
   const indexOfLastItem = page * ITEMS_PER_PAGE;
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
@@ -120,161 +120,241 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   //HANDLE TABLE VIEW
   const handleListView = () => {
     return (
-      <TableContainer sx={{ maxHeight: 800 }}>
-        <Table stickyHeader>
-          {/* Added stickyHeader for better UX */}
-          <TableHead>
-            <TableRow>
-              {/* <TableCell sx={{ backgroundColor: "primary.main", color: "white" }}>ID</TableCell>  not needed for user */}
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Image
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Name
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Description
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Size
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Color
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Item Location
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Category
-              </TableCell>
-              {/* <TableCell>Storage Details</TableCell> */}
-              {/* <TableCell>Storage Location</TableCell> */}
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Action
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {currentItems.map((item) => {
-              const category = categories.find((c) => c.id === item.categoryId);
-              return (
-                <TableRow
-                  key={item.id}
-                  // component={Link}
-                  // to={`/product/${product.id}`}
-                  onClick={() => openModal(item)}
+      <Box
+        sx={{
+          width: "100%",
+          overflowX: "auto",
+          "& .MuiTableCell-root": {
+            whiteSpace: "nowrap",
+            maxWidth: "200px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            "@media (max-width: 600px)": {
+              padding: "8px",
+              fontSize: "0.75rem",
+            },
+          },
+          "& .MuiTableHead-root": {
+            "@media (max-width: 600px)": {
+              "& .MuiTableCell-root": {
+                fontSize: "0.75rem",
+                fontWeight: "bold",
+              },
+            },
+          },
+          "& .MuiTableRow-root": {
+            "@media (max-width: 600px)": {
+              "&:hover": {
+                backgroundColor: "action.hover",
+              },
+            },
+          },
+        }}
+      >
+        <TableContainer
+          sx={{
+            maxHeight: 800,
+            "&::-webkit-scrollbar": {
+              width: "8px",
+              height: "8px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#f1f1f1",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "#888",
+              borderRadius: "4px",
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              background: "#555",
+            },
+          }}
+        >
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "100px",
+                  }}
                 >
-                  {/* <TableCell>{item.id}</TableCell> */}
-                  <TableCell>
-                    {item.imageUrl ? (
-                      <img
-                        src={item.imageUrl}
-                        alt={item.description}
-                        style={{
-                          width: "150px",
-                          height: "150px",
-                          objectFit: "cover",
+                  Image
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "150px",
+                  }}
+                >
+                  Name
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "200px",
+                  }}
+                >
+                  Description
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "80px",
+                  }}
+                >
+                  Size
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "80px",
+                  }}
+                >
+                  Color
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "80px",
+                  }}
+                >
+                  Quantity
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "120px",
+                  }}
+                >
+                  Item Location
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "100px",
+                  }}
+                >
+                  Category
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "120px",
+                  }}
+                >
+                  Action
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {currentItems.map((item) => {
+                const category = categories.find(
+                  (c) => c.id === item.categoryId
+                );
+                return (
+                  <TableRow
+                    key={item.id}
+                    onClick={() => openModal(item)}
+                    sx={{
+                      "&:hover": {
+                        cursor: "pointer",
+                        backgroundColor: "action.hover",
+                      },
+                    }}
+                  >
+                    <TableCell>
+                      {item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.description}
+                          style={{
+                            width: "100px",
+                            height: "100px",
+                            objectFit: "cover",
+                            "@media (max-width: 600px)": {
+                              width: "50px",
+                              height: "50px",
+                            },
+                          }}
+                        />
+                      ) : (
+                        <img
+                          src={camera}
+                          alt="No Image Available"
+                          style={{
+                            width: "100px",
+                            height: "100px",
+                            objectFit: "cover",
+                            "@media (max-width: 600px)": {
+                              width: "50px",
+                              height: "50px",
+                            },
+                          }}
+                        />
+                      )}
+                    </TableCell>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.description}</TableCell>
+                    <TableCell>{item.size}</TableCell>
+                    <TableCell>{item.color}</TableCell>
+                    <TableCell>{item.quantity}</TableCell>
+                    <TableCell>{item.itemLocation}</TableCell>
+                    <TableCell>
+                      {category
+                        ? category.name
+                        : item.categoryId
+                        ? `Category ${item.categoryId}`
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          navigate(`/product/${item.id}`);
                         }}
-                      />
-                    ) : (
-                      <img
-                        src={camera} // Use the camera variable here
-                        alt="No Image Available"
-                        style={{
-                          width: "150px",
-                          height: "150px",
-                          objectFit: "cover",
+                        sx={{
+                          fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                          padding: { xs: "4px 8px", sm: "6px 16px" },
                         }}
-                      />
-                    )}
-                  </TableCell>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.description}</TableCell>
-                  <TableCell>{item.size}</TableCell>
-                  <TableCell>{item.color}</TableCell>
-                  <TableCell>{item.itemLocation}</TableCell>
-                  <TableCell>
-                    {category
-                      ? category.name
-                      : item.categoryId
-                      ? `Category ${item.categoryId}`
-                      : "N/A"}
-                  </TableCell>
-                  {/* <TableCell>{item.storageLocation}</TableCell>  */}
-                  {/* <TableCell>{item.storageLocation}</TableCell>  */}
-                  {/* <TableCell><Button onClick={handleBooking}>Book</Button></TableCell> */}
-                  <TableCell>
-                    <Button
-                      onClick={(event) => {
-                        event.stopPropagation(); // Prevent row click when clicking the button
-                        navigate(`/product/${item.id}`);
-                      }}
-                    >
-                      Add to Cart
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                      >
+                        Add to Cart
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     );
   };
 

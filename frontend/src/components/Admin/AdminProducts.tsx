@@ -274,224 +274,288 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   //HANDLE TABLE VIEW
   const handleListView = () => {
     return (
-      <TableContainer sx={{ maxHeight: 800 }}>
-        <Table stickyHeader>
-          {/* Added stickyHeader for better UX */}
-          <TableHead>
-            <TableRow>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                ID
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Image{" "}
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Name
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Description{" "}
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Size
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Color{" "}
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Item Location
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Storage Location
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Quantity{" "}
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Category{" "}
-              </TableCell>
-              {/* <TableCell>Storage Location</TableCell> */}
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Action
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {currentItems.map((item) => {
-              const category = categories.find((c) => c.id === item.categoryId);
-              return (
-                <TableRow
-                  key={item.id}
-                  style={{ opacity: itemVisibility[item.id] ? 1 : 0.5 }}
-                  onClick={() => openModal(item)}
+      <Box
+        sx={{
+          width: "100%",
+          overflowX: "auto",
+          "& .MuiTableCell-root": {
+            whiteSpace: "nowrap",
+            maxWidth: "200px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            "@media (max-width: 600px)": {
+              padding: "8px",
+              fontSize: "0.75rem",
+            },
+          },
+          "& .MuiTableHead-root": {
+            "@media (max-width: 600px)": {
+              "& .MuiTableCell-root": {
+                fontSize: "0.75rem",
+                fontWeight: "bold",
+              },
+            },
+          },
+          "& .MuiTableRow-root": {
+            "@media (max-width: 600px)": {
+              "&:hover": {
+                backgroundColor: "action.hover",
+              },
+            },
+          },
+        }}
+      >
+        <TableContainer
+          sx={{
+            maxHeight: 800,
+            "&::-webkit-scrollbar": {
+              width: "8px",
+              height: "8px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#f1f1f1",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "#888",
+              borderRadius: "4px",
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              background: "#555",
+            },
+          }}
+        >
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "50px",
+                  }}
                 >
-                  <TableCell>{item.id}</TableCell>
-                  <TableCell>
-                    {item.imageUrl ? (
-                      <img
-                        src={item.imageUrl}
-                        alt={item.description}
-                        style={{
-                          width: "150px",
-                          height: "150px",
-                          objectFit: "cover",
+                  ID
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "100px",
+                  }}
+                >
+                  Image
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "150px",
+                  }}
+                >
+                  Name
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "200px",
+                  }}
+                >
+                  Description
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "80px",
+                  }}
+                >
+                  Size
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "80px",
+                  }}
+                >
+                  Color
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "120px",
+                  }}
+                >
+                  Item Location
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "120px",
+                  }}
+                >
+                  Storage Location
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "80px",
+                  }}
+                >
+                  Quantity
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "100px",
+                  }}
+                >
+                  Category
+                </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                    fontWeight: "bold",
+                    minWidth: "120px",
+                  }}
+                >
+                  Action
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {currentItems.map((item) => {
+                const category = categories.find(
+                  (c) => c.id === item.categoryId
+                );
+                return (
+                  <TableRow
+                    key={item.id}
+                    style={{ opacity: itemVisibility[item.id] ? 1 : 0.5 }}
+                    onClick={() => openModal(item)}
+                    sx={{
+                      "&:hover": {
+                        cursor: "pointer",
+                        backgroundColor: "action.hover",
+                      },
+                    }}
+                  >
+                    <TableCell>{item.id}</TableCell>
+                    <TableCell>
+                      {item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.description}
+                          style={{
+                            width: { xs: "50px", sm: "150px" },
+                            height: { xs: "50px", sm: "150px" },
+                            objectFit: "cover",
+                          }}
+                        />
+                      ) : (
+                        <img
+                          src={camera}
+                          alt="No Image Available"
+                          style={{
+                            width: { xs: "50px", sm: "150px" },
+                            height: { xs: "50px", sm: "150px" },
+                            objectFit: "cover",
+                          }}
+                        />
+                      )}
+                    </TableCell>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.description}</TableCell>
+                    <TableCell>{item.size}</TableCell>
+                    <TableCell>{item.color}</TableCell>
+                    <TableCell>{item.itemLocation}</TableCell>
+                    <TableCell>
+                      {item.storageLocation || item.storage_location || "N/A"}
+                    </TableCell>
+                    <TableCell>{item.quantity}</TableCell>
+                    <TableCell>
+                      {category
+                        ? category.name
+                        : item.categoryId
+                        ? `Category ${item.categoryId}`
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 1,
+                          "& .MuiIconButton-root": {
+                            padding: { xs: "4px", sm: "8px" },
+                          },
                         }}
-                      />
-                    ) : (
-                      <img
-                        src={camera} // Use the camera variable here
-                        alt="No Image Available"
-                        style={{
-                          width: "150px",
-                          height: "150px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    )}
-                  </TableCell>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.description}</TableCell>
-                  <TableCell>{item.size}</TableCell>
-                  <TableCell>{item.color}</TableCell>
-                  <TableCell>{item.itemLocation}</TableCell>
-                  <TableCell>
-                    {item.storageLocation || item.storage_location || "N/A"}
-                  </TableCell>
-                  <TableCell>{item.quantity}</TableCell>
-                  <TableCell>
-                    {category
-                      ? category.name
-                      : item.categoryId
-                      ? `Category ${item.categoryId}`
-                      : "N/A"}
-                  </TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <IconButton
-                        color="primary"
-                        onClick={(event) => {event.stopPropagation();handleEdit(item);}}
-                        size="medium"
                       >
-                        {" "}
-                        <EditIcon />{" "}
-                      </IconButton>
-                      <IconButton
-                        color="primary"
-                        onClick={() => confirmDelete(item.id)}
-                        size="medium"
-                      >
-                        {" "}
-                        <DeleteIcon />{" "}
-                      </IconButton>
-                      <IconButton
-                        color="primary"
-                        onClick={() => visibilityToggle(item)}
-                        size="medium"
-                      >
-                        {itemVisibility[item.id] ? (
-                          <VisibilityIcon />
-                        ) : (
-                          <VisibilityOffIcon />
-                        )}
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                        <IconButton
+                          color="primary"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleEdit(item);
+                          }}
+                          size="small"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          color="primary"
+                          onClick={() => confirmDelete(item.id)}
+                          size="small"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                        <IconButton
+                          color="primary"
+                          onClick={() => visibilityToggle(item)}
+                          size="small"
+                        >
+                          {itemVisibility[item.id] ? (
+                            <VisibilityIcon />
+                          ) : (
+                            <VisibilityOffIcon />
+                          )}
+                        </IconButton>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     );
   };
 
@@ -529,7 +593,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                 <CardMedia
                   sx={{ height: 200, width: "100%", objectFit: "cover" }}
                   image={item.imageUrl || camera}
-                 
                   title={item.description}
                 />
                 <CardContent
@@ -698,29 +761,48 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             justifyContent: "center",
+            alignItems: { xs: "stretch", sm: "center" },
             marginTop: "50px",
-            gap: "50px",
+            gap: { xs: "20px", sm: "50px" },
           }}
         >
           <TextField
             onChange={handleSearch}
             value={searchInput}
             label="search item"
-            sx={{ width: "50%" }}
-          ></TextField>
-          <Button onClick={handleCreate}>ADD NEW ITEM</Button>
+            sx={{
+              width: { xs: "100%", sm: "50%" },
+              "& .MuiInputBase-root": {
+                height: { xs: "40px", sm: "56px" },
+              },
+            }}
+          />
+          <Button
+            onClick={handleCreate}
+            sx={{
+              width: { xs: "100%", sm: "auto" },
+              height: { xs: "40px", sm: "56px" },
+              fontSize: { xs: "0.875rem", sm: "1rem" },
+            }}
+          >
+            ADD NEW ITEM
+          </Button>
         </Box>
 
         {/* filter by category */}
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: { xs: "stretch", sm: "center" },
+            gap: { xs: "20px", sm: "0" },
+            marginTop: { xs: "20px", sm: "0" },
           }}
         >
-          <FormControl sx={{ width: 200 }}>
+          <FormControl sx={{ width: { xs: "100%", sm: 200 } }}>
             <InputLabel id="category-filter-label">
               Filter by Category
             </InputLabel>
@@ -729,6 +811,9 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               value={categoryFilter}
               label="Filter by Category"
               onChange={handleByCategory}
+              sx={{
+                height: { xs: "40px", sm: "56px" },
+              }}
             >
               <MenuItem value="all">All Categories</MenuItem>
               {categories && categories.length > 0 ? (
@@ -746,15 +831,33 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           </FormControl>
 
           {/* grid and list views */}
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <AppsIcon
-              sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }}
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              justifyContent: { xs: "center", sm: "flex-end" },
+            }}
+          >
+            <IconButton
               onClick={toggleDisplayMode}
-            />
-            <TableRowsIcon
-              sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }}
+              sx={{
+                fontSize: { xs: 30, sm: 40 },
+                color: "primary.main",
+                cursor: "pointer",
+              }}
+            >
+              <AppsIcon />
+            </IconButton>
+            <IconButton
               onClick={toggleDisplayMode}
-            />
+              sx={{
+                fontSize: { xs: 30, sm: 40 },
+                color: "primary.main",
+                cursor: "pointer",
+              }}
+            >
+              <TableRowsIcon />
+            </IconButton>
           </Box>
         </Box>
       </Box>
@@ -872,7 +975,15 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
       {singleItemModal && selectedProduct && (
         <div>
-          <UserSingleProduct item={selectedProduct} onClose={closeModal} buttonText="Edit" onEdit={() => {closeModal(); handleEdit(selectedProduct)}}/>
+          <UserSingleProduct
+            item={selectedProduct}
+            onClose={closeModal}
+            buttonText="Edit"
+            onEdit={() => {
+              closeModal();
+              handleEdit(selectedProduct);
+            }}
+          />
         </div>
       )}
     </div>
