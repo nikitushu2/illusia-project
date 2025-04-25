@@ -101,9 +101,9 @@ export const Header = () => {
             <Box sx={{ display: "flex", alignItems: "center", gap: "30px" }}>
               {isLoggedIn 
               ? <>
-                  <Chip 
+                  <Chip sx={{py: 3, pl: 1}}
                     avatar={<Avatar src={applicationUser?.picture} alt={applicationUser?.email} />}
-                    label={<Typography>{`${applicationUser?.email} (${applicationUser?.role})`}</Typography>}
+                    label={<Typography variant="body1" sx={{color: 'primary.main', fontWeight: 'bold'}}>{`${applicationUser?.email} (${applicationUser?.role})`}</Typography>}
                     variant="outlined"
                   />
                   <Button
