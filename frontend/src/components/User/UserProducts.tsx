@@ -18,6 +18,8 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Stack,
+  Pagination,
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
@@ -43,13 +45,16 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const [items, setItems] = React.useState<Item[]>([]);
   const [loading, setLoading] = React.useState(false);
 
-  //modal view for single product
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [selectedProduct, setSelectedProduct] = React.useState<Item | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);  //modal view for single product
+  const [selectedProduct, setSelectedProduct] = React.useState<Item | null>(
+    null
+  );
   const [searchInput, setSearchInput] = useState<string>(""); // for search bar
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
+
+  const [page, setPage] = useState(1);
 
   const navigate = useNavigate();
 
@@ -105,6 +110,12 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   useEffect(() => {
     console.log("Categories in ItemList:", categories);
   }, [categories]);
+
+   // Pagination
+  const ITEMS_PER_PAGE = 12;
+  const indexOfLastItem = page * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
   //HANDLE TABLE VIEW
   const handleListView = () => {
@@ -200,7 +211,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredItems.map((item) => {
+            {currentItems.map((item) => {
               const category = categories.find((c) => c.id === item.categoryId);
               return (
                 <TableRow
@@ -255,7 +266,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                         navigate(`/product/${item.id}`);
                       }}
                     >
-                      Book
+                      Add to Cart
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -280,7 +291,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
             padding: 2,
           }}
         >
-          {filteredItems.map((item) => {
+          {currentItems.map((item) => {
             const category = categories.find((c) => c.id === item.categoryId);
             return (
               <Card
@@ -326,7 +337,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                       navigate(`/product/${item.id}`);
                     }}
                   >
-                    Book
+                    Add to Cart
                   </Button>
                 </CardActions>
               </Card>
@@ -352,13 +363,6 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const handleByCategory = (event: SelectChangeEvent) => {
     setCategoryFilter(event.target.value);
   };
-
-  // Pagination calculations
-  /* const paginatedItems = filteredItems.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
- */
 
   // SEARCH MANUALLY TYPED ITEMS
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -452,6 +456,15 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
           <UserSingleProduct item={selectedProduct} onClose={closeModal} />
         </div>
       )}
+
+      <Stack spacing={2} paddingTop={5} alignItems={"center"}>
+        <Pagination
+          count={Math.ceil(filteredItems.length / ITEMS_PER_PAGE)}
+          onChange={(_, value) => setPage(value)}
+          variant="outlined"
+          shape="rounded"
+        />
+      </Stack>
     </div>
   );
 };

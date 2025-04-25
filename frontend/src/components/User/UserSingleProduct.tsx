@@ -7,6 +7,8 @@ import camera from "../../images/camera.png";
 interface UserSingleProductProps {
   item: Item;
   onClose: () => void;
+  buttonText?: string;
+  onEdit?: () => void;
 }
 
 const modalStyle = {
@@ -23,7 +25,7 @@ const modalStyle = {
   overflowY: 'auto',
 };
 
-const UserSingleProduct: React.FC<UserSingleProductProps> = ({ item, onClose }) => {
+const UserSingleProduct: React.FC<UserSingleProductProps> = ({ item, onClose, buttonText, onEdit }) => {
   if (!item) {
     return null;
   }
@@ -63,8 +65,8 @@ const UserSingleProduct: React.FC<UserSingleProductProps> = ({ item, onClose }) 
         </Box>
 
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mt: 2 }}>
-          <Button variant="contained" color="primary">
-            Book Now
+          <Button variant="contained" color="primary" onClick={() => {if(onEdit) onEdit();}} >
+            {buttonText || "Add to Cart"}
           </Button>
         </Box>
       </Box>

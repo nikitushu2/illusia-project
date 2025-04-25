@@ -27,6 +27,8 @@ import {
   MenuItem,
   SelectChangeEvent,
   TextField,
+  Pagination,
+  Stack,
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
@@ -43,7 +45,7 @@ import { Item } from "../../services/itemService";
 import camera from "../../images/camera.png";
 import ItemForm from "../Items/ItemForm";
 import { useAuth } from "../../context/AuthContext";
-
+import UserSingleProduct from "../User/UserSingleProduct";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
@@ -74,6 +76,12 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   }>({}); // State to track visibility per item
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  const [selectedProduct, setSelectedProduct] = React.useState<Item | null>(
+    null
+  );
+
+  const [singleItemModal, setSingleItemModal] = useState(false);
 
   const [itemToDelete, setItemToDelete] = useState<number | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -108,6 +116,17 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
     setSelectedItem(item);
     setIsModalOpen(true);
+  };
+
+  // Open and close modal for viewing Single Items details
+  const openModal = (item: Item) => {
+    setSelectedProduct(item);
+    setSingleItemModal(true);
+  };
+
+  const closeModal = () => {
+    setSelectedProduct(null);
+    setSingleItemModal(false);
   };
 
   // Handle actual deletion when confirmed
@@ -246,6 +265,12 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     }));
   };
 
+  // Pagination
+  const ITEMS_PER_PAGE = 12;
+  const indexOfLastItem = page * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+
   //HANDLE TABLE VIEW
   const handleListView = () => {
     return (
@@ -376,12 +401,13 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredItems.map((item) => {
+            {currentItems.map((item) => {
               const category = categories.find((c) => c.id === item.categoryId);
               return (
                 <TableRow
                   key={item.id}
                   style={{ opacity: itemVisibility[item.id] ? 1 : 0.5 }}
+                  onClick={() => openModal(item)}
                 >
                   <TableCell>{item.id}</TableCell>
                   <TableCell>
@@ -433,7 +459,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     >
                       <IconButton
                         color="primary"
-                        onClick={() => handleEdit(item)}
+                        onClick={(event) => {event.stopPropagation();handleEdit(item);}}
                         size="medium"
                       >
                         {" "}
@@ -482,7 +508,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
             padding: 2,
           }}
         >
-          {filteredItems.map((item) => {
+          {currentItems.map((item) => {
             const category = categories.find((c) => c.id === item.categoryId);
             return (
               <Card
@@ -502,13 +528,13 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               >
                 <CardMedia
                   sx={{ height: 200, width: "100%", objectFit: "cover" }}
-                  //image={item.imageUrl || camera}
-                  image={item.imageUrl}
+                  image={item.imageUrl || camera}
+                 
                   title={item.description}
                 />
                 <CardContent
                   sx={{ textAlign: "center", cursor: "pointer" }}
-                  //onClick={() => openModal(item)}
+                  onClick={() => openModal(item)}
                 >
                   <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
                   <p style={{ margin: 0 }}>{item.description}</p>
@@ -743,19 +769,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         handleGridView()
       )}
 
-      {/* Causing double tables why? */}
-      {/*    {categoriesLoading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <ItemList
-            key={refreshKey}
-            onEdit={handleEdit}
-            categories={categories}
-          />
-        )} */}
-
       {/* open a modal to edit/create an item */}
       <Dialog
         open={isModalOpen}
@@ -847,6 +860,21 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      <Stack spacing={2} paddingTop={5} alignItems={"center"}>
+        <Pagination
+          count={Math.ceil(filteredItems.length / ITEMS_PER_PAGE)}
+          onChange={(_, value) => setPage(value)}
+          variant="outlined"
+          shape="rounded"
+        />
+      </Stack>
+
+      {singleItemModal && selectedProduct && (
+        <div>
+          <UserSingleProduct item={selectedProduct} onClose={closeModal} buttonText="Edit" onEdit={() => {closeModal(); handleEdit(selectedProduct)}}/>
+        </div>
+      )}
     </div>
   );
 };
