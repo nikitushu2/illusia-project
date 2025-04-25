@@ -1,13 +1,10 @@
 import {
   AppBar,
-  // Avatar,
+  Avatar,
   Box,
   Button,
+  Chip,
   Container,
-  // IconButton,
-  // IconButton,
-  // Menu,
-  // MenuItem,
   Toolbar,
   Typography,
 } from "@mui/material";
@@ -20,16 +17,10 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 
-
-
-
-// import DarkModeIcon from "@mui/icons-material/DarkMode";
-// import LightModeIcon from "@mui/icons-material/LightMode";
-
 export const Header = () => {
   // concerning light and dark mode
   const themeContext = useContext(ThemeContext);
-  const { logout, isLoggedIn, signUp, signUpUser } = useAuth();
+  const { logout, isLoggedIn, signUp, signUpUser, isAdmin, applicationUser } = useAuth();
 
   const navigate = useNavigate();
 
@@ -37,6 +28,17 @@ export const Header = () => {
     logout();
     navigate("/logoutPage");
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      if (isAdmin) {
+        navigate("/adminDashboard");
+      }
+      else {
+        navigate("/userDashboard");
+      }
+    }
+  }, [isAdmin, isLoggedIn]);
 
   useEffect(() => {
     if (signUpUser) {
@@ -77,14 +79,6 @@ export const Header = () => {
                 gap: "20px",
               }}
             >
-            
-
-
-            
-
-           
-             
-
                <Button color="inherit" variant="text" component={Link} to="/">
                 <Typography variant="body1">HOME</Typography>
               </Button>
@@ -106,14 +100,21 @@ export const Header = () => {
 
             <Box sx={{ display: "flex", alignItems: "center", gap: "30px" }}>
               {isLoggedIn 
-              ? <Button
-                  onClick={handleLogout}
-                  color="inherit"
-                  variant="contained"
-                  sx={{ fontSize: "1rem", fontWeight: "bold" }}
-                >
-                  Logout
-              </Button>
+              ? <>
+                  <Chip sx={{py: 3, pl: 1}}
+                    avatar={<Avatar src={applicationUser?.picture} alt={applicationUser?.email} />}
+                    label={<Typography variant="body1" sx={{color: 'primary.main', fontWeight: 'bold'}}>{`${applicationUser?.email} (${applicationUser?.role})`}</Typography>}
+                    variant="outlined"
+                  />
+                  <Button
+                      onClick={handleLogout}
+                      color="inherit"
+                      variant="contained"
+                      sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                    >
+                      Logout
+                  </Button>
+                </>
              : (<>
                   <Button
                     onClick={signUp}

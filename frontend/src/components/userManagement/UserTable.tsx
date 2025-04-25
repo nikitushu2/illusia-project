@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { TableCell, TableContainer, TableHead, TableRow, Paper, TableBody, Table, Button, Box, useMediaQuery, Typography, Grid, Popover, Stack, Pagination, OutlinedInput, InputAdornment } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 import { ApplicationUser } from '../../types/applicationUser';
@@ -21,7 +21,7 @@ interface UserTableProps {
 
 const BACKEND_BASE_PATH = import.meta.env.VITE_BACKEND_ORIGIN + '/api/private'
 
-const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState: approveUser, deleteUserFromState: deleteUser }: UserTableProps) => {
+const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState, deleteUserFromState }: UserTableProps) => {
     const [approveAnchorEl, setApproveAnchorEl] = React.useState<HTMLButtonElement | null>(null);
     const [deleteAnchorEl, setDeleteAnchorEl] = React.useState<HTMLButtonElement | null>(null);
     const [clickedUser, setClickedUser] = React.useState<ApplicationUser | null>(null);
@@ -31,6 +31,21 @@ const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm')); 
     const ITEMS_PER_PAGE = 8;
+
+    const doSearch = () => {
+        if (searchValue === "") {
+            setSearchResults(applicationUsers);
+        }
+        else {
+            const filteredUsers = applicationUsers.filter((user) =>
+                user.email.toLowerCase().includes(searchValue.toLowerCase()) || user.displayName.toLowerCase().includes(searchValue.toLowerCase()));
+            setSearchResults(filteredUsers);
+        }
+    }
+
+    useEffect(() => {
+        doSearch();
+    }, [applicationUsers, searchValue])
 
     const promptApproveClick = (event: React.MouseEvent<HTMLButtonElement>, user: ApplicationUser) => {
         setClickedUser(user);
@@ -45,14 +60,6 @@ const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             const searchText = event.target.value.trim();
             setSearchValue(searchText);
-            if (searchText === "") {
-                setSearchResults(applicationUsers);
-            }
-            else {
-                const filteredUsers = applicationUsers.filter((user) =>
-                    user.email.toLowerCase().includes(searchText.toLowerCase()) || user.displayName.toLowerCase().includes(searchText.toLowerCase()));
-                setSearchResults(filteredUsers);
-            }
         };
 
     const handleApproveClick = async () => {
@@ -70,7 +77,7 @@ const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState
             });
             if (response.ok) {
                 const updatedUser = await response.json() as ApplicationUser;
-                approveUser(updatedUser.email, updatedUser.isApproved);
+                updateUserApprovalState(updatedUser.email, updatedUser.isApproved);
             }
         } catch (error) {
             // TODO: Shoow error message
@@ -94,7 +101,7 @@ const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState
                 body: JSON.stringify({ email })
             });
             if (response.ok) {
-                deleteUser!(email);
+                deleteUserFromState!(email);
             }
         } catch (error) {
             // TODO: Shoow error message

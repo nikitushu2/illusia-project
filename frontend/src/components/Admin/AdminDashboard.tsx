@@ -20,10 +20,10 @@ import DraftsIcon from "@mui/icons-material/Drafts";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 
-import AdminUsersList from "./AdminUsersList";
 import AdminBookings from "./AdminBookings";
 import AdminProducts from "./AdminProducts";
 import categoryService from "../../services/categoryService";
+import { UserManagement } from "../userManagement/UserManagement";
 
 const AdminDashboard = () => {
   const [sideLink, setsideLink] = useState<string | null>(null);
@@ -32,7 +32,6 @@ const AdminDashboard = () => {
   );
   const [productsOpen, setProductsOpen] = useState(false);
   const [bookingsOpen, setBookingsOpen] = useState(false);
-  //const[component, setComponent] = useState<JSX.Element | null>(<AdminProducts/>);
   const [component, setComponent] = useState<React.ReactElement | null>(null);
 
   // Fetch categories when component mounts
@@ -172,7 +171,7 @@ const AdminDashboard = () => {
                     </ListItemIcon>
                     <ListItemText
                       primary="Users"
-                      onClick={() => handleSideBar(<AdminUsersList />)}
+                      onClick={() => handleSideBar(<UserManagement />)}
                     />
                   </ListItemButton>
                 </ListItem>
