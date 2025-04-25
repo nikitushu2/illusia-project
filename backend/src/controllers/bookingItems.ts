@@ -32,6 +32,8 @@ const findBookingItemById = async (
 };
 
 // GET all booking items
+// for both admin and users
+// allows to view all booking items in the system
 bookingItemsRouter.get(
   "/",
   async (_req: Request, res: Response, next: NextFunction) => {
@@ -45,6 +47,8 @@ bookingItemsRouter.get(
 );
 
 // GET booking item by ID
+// for both admin and users
+// allows to view a specific booking item by its ID
 bookingItemsRouter.get(
   "/:id",
   findBookingItemById,
@@ -54,6 +58,8 @@ bookingItemsRouter.get(
 );
 
 // GET booking items by booking ID
+// for both admin and users
+// allows to view all booking items for a specific booking
 bookingItemsRouter.get(
   "/booking/:bookingId",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -69,6 +75,8 @@ bookingItemsRouter.get(
 );
 
 // POST create new booking item
+// for both admin and users
+// allows to create a new booking item
 bookingItemsRouter.post(
   "/",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -84,6 +92,8 @@ bookingItemsRouter.post(
 );
 
 // POST create multiple booking items
+// for both admin and users
+// allows to create multiple booking items
 bookingItemsRouter.post(
   "/bulk",
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -110,6 +120,8 @@ bookingItemsRouter.post(
 );
 
 // PUT update booking item
+// for both admin and users
+// allows to update a booking item
 bookingItemsRouter.put(
   "/:id",
   findBookingItemById,
@@ -127,6 +139,8 @@ bookingItemsRouter.put(
 );
 
 // PATCH update booking item quantity
+// for both admin and users
+// allows to update the quantity of a booking item
 bookingItemsRouter.patch(
   "/:id/quantity",
   findBookingItemById,
@@ -154,6 +168,8 @@ bookingItemsRouter.patch(
 );
 
 // DELETE booking item
+// for both admin and users
+// allows to delete a booking item
 bookingItemsRouter.delete(
   "/:id",
   findBookingItemById,
@@ -168,6 +184,8 @@ bookingItemsRouter.delete(
 );
 
 // DELETE all booking items for a booking
+// for both admin and users
+// allows deleting all booking items for a specific booking
 bookingItemsRouter.delete(
   "/booking/:bookingId",
   async (req: Request, res: Response, next: NextFunction) => {

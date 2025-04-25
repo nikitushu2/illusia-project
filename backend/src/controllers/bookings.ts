@@ -41,6 +41,8 @@ const findBookingById = async (
 };
 
 // GET all bookings
+// for both admin and users
+// allows to view all bookings in the system
 bookingsRouter.get(
   "/",
   async (_req: Request, res: Response, next: NextFunction) => {
@@ -54,6 +56,8 @@ bookingsRouter.get(
 );
 
 // GET booking by ID
+// for both admin and users
+// allows to view a specific booking by its ID
 bookingsRouter.get(
   "/:id",
   findBookingById,
@@ -63,6 +67,8 @@ bookingsRouter.get(
 );
 
 // GET bookings by user ID
+// for both admin and users
+// allows to view bookings by user ID
 bookingsRouter.get(
   "/user/:userId",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -78,6 +84,8 @@ bookingsRouter.get(
 );
 
 // POST create new booking
+// for both admin and users
+// allows to create a new booking
 bookingsRouter.post(
   "/",
   async (
@@ -95,6 +103,8 @@ bookingsRouter.post(
 );
 
 // PUT update booking
+// for both admin and users
+// allows to update a booking
 bookingsRouter.put(
   "/:id",
   findBookingById,
@@ -112,6 +122,8 @@ bookingsRouter.put(
 );
 
 // PATCH update booking status
+// for admins only
+// allows changing the status of a booking
 bookingsRouter.patch(
   "/:id/status",
   findBookingById,
@@ -139,6 +151,8 @@ bookingsRouter.patch(
 );
 
 // DELETE booking
+// for both admin and users
+// allows deleting a booking
 bookingsRouter.delete(
   "/:id",
   findBookingById,
