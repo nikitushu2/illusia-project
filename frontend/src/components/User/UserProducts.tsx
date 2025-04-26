@@ -206,7 +206,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                 >
                   Description
                 </TableCell>
-                <TableCell
+                {/* <TableCell
                   sx={{
                     backgroundColor: "primary.main",
                     color: "white",
@@ -216,8 +216,8 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                   }}
                 >
                   Size
-                </TableCell>
-                <TableCell
+                </TableCell> */}
+                {/* <TableCell
                   sx={{
                     backgroundColor: "primary.main",
                     color: "white",
@@ -227,7 +227,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                   }}
                 >
                   Color
-                </TableCell>
+                </TableCell> */}
                 <TableCell
                   sx={{
                     backgroundColor: "primary.main",
@@ -299,10 +299,10 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                             width: "100px",
                             height: "100px",
                             objectFit: "cover",
-                            "@media (max-width: 600px)": {
-                              width: "50px",
-                              height: "50px",
-                            },
+                            // "@media (max-width: 600px)": {
+                            //   width: "50px",
+                            //   height: "50px",
+                            // },
                           }}
                         />
                       ) : (
@@ -313,18 +313,18 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                             width: "100px",
                             height: "100px",
                             objectFit: "cover",
-                            "@media (max-width: 600px)": {
-                              width: "50px",
-                              height: "50px",
-                            },
+                            // "@media (max-width: 600px)": {
+                            //   width: "50px",
+                            //   height: "50px",
+                            // },
                           }}
                         />
                       )}
                     </TableCell>
                     <TableCell>{item.name}</TableCell>
                     <TableCell>{item.description}</TableCell>
-                    <TableCell>{item.size}</TableCell>
-                    <TableCell>{item.color}</TableCell>
+                    {/* <TableCell>{item.size}</TableCell>
+                    <TableCell>{item.color}</TableCell> */}
                     <TableCell>{item.quantity}</TableCell>
                     <TableCell>{item.itemLocation}</TableCell>
                     <TableCell>

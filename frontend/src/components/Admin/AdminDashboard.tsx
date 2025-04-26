@@ -109,7 +109,7 @@ const AdminDashboard = () => {
               backgroundColor: "#44195b",
               padding: "20px",
               borderRadius: "8px 0 0 8px", // Rounded corners only on the right side
-              width: isCollapsed ? "80px" : "280px",
+              width: isCollapsed ? "80px" : "290px",
               transition: "width 0.3s ease-in-out",
               position: "relative",
             }}
@@ -153,7 +153,7 @@ const AdminDashboard = () => {
                 display: "flex",
                 flexDirection: "column",
                 gap: "20px",
-                marginTop: "100px",
+                marginTop: "120px",
               }}
             >
               <List>
@@ -163,25 +163,25 @@ const AdminDashboard = () => {
                       <LeaderboardIcon />
                     </ListItemIcon>
                     {!isCollapsed && (
-                        <>
+                      <>
                         <ListItemText
                           primary="Products"
                           slotProps={{
-                            primary: {style: { color: "white" }},
+                            primary: { style: { color: "white" } },
                           }}
                           onClick={() =>
-                          handleSideBar(
-                            <AdminProducts
-                            onEdit={(item) =>
-                              console.log("Edit item", item)
-                            }
-                            categories={categories}
-                            />
-                          )
+                            handleSideBar(
+                              <AdminProducts
+                                onEdit={(item) =>
+                                  console.log("Edit item", item)
+                                }
+                                categories={categories}
+                              />
+                            )
                           }
                         />
-                        {productsOpen ? <ExpandLess /> : <ExpandMore />}
-                        </>
+                        {productsOpen ? <ExpandLess  style={{color:"white"}}/> : <ExpandMore style={{color:"white"}} />}
+                      </>
                     )}
                   </ListItemButton>
                 </ListItem>
@@ -199,9 +199,8 @@ const AdminDashboard = () => {
                         {!isCollapsed && (
                           <ListItemText
                             primary="Inventory"
-
                             slotProps={{
-                              primary: {style: { color: "white" }},
+                              primary: { style: { color: "white" } },
                             }}
                             onClick={() => handleSideBar("Display inventory")}
                           />
@@ -210,7 +209,7 @@ const AdminDashboard = () => {
                     </List>
                   </ListItem>
                 </Collapse>
-                <Divider />
+                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} />
 
                 <ListItem disablePadding>
                   <ListItemButton>
@@ -221,7 +220,7 @@ const AdminDashboard = () => {
                       <ListItemText
                         primary="Users"
                         slotProps={{
-                          primary: {style: { color: "white" }},
+                          primary: { style: { color: "white" } },
                         }}
                         onClick={() => handleSideBar(<UserManagement />)}
                       />
@@ -236,12 +235,14 @@ const AdminDashboard = () => {
                     </ListItemIcon>
                     {!isCollapsed && (
                       <>
-                        <ListItemText primary="Bookings" 
-                         slotProps={{
-                          primary: {style: { color: "white" }},
-                        }}/>
-                        
-                        {bookingsOpen ? <ExpandLess /> : <ExpandMore />}
+                        <ListItemText
+                          primary="Bookings"
+                          slotProps={{
+                            primary: { style: { color: "white" } },
+                          }}
+                        />
+
+                        {bookingsOpen ? <ExpandLess style={{color:"white"}}/> : <ExpandMore style={{color:"white"}}/>}
                       </>
                     )}
                   </ListItemButton>
@@ -261,7 +262,7 @@ const AdminDashboard = () => {
                           <ListItemText
                             primary="Pending"
                             slotProps={{
-                              primary: {style: { color: "white" }},
+                              primary: { style: { color: "white" } },
                             }}
                             onClick={() => handleSideBar(<AdminBookings />)}
                           />
@@ -275,7 +276,7 @@ const AdminDashboard = () => {
                           <ListItemText
                             primary="Reservations"
                             slotProps={{
-                              primary: {style: { color: "white" }},
+                              primary: { style: { color: "white" } },
                             }}
                             onClick={() =>
                               handleSideBar("Display reservations")
@@ -286,7 +287,7 @@ const AdminDashboard = () => {
                     </List>
                   </ListItem>
                 </Collapse>
-                <Divider />
+                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }}/>
 
                 <ListItem disablePadding>
                   <ListItemButton>
@@ -297,7 +298,7 @@ const AdminDashboard = () => {
                       <ListItemText
                         primary="Messages"
                         slotProps={{
-                          primary: {style: { color: "white" }},
+                          primary: { style: { color: "white" } },
                         }}
                         onClick={() => handleSideBar("Display messages")}
                       />

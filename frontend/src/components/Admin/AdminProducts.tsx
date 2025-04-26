@@ -49,8 +49,7 @@ import UserSingleProduct from "../User/UserSingleProduct";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
-//import categoryService, { Category } from "../../services/categoryService";
-//import ItemList from "../Items/ItemList";
+
 interface ItemListProps {
   onEdit?: (item: Item) => void;
   categories?: { id: number; name: string }[];
@@ -278,29 +277,31 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         sx={{
           width: "100%",
           overflowX: "auto",
+          marginTop: { xs: 2, sm: 4 },
+          padding: { xs: 1, sm: 2 },
           "& .MuiTableCell-root": {
             whiteSpace: "nowrap",
             maxWidth: "200px",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            "@media (max-width: 600px)": {
-              padding: "8px",
-              fontSize: "0.75rem",
-            },
+            padding: { xs: "8px 4px", sm: "16px" },
+            fontSize: { xs: "0.75rem", sm: "0.875rem" },
           },
           "& .MuiTableHead-root": {
-            "@media (max-width: 600px)": {
-              "& .MuiTableCell-root": {
-                fontSize: "0.75rem",
-                fontWeight: "bold",
-              },
+            "& .MuiTableCell-root": {
+              fontSize: { xs: "0.75rem", sm: "0.875rem" },
+              fontWeight: "bold",
+              backgroundColor: "primary.main",
+              color: "white",
+              padding: { xs: "8px 4px", sm: "16px" },
             },
           },
           "& .MuiTableRow-root": {
-            "@media (max-width: 600px)": {
-              "&:hover": {
-                backgroundColor: "action.hover",
-              },
+            "&:hover": {
+              backgroundColor: "action.hover",
+            },
+            "&:last-child td": {
+              borderBottom: 0,
             },
           },
         }}
@@ -308,6 +309,8 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         <TableContainer
           sx={{
             maxHeight: 800,
+            borderRadius: 2,
+            boxShadow: 2,
             "&::-webkit-scrollbar": {
               width: "8px",
               height: "8px",
@@ -329,121 +332,63 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               <TableRow>
                 <TableCell
                   sx={{
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
-                    fontWeight: "bold",
-                    minWidth: "50px",
-                  }}
-                >
-                  ID
-                </TableCell>
-                <TableCell
-                  sx={{
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
-                    fontWeight: "bold",
-                    minWidth: "100px",
+                    minWidth: { xs: "80px", sm: "100px" },
                   }}
                 >
                   Image
                 </TableCell>
                 <TableCell
                   sx={{
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
-                    fontWeight: "bold",
-                    minWidth: "150px",
+                    minWidth: { xs: "120px", sm: "150px" },
                   }}
                 >
                   Name
                 </TableCell>
                 <TableCell
                   sx={{
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
-                    fontWeight: "bold",
-                    minWidth: "200px",
+                    minWidth: { xs: "150px", sm: "200px" },
                   }}
                 >
                   Description
                 </TableCell>
                 <TableCell
                   sx={{
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
-                    fontWeight: "bold",
-                    minWidth: "80px",
+                    minWidth: { xs: "60px", sm: "80px" },
                   }}
                 >
                   Size
                 </TableCell>
                 <TableCell
                   sx={{
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
-                    fontWeight: "bold",
-                    minWidth: "80px",
+                    minWidth: { xs: "60px", sm: "80px" },
                   }}
                 >
                   Color
                 </TableCell>
                 <TableCell
                   sx={{
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
-                    fontWeight: "bold",
-                    minWidth: "120px",
-                  }}
-                >
-                  Item Location
-                </TableCell>
-                <TableCell
-                  sx={{
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
-                    fontWeight: "bold",
-                    minWidth: "120px",
-                  }}
-                >
-                  Storage Location
-                </TableCell>
-                <TableCell
-                  sx={{
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
-                    fontWeight: "bold",
-                    minWidth: "80px",
+                    minWidth: { xs: "60px", sm: "80px" },
                   }}
                 >
                   Quantity
                 </TableCell>
                 <TableCell
                   sx={{
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
-                    fontWeight: "bold",
-                    minWidth: "100px",
+                    minWidth: { xs: "100px", sm: "120px" },
+                  }}
+                >
+                  Item Location
+                </TableCell>
+                <TableCell
+                  sx={{
+                    minWidth: { xs: "80px", sm: "100px" },
                   }}
                 >
                   Category
                 </TableCell>
                 <TableCell
                   sx={{
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
-                    fontWeight: "bold",
-                    minWidth: "120px",
+                    minWidth: { xs: "100px", sm: "120px" },
                   }}
                 >
                   Action
@@ -458,48 +403,42 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                 return (
                   <TableRow
                     key={item.id}
-                    style={{ opacity: itemVisibility[item.id] ? 1 : 0.5 }}
                     onClick={() => openModal(item)}
                     sx={{
+                      cursor: "pointer",
                       "&:hover": {
-                        cursor: "pointer",
                         backgroundColor: "action.hover",
                       },
                     }}
                   >
-                    <TableCell>{item.id}</TableCell>
                     <TableCell>
-                      {item.imageUrl ? (
+                      <Box
+                        sx={{
+                          width: { xs: 50, sm: 100 },
+                          height: { xs: 50, sm: 100 },
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
                         <img
-                          src={item.imageUrl}
-                          alt={item.description}
+                          src={item.imageUrl || camera}
+                          alt={item.description || "No Image Available"}
                           style={{
-                            width: { xs: "50px", sm: "150px" },
-                            height: { xs: "50px", sm: "150px" },
+                            width: "100%",
+                            height: "100%",
                             objectFit: "cover",
+                            borderRadius: "4px",
                           }}
                         />
-                      ) : (
-                        <img
-                          src={camera}
-                          alt="No Image Available"
-                          style={{
-                            width: { xs: "50px", sm: "150px" },
-                            height: { xs: "50px", sm: "150px" },
-                            objectFit: "cover",
-                          }}
-                        />
-                      )}
+                      </Box>
                     </TableCell>
                     <TableCell>{item.name}</TableCell>
                     <TableCell>{item.description}</TableCell>
                     <TableCell>{item.size}</TableCell>
                     <TableCell>{item.color}</TableCell>
-                    <TableCell>{item.itemLocation}</TableCell>
-                    <TableCell>
-                      {item.storageLocation || item.storage_location || "N/A"}
-                    </TableCell>
                     <TableCell>{item.quantity}</TableCell>
+                    <TableCell>{item.itemLocation}</TableCell>
                     <TableCell>
                       {category
                         ? category.name
@@ -511,9 +450,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       <Box
                         sx={{
                           display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: 1,
+                          gap: { xs: 0.5, sm: 1 },
                           "& .MuiIconButton-root": {
                             padding: { xs: "4px", sm: "8px" },
                           },
@@ -531,14 +468,20 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                         </IconButton>
                         <IconButton
                           color="primary"
-                          onClick={() => confirmDelete(item.id)}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            confirmDelete(item.id);
+                          }}
                           size="small"
                         >
                           <DeleteIcon />
                         </IconButton>
                         <IconButton
                           color="primary"
-                          onClick={() => visibilityToggle(item)}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            visibilityToggle(item);
+                          }}
                           size="small"
                         >
                           {itemVisibility[item.id] ? (
@@ -754,7 +697,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           display: "column",
           marginBottom: "50px",
           marginTop: "10px",
-          gap: "20px",
+          gap: { xs: "30px", sm: "20px" },
           paddingX: "20px",
         }}
       >
@@ -785,12 +728,17 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               width: { xs: "100%", sm: "auto" },
               height: { xs: "40px", sm: "56px" },
               fontSize: { xs: "0.875rem", sm: "1rem" },
+              // fontWeight: "bold",
+              backgroundColor: "primary.main",
+              color: "white",
+              "&:hover": { backgroundColor: "primary.dark",}
             }}
           >
             ADD NEW ITEM
           </Button>
         </Box>
-
+        </Box>
+        <Box sx={{marginBottom:"10px"}}>
         {/* filter by category */}
         <Box
           sx={{
@@ -800,9 +748,20 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
             alignItems: { xs: "stretch", sm: "center" },
             gap: { xs: "20px", sm: "0" },
             marginTop: { xs: "20px", sm: "0" },
+            padding: { xs: "20px", sm: "0" },
+            backgroundColor: { xs: "background.paper", sm: "transparent" },
+            borderRadius: { xs: 2, sm: 0 },
+            boxShadow: { xs: 2, sm: 0 },
           }}
         >
-          <FormControl sx={{ width: { xs: "100%", sm: 200 } }}>
+          <FormControl
+            sx={{
+              width: { xs: "100%", sm: 200 },
+              "& .MuiInputBase-root": {
+                height: { xs: "40px", sm: "56px" },
+              },
+            }}
+          >
             <InputLabel id="category-filter-label">
               Filter by Category
             </InputLabel>
@@ -811,9 +770,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               value={categoryFilter}
               label="Filter by Category"
               onChange={handleByCategory}
-              sx={{
-                height: { xs: "40px", sm: "56px" },
-              }}
             >
               <MenuItem value="all">All Categories</MenuItem>
               {categories && categories.length > 0 ? (
@@ -836,6 +792,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               display: "flex",
               gap: 2,
               justifyContent: { xs: "center", sm: "flex-end" },
+              marginTop: { xs: "10px", sm: "0" },
             }}
           >
             <IconButton
