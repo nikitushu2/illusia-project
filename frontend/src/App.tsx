@@ -1,43 +1,53 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Footer from "./components/Footer";
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Box, CssBaseline } from "@mui/material";
+import ItemManagement from "./components/Items/ItemManagement";
+
 import LandingPage from "./components/LandingPage";
-import { Header } from "./components/Header";
-import SignUp from "./components/SignUp";
+//import Sidebar from "./components/Sidebar";
+import { LogoutPage } from "./components/LogoutPage";
 import { Login } from "./components/login/Login";
-import { Box } from "@mui/system";
-//import SideBar from "./components/SideBar";
-import Events from "./components/Events";
-import Shop from "./components/Shop";
+import SignUp from "./components/SignUp";
+import { Header } from "./components/Header";
+import { UserManagement } from "./components/userManagement/UserManagement";
+import Footer from "./components/Footer";
+
+
+import UserDashboard from "./components/User/UserDashboard";
+
+import AdminNewProductForm from "./components/Admin/AdminNewProductForm";
+import AdminDashboard from "./components/Admin/AdminDashboard";
 
 
 
-
-function App() {
+const App: React.FC = () => {
   return (
-    <Box
-    sx={{
-      display: "flex",
-      flexDirection: "column",
-      minHeight: "100vh", // Full viewport height
-    }}
-  >
-    <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
-        {/* <Route path="/sideBar" element={<SideBar />} /> */}
-      </Routes>
-      <Footer />
-    </BrowserRouter>
-  </Box>
- 
- 
-  
+    <Router>
+      <CssBaseline />
+      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}> 
+        <Header />
+         <Routes>
+            <Route path="/" element={<LandingPage />} />
+            {/* <Route path="/sideBar" element={<Sidebar />} /> */}
+            <Route path="/logoutPage" element={<LogoutPage />} />
+            <Route path="/items" element={<ItemManagement />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/login" element={<Login />} />
+            { /* TODO: show error page for /users if user is not admin, once the error page is created */}
+            <Route path="/users" element={<UserManagement />} />
+
+            {/* User Routes */}
+            <Route path="/userDashboard" element={<UserDashboard />} />
+
+            {/* Admin Routes */}
+            <Route path="/adminDashboard" element={<AdminDashboard/>} />
+            <Route path="/adminNewProduct" element={<AdminNewProductForm/>} />
+            
+          </Routes>
+        <Footer />
+      </Box>
+    </Router>
   );
-}
+};
 
 export default App;

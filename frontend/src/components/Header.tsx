@@ -1,13 +1,10 @@
 import {
   AppBar,
-  // Avatar,
+  Avatar,
   Box,
   Button,
+  Chip,
   Container,
-  // IconButton,
-  // IconButton,
-  // Menu,
-  // MenuItem,
   Toolbar,
   Typography,
 } from "@mui/material";
@@ -15,42 +12,51 @@ import logo from "../images/logo-transparent.png";
 
 import { Link } from "react-router-dom";
 import { ThemeContext } from "../themes/themeContext";
-import { useContext } from "react";
-
-
-
-
-// import DarkModeIcon from "@mui/icons-material/DarkMode";
-// import LightModeIcon from "@mui/icons-material/LightMode";
-
-
-
-
+import { useContext, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 
 export const Header = () => {
   // concerning light and dark mode
   const themeContext = useContext(ThemeContext);
+  const { logout, isLoggedIn, signUp, signUpUser, isAdmin, applicationUser } = useAuth();
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/logoutPage");
+  };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      if (isAdmin) {
+        navigate("/adminDashboard");
+      }
+      else {
+        navigate("/userDashboard");
+      }
+    }
+  }, [isAdmin, isLoggedIn]);
+
+  useEffect(() => {
+    if (signUpUser) {
+        navigate('/signup')
+    }
+  }, [signUpUser]);
 
   if (!themeContext) {
     throw new Error(
       "ThemeContext is undefined. Make sure you are using ThemeProvider."
     );
-
   }
-
-  
-
   // const { mode, toggleMode } = themeContext;
-
-  
-
   return (
     <>
       <AppBar position="static">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-
             <Box
               sx={{
                 alignItems: "center",
@@ -76,18 +82,18 @@ export const Header = () => {
                 gap: "20px",
               }}
             >
-            
-
-
-            
-
-           
-             
-
-               <Button color="inherit" variant="text" to="/" component={Link}>
-                <Typography variant="body1" >HOME</Typography>
+               <Button color="inherit" variant="text" component={Link} to="/">
+                <Typography variant="body1">HOME</Typography>
               </Button>
-              <Button color="inherit" variant="text" to="/events" component={Link}>
+              <Button
+                color="inherit"
+                variant="text"
+                component={Link}
+                to="/items"
+              >
+                <Typography variant="body1">ITEMS</Typography>
+              </Button>
+              <Button color="inherit" variant="text">
                 <Typography variant="body1">EVENTS</Typography>
               </Button>
               <Button color="inherit" variant="text">
@@ -98,36 +104,49 @@ export const Header = () => {
               </Button>
             </Box>
 
-
             <Box sx={{ display: "flex", alignItems: "center", gap: "30px" }}>
-              <Button
-                to="/signup"
-                component={Link}
-                color="inherit"
-                variant="contained"
-                sx={{ fontSize: "1rem", fontWeight: "bold" }}
-              >
-                Sign Up
-              </Button>
-              <Button
-                to="/login"
-                component={Link}
-                color="inherit"
-                variant="contained"
-                sx={{ fontSize: "1rem", fontWeight: "bold" }}
-              >
-                Log In
-              </Button>
+              {isLoggedIn 
+              ? <>
+                  <Chip sx={{py: 3, pl: 1}}
+                    avatar={<Avatar src={applicationUser?.picture} alt={applicationUser?.email} />}
+                    label={<Typography variant="body1" sx={{color: 'primary.main', fontWeight: 'bold'}}>{`${applicationUser?.email} (${applicationUser?.role})`}</Typography>}
+                    variant="outlined"
+                  />
+                  <Button
+                      onClick={handleLogout}
+                      color="inherit"
+                      variant="contained"
+                      sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                    >
+                      Logout
+                  </Button>
+                </>
+             : (<>
+                  <Button
+                    onClick={signUp}
+                    color="inherit"
+                    variant="contained"
+                    sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                  >
+                    Sign Up
+                  </Button>
+                  <Button
+                      to="/login"
+                      component={Link}
+                      color="inherit"
+                      variant="contained"
+                      sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                    >
+                      Log In
+                  </Button>
+                </>
+                  )
+              }
             </Box>
-
             {/* toggleMode for light and dark mode */}
             {/* <IconButton onClick={toggleMode} color="inherit"> */}
             {/* {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />} */}
             {/* </IconButton>*/}
-
-           
-
-           
 
           </Toolbar>
         </Container>

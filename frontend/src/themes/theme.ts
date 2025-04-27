@@ -1,5 +1,21 @@
 import { createTheme } from '@mui/material/styles';
 
+declare module '@mui/material/styles' {
+  interface PaletteOptions {
+    dark?: {
+      main: string;
+      contrastText: string;
+    };
+  }
+  
+  interface Palette {
+    dark: {
+      main: string;
+      contrastText: string;
+    };
+  }
+}
+
 export const lightTheme = createTheme({
   palette: {
     primary: {
@@ -16,10 +32,10 @@ export const lightTheme = createTheme({
     text: {
       primary: '#2a2a2a', // Font basic 
     },
-    dark: {
+    /* dark: {
         main: '#44195b', // Dark purple for footer
         contrastText: '#ffffff', // White text on dark purple
-    }
+    } */
   },
   typography: {
     fontFamily: 'Lato, sans-serif', // Default font

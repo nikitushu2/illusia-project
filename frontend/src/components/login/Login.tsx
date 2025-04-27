@@ -1,12 +1,10 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import { Google as GoogleIcon } from "@mui/icons-material";
+import GoogleIcon from "@mui/icons-material/Google";
+import { useAuth } from "../../context/AuthContext";
 
 export const Login = () => {
-  const handleGoogleLogin = () => {
-    // TODO: Integrate with Firebase or OAuth provider
-    console.log("Google login clicked");
-  };
+  const { login } = useAuth();
 
   return (
     <Box sx={{ margin: "auto", textAlign: "center", maxWidth: 600, px: 2 }}>
@@ -76,7 +74,7 @@ export const Login = () => {
 
       <Box>
         <Button
-          onClick={handleGoogleLogin}
+          onClick={login}
           variant="outlined"
           sx={{
             textTransform: "none",

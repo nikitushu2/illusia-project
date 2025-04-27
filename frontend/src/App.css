@@ -1,0 +1,47 @@
+/* .layout {
+  min-height: 100vh;
+}
+
+.logo {
+  float: left;
+  width: 120px;
+  height: 31px;
+  margin: 16px 24px 16px 0;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.site-layout-content {
+  background: #fff;
+  padding: 24px;
+  min-height: 280px;
+}
+
+.ant-row-rtl .logo {
+  float: right;
+  margin: 16px 0 16px 24px;
+}
+
+
+.item-management-container {
+  padding: 24px;
+}
+
+.item-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.item-table-container {
+  margin-top: 24px;
+} */
+
+/* Responsive adjustments */
+/* @media (max-width: 768px) {
+  .site-layout-content {
+    padding: 12px;
+  }
+
+  .item-management-container {
+    padding: 12px;
+  }
+} */

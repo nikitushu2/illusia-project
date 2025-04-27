@@ -1,4 +1,4 @@
-import { CssBaseline } from "@mui/material"
+/* import { CssBaseline } from "@mui/material"
 import React, { useEffect, useMemo, useState } from "react"
 import { ThemeContext } from "./themeContext"
 import { ThemeProvider as  MUIThemeProvider } from "@mui/material/styles"
@@ -29,4 +29,39 @@ return(
     </ThemeContext.Provider>
 )
 
+} */
+
+
+// solution
+import { CssBaseline } from "@mui/material"
+import React, { useMemo } from "react"
+import { ThemeContext } from "./themeContext"
+import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles"
+import { lightTheme } from "./theme"
+
+
+export const ThemeProvider = ({children}:{children:React.ReactNode}) => {
+   const mode = "light" as const;
+
+
+   // useEffect(() => {
+   //     localStorage.setItem("theme", mode);
+   // }, [mode]);
+
+
+   // const toggleMode = () => {
+   //     setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+   // }
+
+
+   const modeTheme = useMemo(() => (lightTheme), []);
+
+return(
+   <ThemeContext.Provider value={{mode}}>
+       <MUIThemeProvider theme = {modeTheme}>
+           <CssBaseline />
+           {children}
+       </MUIThemeProvider>
+   </ThemeContext.Provider>
+)
 }
