@@ -7,22 +7,32 @@ import {
   Container,
   Toolbar,
   Typography,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton,
 } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import logo from "../images/logo-transparent.png";
 
 import { Link } from "react-router-dom";
 import { ThemeContext } from "../themes/themeContext";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-
 export const Header = () => {
-  // concerning light and dark mode
+  const [mobileOpen, setMobileOpen] = useState(false);
   const themeContext = useContext(ThemeContext);
-  const { logout, isLoggedIn, signUp, signUpUser, isAdmin, applicationUser } = useAuth();
-
+  const { logout, isLoggedIn, signUp, signUpUser, isAdmin, applicationUser } =
+    useAuth();
   const navigate = useNavigate();
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
   const handleLogout = () => {
     logout();
@@ -33,8 +43,7 @@ export const Header = () => {
     if (isLoggedIn) {
       if (isAdmin) {
         navigate("/adminDashboard");
-      }
-      else {
+      } else {
         navigate("/userDashboard");
       }
     }
@@ -42,7 +51,7 @@ export const Header = () => {
 
   useEffect(() => {
     if (signUpUser) {
-        navigate('/signup')
+      navigate("/signup");
     }
   }, [signUpUser]);
 
@@ -51,27 +60,99 @@ export const Header = () => {
       "ThemeContext is undefined. Make sure you are using ThemeProvider."
     );
   }
-  // const { mode, toggleMode } = themeContext;
+
+  const drawer = (
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/">
+            <ListItemText primary="HOME" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/items">
+            <ListItemText primary="ITEMS" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/events">
+            <ListItemText primary="EVENTS" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton>
+            <ListItemText primary="INFO" />
+          </ListItemButton>
+        </ListItem>
+        {isLoggedIn ? (
+          <>
+            <ListItem>
+              <Chip
+                sx={{ py: 3, pl: 1 }}
+                avatar={
+                  <Avatar
+                    src={applicationUser?.picture}
+                    alt={applicationUser?.email}
+                  />
+                }
+                label={
+                  <Typography
+                    variant="body1"
+                    sx={{ color: "primary.main", fontWeight: "bold" }}
+                  >{`${applicationUser?.email} (${applicationUser?.role})`}</Typography>
+                }
+                variant="outlined"
+              />
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton onClick={handleLogout}>
+                <ListItemText primary="Logout" />
+              </ListItemButton>
+            </ListItem>
+          </>
+        ) : (
+          <>
+            <ListItem disablePadding>
+              <ListItemButton onClick={signUp}>
+                <ListItemText primary="Sign Up" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton component={Link} to="/login">
+                <ListItemText primary="Log In" />
+              </ListItemButton>
+            </ListItem>
+          </>
+        )}
+      </List>
+    </Box>
+  );
+
   return (
     <>
       <AppBar position="static">
         <Container maxWidth="xl">
-          <Toolbar disableGutters>
+          <Toolbar
+            disableGutters
+            sx={{ display: "flex", justifyContent: "space-between" }}
+          >
             <Box
               sx={{
                 alignItems: "center",
-                display: { xs: "none", md: "flex" },
-                mr: 1,
+                display: "flex",
               }}
             >
               <Link to="/">
                 <img
                   src={logo}
                   alt="illusia-logo"
-                  style={{ height: "120px", width: "auto", objectFit: "contain" }}
+                  style={{
+                    height: "120px",
+                    width: "auto",
+                    objectFit: "contain",
+                  }}
                 />
               </Link>
-              
             </Box>
 
             <Box
@@ -82,7 +163,7 @@ export const Header = () => {
                 gap: "20px",
               }}
             >
-               <Button color="inherit" variant="text" component={Link} to="/">
+              <Button color="inherit" variant="text" component={Link} to="/">
                 <Typography variant="body1">HOME</Typography>
               </Button>
               <Button
@@ -91,37 +172,57 @@ export const Header = () => {
                 component={Link}
                 to="/items"
               >
-                <Typography variant="body1">ITEMS</Typography>
+                <Typography variant="body1">STORE</Typography>
               </Button>
-              <Button color="inherit" variant="text">
+              <Button
+                color="inherit"
+                variant="text"
+                component={Link}
+                to="/events"
+              >
                 <Typography variant="body1">EVENTS</Typography>
               </Button>
               <Button color="inherit" variant="text">
                 <Typography variant="body1">INFO</Typography>
               </Button>
-              <Button color="inherit" variant="text" to="/shop" component={Link}>
-                <Typography variant="body1">SHOP</Typography>
-              </Button>
             </Box>
 
-            <Box sx={{ display: "flex", alignItems: "center", gap: "30px" }}>
-              {isLoggedIn 
-              ? <>
-                  <Chip sx={{py: 3, pl: 1}}
-                    avatar={<Avatar src={applicationUser?.picture} alt={applicationUser?.email} />}
-                    label={<Typography variant="body1" sx={{color: 'primary.main', fontWeight: 'bold'}}>{`${applicationUser?.email} (${applicationUser?.role})`}</Typography>}
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                alignItems: "center",
+                gap: "30px",
+              }}
+            >
+              {isLoggedIn ? (
+                <>
+                  <Chip
+                    sx={{ py: 3, pl: 1 }}
+                    avatar={
+                      <Avatar
+                        src={applicationUser?.picture}
+                        alt={applicationUser?.email}
+                      />
+                    }
+                    label={
+                      <Typography
+                        variant="body1"
+                        sx={{ color: "primary.main", fontWeight: "bold" }}
+                      >{`${applicationUser?.email} (${applicationUser?.role})`}</Typography>
+                    }
                     variant="outlined"
                   />
                   <Button
-                      onClick={handleLogout}
-                      color="inherit"
-                      variant="contained"
-                      sx={{ fontSize: "1rem", fontWeight: "bold" }}
-                    >
-                      Logout
+                    onClick={handleLogout}
+                    color="inherit"
+                    variant="contained"
+                    sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                  >
+                    Logout
                   </Button>
                 </>
-             : (<>
+              ) : (
+                <>
                   <Button
                     onClick={signUp}
                     color="inherit"
@@ -131,26 +232,46 @@ export const Header = () => {
                     Sign Up
                   </Button>
                   <Button
-                      to="/login"
-                      component={Link}
-                      color="inherit"
-                      variant="contained"
-                      sx={{ fontSize: "1rem", fontWeight: "bold" }}
-                    >
-                      Log In
+                    to="/login"
+                    component={Link}
+                    color="inherit"
+                    variant="contained"
+                    sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                  >
+                    Log In
                   </Button>
                 </>
-                  )
-              }
+              )}
             </Box>
-            {/* toggleMode for light and dark mode */}
-            {/* <IconButton onClick={toggleMode} color="inherit"> */}
-            {/* {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />} */}
-            {/* </IconButton>*/}
 
+            <Box sx={{ display: { xs: "block", md: "none" } }}>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="end"
+                onClick={handleDrawerToggle}
+              >
+                <MenuIcon />
+              </IconButton>
+            </Box>
           </Toolbar>
         </Container>
       </AppBar>
+      <Drawer
+        variant="temporary"
+        anchor="right"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{
+          keepMounted: true,
+        }}
+        sx={{
+          display: { xs: "block", md: "none" },
+          "& .MuiDrawer-paper": { boxSizing: "border-box", width: 240 },
+        }}
+      >
+        {drawer}
+      </Drawer>
     </>
   );
 };
