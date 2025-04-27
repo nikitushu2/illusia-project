@@ -68,7 +68,7 @@ const UserSingleProduct: React.FC<UserSingleProductProps> = ({ item, onClose, bu
 
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mt: 2 }}>
           <Button variant="contained" color="primary" onClick={() => { if (onEdit) onEdit(); }}>
-            {buttonText || "Add to Cart"}
+            {buttonText || "Book"}
           </Button>
         </Box>
       </Box>

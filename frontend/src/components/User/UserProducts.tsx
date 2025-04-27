@@ -345,7 +345,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                           padding: { xs: "4px 8px", sm: "6px 16px" },
                         }}
                       >
-                        Add to Cart
+                        Book
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -417,7 +417,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                       navigate(`/product/${item.id}`);
                     }}
                   >
-                    Add to Cart
+                    Book
                   </Button>
                 </CardActions>
               </Card>
