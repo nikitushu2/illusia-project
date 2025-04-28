@@ -4,7 +4,6 @@ import User from "./user";
 import Category from "./category";
 import Booking from "./booking";
 import BookingItem from "./bookingItem";
-import Status from "./status";
 
 // Initialize models
 const models = {
@@ -33,17 +32,6 @@ User.hasMany(Booking, {
 Booking.belongsTo(User, {
   foreignKey: "userId",
   as: "user",
-});
-
-// Status and Booking (one-to-many)
-Status.hasMany(Booking, {
-  foreignKey: "statusId",
-  as: "bookings",
-});
-
-Booking.belongsTo(Status, {
-  foreignKey: "statusId",
-  as: "status",
 });
 
 // Booking and BookingItem (one-to-many)

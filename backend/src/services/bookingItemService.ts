@@ -1,3 +1,4 @@
+import Booking from "../models/booking";
 import BookingItem from "../models/bookingItem";
 import Item from "../models/item";
 import { InferCreationAttributes } from "sequelize";
@@ -54,3 +55,15 @@ export const remove = async (id: number) => {
 export const removeByBookingId = async (bookingId: number) => {
   return await BookingItem.destroy({ where: { bookingId } });
 };
+
+export const findByUserBookings = async (userId: number): Promise<BookingItem[]> => {
+     return BookingItem.findAll({
+      include: [
+        {
+          model: Booking,
+          where: { userId },
+          attributes: [],
+        },
+      ],
+    });
+  };

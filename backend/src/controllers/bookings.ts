@@ -2,17 +2,21 @@ import { Request, Response, NextFunction } from "express";
 import { Router } from "express";
 import Booking from "../models/booking";
 import * as bookingService from "../services/bookingService";
+import { RequestWithSession } from "../types/requestWithSession";
+import { verifySession, verifyAdminSession } from "../middleware/verifySession";
+import User from "../models/user";
+import { UserRole } from "../types/applicationUser";
 
 export interface BookingAttributes {
-  id: number;
+  id?: number;
   userId: number;
   startDate: Date;
   endDate: Date;
   statusId: number;
-  createdAt: Date;
+  createdAt?: Date;
 }
 
-export interface BookingRequest extends Request {
+export interface BookingRequest extends RequestWithSession {
   booking?: BookingAttributes;
 }
 
@@ -33,6 +37,20 @@ const findBookingById = async (
       return;
     }
 
+    if (
+      req.applicationUser?.role !== UserRole.ADMIN &&
+      req.applicationUser?.role !== UserRole.SUPER_ADMIN
+    ) {
+      const user = await User.findOne({
+        where: { email: req.applicationUser?.email },
+      });
+
+      if (!user || booking.userId !== user.id) {
+        res.status(403).json({ error: "Access denied" });
+        return;
+      }
+    }
+
     req.booking = booking.get({ plain: true }) as BookingAttributes;
     next();
   } catch (error) {
@@ -40,12 +58,14 @@ const findBookingById = async (
   }
 };
 
-// GET all bookings
-// for both admin and users
-// allows to view all bookings in the system
+bookingsRouter.use(verifySession);
+
+// ADMIN ROUTES
+// GET all bookings - admin only
 bookingsRouter.get(
-  "/",
-  async (_req: Request, res: Response, next: NextFunction) => {
+  "/admin",
+  verifyAdminSession,
+  async (_req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
       const bookings = await bookingService.findAll();
       res.json(bookings);
@@ -55,23 +75,21 @@ bookingsRouter.get(
   }
 );
 
-// GET booking by ID
-// for both admin and users
-// allows to view a specific booking by its ID
+// GET booking by ID - admin only
 bookingsRouter.get(
-  "/:id",
+  "/admin/:id",
+  verifyAdminSession,
   findBookingById,
   (req: BookingRequest, res: Response) => {
     res.json(req.booking);
   }
 );
 
-// GET bookings by user ID
-// for both admin and users
-// allows to view bookings by user ID
+// GET bookings by user ID - admin only
 bookingsRouter.get(
-  "/user/:userId",
-  async (req: Request, res: Response, next: NextFunction) => {
+  "/admin/user/:userId",
+  verifyAdminSession,
+  async (req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
       const bookings = await bookingService.findByUserId(
         Number(req.params.userId)
@@ -83,11 +101,10 @@ bookingsRouter.get(
   }
 );
 
-// POST create new booking
-// for both admin and users
-// allows to create a new booking
+// POST create new booking - admin only
 bookingsRouter.post(
-  "/",
+  "/admin",
+  verifyAdminSession,
   async (
     req: Request<{}, {}, BookingAttributes>,
     res: Response,
@@ -102,11 +119,10 @@ bookingsRouter.post(
   }
 );
 
-// PUT update booking
-// for both admin and users
-// allows to update a booking
+// PUT update booking - admin only
 bookingsRouter.put(
-  "/:id",
+  "/admin/:id",
+  verifyAdminSession,
   findBookingById,
   async (req: BookingRequest, res: Response, next: NextFunction) => {
     try {
@@ -121,11 +137,10 @@ bookingsRouter.put(
   }
 );
 
-// PATCH update booking status
-// for admins only
-// allows changing the status of a booking
+// PATCH update booking status - admin only
 bookingsRouter.patch(
-  "/:id/status",
+  "/admin/:id/status",
+  verifyAdminSession,
   findBookingById,
   async (
     req: BookingRequest,
@@ -150,14 +165,120 @@ bookingsRouter.patch(
   }
 );
 
-// DELETE booking
-// for both admin and users
-// allows deleting a booking
+// DELETE booking - admin only
+bookingsRouter.delete(
+  "/admin/:id",
+  verifyAdminSession,
+  findBookingById,
+  async (req: BookingRequest, res: Response, next: NextFunction) => {
+    try {
+      await bookingService.remove(Number(req.params.id));
+      res.status(204).end();
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// USER ROUTES
+// GET bookings for the current user
+bookingsRouter.get(
+  "/my-bookings",
+  async (req: RequestWithSession, res: Response, next: NextFunction) => {
+    try {
+      if (!req.applicationUser) {
+        res.status(401).json({ error: "Authentication required" });
+        return;
+      }
+
+      const user = await User.findOne({
+        where: { email: req.applicationUser.email },
+      });
+      if (!user) {
+        res.status(404).json({ error: "User not found" });
+        return;
+      }
+
+      const bookings = await bookingService.findByUserId(user.id);
+      res.json(bookings);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// GET a specific booking owned by the current user
+bookingsRouter.get(
+  "/:id",
+  findBookingById,
+  (req: BookingRequest, res: Response) => {
+    res.json(req.booking);
+  }
+);
+
+// POST create new booking for the current user
+bookingsRouter.post(
+  "/",
+  async (req: RequestWithSession, res: Response, next: NextFunction) => {
+    try {
+      if (!req.applicationUser) {
+        res.status(401).json({ error: "Authentication required" });
+        return;
+      }
+
+      const user = await User.findOne({
+        where: { email: req.applicationUser.email },
+      });
+      if (!user) {
+        res.status(404).json({ error: "User not found" });
+        return;
+      }
+
+      const { startDate, endDate, statusId } = req.body as {
+        startDate: Date;
+        endDate: Date;
+        statusId: number;
+      };
+
+      const newBooking = await bookingService.create({
+        userId: user.id,
+        startDate,
+        endDate,
+        statusId,
+      });
+
+      res.status(201).json(newBooking);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// PUT update booking owned by the current user
+bookingsRouter.put(
+  "/:id",
+  findBookingById,
+  async (req: BookingRequest, res: Response, next: NextFunction) => {
+    try {
+      // findBookingById middleware already checks ownership
+      const updatedBooking = await bookingService.update(
+        Number(req.params.id),
+        req.body as Partial<BookingAttributes>
+      );
+      res.json(updatedBooking);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// DELETE a booking owned by the current user
 bookingsRouter.delete(
   "/:id",
   findBookingById,
   async (req: BookingRequest, res: Response, next: NextFunction) => {
     try {
+      // findBookingById middleware already checks ownership
       await bookingService.remove(Number(req.params.id));
       res.status(204).end();
     } catch (error) {

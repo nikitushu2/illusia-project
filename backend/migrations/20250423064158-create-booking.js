@@ -29,12 +29,10 @@ module.exports = {
       status_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: 'statuses',
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'RESTRICT'
+        validate: {
+          min: 1,
+          max: 6
+        }
       },
       created_at: {
         type: Sequelize.DATE,

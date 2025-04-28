@@ -1,6 +1,15 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../util/db";
 
+export enum BookingStatus {
+  "RESERVED" = 1,
+  "CANCELLED" = 2,
+  "PENDING_APPROVAL" = 3,
+  "IN_PROGRESS" = 4,
+  "CLOSED" = 5,
+  "IN_QUEUE" = 6,
+}
+
 export interface BookingAttributes {
   id?: number;
   userId: number;
@@ -42,7 +51,11 @@ Booking.init(
     statusId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: { model: "statuses", key: "id" },
+      validate: {
+        isIn: [
+          Object.values(BookingStatus).filter((v) => typeof v === "number"),
+        ],
+      },
     },
     createdAt: {
       type: DataTypes.DATE,
