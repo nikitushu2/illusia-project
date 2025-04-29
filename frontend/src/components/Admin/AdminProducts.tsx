@@ -29,6 +29,9 @@ import {
   TextField,
   Pagination,
   Stack,
+  useTheme,
+  useMediaQuery,
+  Typography,
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
@@ -49,14 +52,16 @@ import UserSingleProduct from "../User/UserSingleProduct";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
-//import categoryService, { Category } from "../../services/categoryService";
-//import ItemList from "../Items/ItemList";
+
 interface ItemListProps {
   onEdit?: (item: Item) => void;
   categories?: { id: number; name: string }[];
 }
 
 const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const { isLoggedIn, isAdmin } = useAuth();
   const [modeDisplay, setModeDisplay] = React.useState("table");
 
@@ -273,225 +278,313 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   //HANDLE TABLE VIEW
   const handleListView = () => {
-    return (
-      <TableContainer sx={{ maxHeight: 800 }}>
-        <Table stickyHeader>
-          {/* Added stickyHeader for better UX */}
-          <TableHead>
-            <TableRow>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                ID
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Image{" "}
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Name
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Description{" "}
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Size
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Color{" "}
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Item Location
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Storage Location
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Quantity{" "}
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Category{" "}
-              </TableCell>
-              {/* <TableCell>Storage Location</TableCell> */}
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Action
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {currentItems.map((item) => {
-              const category = categories.find((c) => c.id === item.categoryId);
-              return (
-                <TableRow
-                  key={item.id}
-                  style={{ opacity: itemVisibility[item.id] ? 1 : 0.5 }}
-                  onClick={() => openModal(item)}
-                >
-                  <TableCell>{item.id}</TableCell>
-                  <TableCell>
-                    {item.imageUrl ? (
-                      <img
-                        src={item.imageUrl}
-                        alt={item.description}
-                        style={{
-                          width: "150px",
-                          height: "150px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      <img
-                        src={camera} // Use the camera variable here
-                        alt="No Image Available"
-                        style={{
-                          width: "150px",
-                          height: "150px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    )}
-                  </TableCell>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.description}</TableCell>
-                  <TableCell>{item.size}</TableCell>
-                  <TableCell>{item.color}</TableCell>
-                  <TableCell>{item.itemLocation}</TableCell>
-                  <TableCell>
-                    {item.storageLocation || item.storage_location || "N/A"}
-                  </TableCell>
-                  <TableCell>{item.quantity}</TableCell>
-                  <TableCell>
-                    {category
-                      ? category.name
-                      : item.categoryId
-                      ? `Category ${item.categoryId}`
-                      : "N/A"}
-                  </TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
+  
+    if (isMobile) {
+      // 📱 Stacked layout for mobile
+      return (
+        <Box sx={{ mt: 2 }}>
+          {currentItems.map((item) => {
+            const category = categories.find((c) => c.id === item.categoryId);
+            return (
+              <Paper key={item.id} sx={{ p: 2, mb: 2 }}>
+                <Box sx={{ display: "flex", gap: 2 }}>
+                  <Box
+                    sx={{
+                      minWidth: 80,
+                      height: 80,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 1,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <img
+                      src={item.imageUrl || camera}
+                      alt={item.description || "No Image"}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  </Box>
+                  <Box>
+                    <Typography variant="subtitle2"><strong>Name:</strong> {item.name}</Typography>
+                    <Typography variant="body2"><strong>Description:</strong> {item.description}</Typography>
+                    <Typography variant="body2"><strong>Size:</strong> {item.size}</Typography>
+                    <Typography variant="body2"><strong>Color:</strong> {item.color}</Typography>
+                    <Typography variant="body2"><strong>Quantity:</strong> {item.quantity}</Typography>
+                    <Typography variant="body2"><strong>Location:</strong> {item.itemLocation}</Typography>
+                    <Typography variant="body2">
+                      <strong>Category:</strong>{" "}
+                      {category ? category.name : `Category ${item.categoryId}`}
+                    </Typography>
+                    <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
                       <IconButton
                         color="primary"
-                        onClick={(event) => {event.stopPropagation();handleEdit(item);}}
-                        size="medium"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(item);
+                        }}
                       >
-                        {" "}
-                        <EditIcon />{" "}
+                        <EditIcon fontSize="small" />
                       </IconButton>
                       <IconButton
                         color="primary"
-                        onClick={() => confirmDelete(item.id)}
-                        size="medium"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          confirmDelete(item.id);
+                        }}
                       >
-                        {" "}
-                        <DeleteIcon />{" "}
+                        <DeleteIcon fontSize="small" />
                       </IconButton>
                       <IconButton
                         color="primary"
-                        onClick={() => visibilityToggle(item)}
-                        size="medium"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          visibilityToggle(item);
+                        }}
                       >
                         {itemVisibility[item.id] ? (
-                          <VisibilityIcon />
+                          <VisibilityIcon fontSize="small" />
                         ) : (
-                          <VisibilityOffIcon />
+                          <VisibilityOffIcon fontSize="small" />
                         )}
                       </IconButton>
                     </Box>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                  </Box>
+                </Box>
+              </Paper>
+            );
+          })}
+        </Box>
+      );
+    }
+
+    return (
+      <Box
+        sx={{
+          width: "100%",
+          overflowX: "auto",
+          marginTop: { xs: 2, sm: 4 },
+          padding: { xs: 1, sm: 2 },
+          "& .MuiTableCell-root": {
+            whiteSpace: "nowrap",
+            maxWidth: "200px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            padding: { xs: "8px 4px", sm: "16px" },
+            fontSize: { xs: "0.75rem", sm: "0.875rem" },
+          },
+          "& .MuiTableHead-root": {
+            "& .MuiTableCell-root": {
+              fontSize: { xs: "0.75rem", sm: "0.875rem" },
+              fontWeight: "bold",
+              backgroundColor: "primary.main",
+              color: "white",
+              padding: { xs: "8px 4px", sm: "16px" },
+            },
+          },
+          "& .MuiTableRow-root": {
+            "&:hover": {
+              backgroundColor: "action.hover",
+            },
+            "&:last-child td": {
+              borderBottom: 0,
+            },
+          },
+        }}
+      >
+        <TableContainer
+          sx={{
+            maxHeight: 800,
+            borderRadius: 2,
+            boxShadow: 2,
+            "&::-webkit-scrollbar": {
+              width: "8px",
+              height: "8px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#f1f1f1",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "#888",
+              borderRadius: "4px",
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              background: "#555",
+            },
+          }}
+        >
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell
+                  sx={{
+                    minWidth: { xs: "80px", sm: "100px" },
+                  }}
+                >
+                  Image
+                </TableCell>
+                <TableCell
+                  sx={{
+                    minWidth: { xs: "120px", sm: "150px" },
+                  }}
+                >
+                  Name
+                </TableCell>
+                <TableCell
+                  sx={{
+                    minWidth: { xs: "150px", sm: "200px" },
+                  }}
+                >
+                  Description
+                </TableCell>
+                <TableCell
+                  sx={{
+                    minWidth: { xs: "60px", sm: "80px" },
+                  }}
+                >
+                  Size
+                </TableCell>
+                <TableCell
+                  sx={{
+                    minWidth: { xs: "60px", sm: "80px" },
+                  }}
+                >
+                  Color
+                </TableCell>
+                <TableCell
+                  sx={{
+                    minWidth: { xs: "60px", sm: "80px" },
+                  }}
+                >
+                  Quantity
+                </TableCell>
+                <TableCell
+                  sx={{
+                    minWidth: { xs: "100px", sm: "120px" },
+                  }}
+                >
+                  Item Location
+                </TableCell>
+                <TableCell
+                  sx={{
+                    minWidth: { xs: "80px", sm: "100px" },
+                  }}
+                >
+                  Category
+                </TableCell>
+                <TableCell
+                  sx={{
+                    minWidth: { xs: "100px", sm: "120px" },
+                  }}
+                >
+                  Action
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {currentItems.map((item) => {
+                const category = categories.find(
+                  (c) => c.id === item.categoryId
+                );
+                return (
+                  <TableRow
+                    key={item.id}
+                    onClick={() => openModal(item)}
+                    sx={{
+                      cursor: "pointer",
+                      "&:hover": {
+                        backgroundColor: "action.hover",
+                      },
+                    }}
+                  >
+                    <TableCell>
+                      <Box
+                        sx={{
+                          width: { xs: 50, sm: 100 },
+                          height: { xs: 50, sm: 100 },
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <img
+                          src={item.imageUrl || camera}
+                          alt={item.description || "No Image Available"}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            borderRadius: "4px",
+                          }}
+                        />
+                      </Box>
+                    </TableCell>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.description}</TableCell>
+                    <TableCell>{item.size}</TableCell>
+                    <TableCell>{item.color}</TableCell>
+                    <TableCell>{item.quantity}</TableCell>
+                    <TableCell>{item.itemLocation}</TableCell>
+                    <TableCell>
+                      {category
+                        ? category.name
+                        : item.categoryId
+                        ? `Category ${item.categoryId}`
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          gap: { xs: 0.5, sm: 1 },
+                          "& .MuiIconButton-root": {
+                            padding: { xs: "4px", sm: "8px" },
+                          },
+                        }}
+                      >
+                        <IconButton
+                          color="primary"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleEdit(item);
+                          }}
+                          size="small"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          color="primary"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            confirmDelete(item.id);
+                          }}
+                          size="small"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                        <IconButton
+                          color="primary"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            visibilityToggle(item);
+                          }}
+                          size="small"
+                        >
+                          {itemVisibility[item.id] ? (
+                            <VisibilityIcon />
+                          ) : (
+                            <VisibilityOffIcon />
+                          )}
+                        </IconButton>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     );
   };
 
@@ -529,7 +622,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                 <CardMedia
                   sx={{ height: 200, width: "100%", objectFit: "cover" }}
                   image={item.imageUrl || camera}
-                 
                   title={item.description}
                 />
                 <CardContent
@@ -691,36 +783,71 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           display: "column",
           marginBottom: "50px",
           marginTop: "10px",
-          gap: "20px",
+          gap: { xs: "30px", sm: "20px" },
           paddingX: "20px",
         }}
       >
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             justifyContent: "center",
+            alignItems: { xs: "stretch", sm: "center" },
             marginTop: "50px",
-            gap: "50px",
+            gap: { xs: "20px", sm: "50px" },
           }}
         >
           <TextField
             onChange={handleSearch}
             value={searchInput}
             label="search item"
-            sx={{ width: "50%" }}
-          ></TextField>
-          <Button onClick={handleCreate}>ADD NEW ITEM</Button>
+            sx={{
+              width: { xs: "100%", sm: "50%" },
+              "& .MuiInputBase-root": {
+                height: { xs: "40px", sm: "56px" },
+              },
+            }}
+          />
+          <Button
+            onClick={handleCreate}
+            sx={{
+              width: { xs: "100%", sm: "auto" },
+              height: { xs: "40px", sm: "56px" },
+              fontSize: { xs: "0.875rem", sm: "1rem" },
+              // fontWeight: "bold",
+              backgroundColor: "primary.main",
+              color: "white",
+              "&:hover": { backgroundColor: "primary.dark",}
+            }}
+          >
+            ADD NEW ITEM
+          </Button>
         </Box>
-
+        </Box>
+        <Box sx={{marginBottom:"10px"}}>
         {/* filter by category */}
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: { xs: "stretch", sm: "center" },
+            gap: { xs: "20px", sm: "0" },
+            marginTop: { xs: "20px", sm: "0" },
+            padding: { xs: "20px", sm: "0" },
+            backgroundColor: { xs: "background.paper", sm: "transparent" },
+            borderRadius: { xs: 2, sm: 0 },
+            boxShadow: { xs: 2, sm: 0 },
           }}
         >
-          <FormControl sx={{ width: 200 }}>
+          <FormControl
+            sx={{
+              width: { xs: "100%", sm: 200 },
+              "& .MuiInputBase-root": {
+                height: { xs: "40px", sm: "56px" },
+              },
+            }}
+          >
             <InputLabel id="category-filter-label">
               Filter by Category
             </InputLabel>
@@ -746,15 +873,34 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           </FormControl>
 
           {/* grid and list views */}
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <AppsIcon
-              sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }}
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              justifyContent: { xs: "center", sm: "flex-end" },
+              marginTop: { xs: "10px", sm: "0" },
+            }}
+          >
+            <IconButton
               onClick={toggleDisplayMode}
-            />
-            <TableRowsIcon
-              sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }}
+              sx={{
+                fontSize: { xs: 30, sm: 40 },
+                color: "primary.main",
+                cursor: "pointer",
+              }}
+            >
+              <AppsIcon />
+            </IconButton>
+            <IconButton
               onClick={toggleDisplayMode}
-            />
+              sx={{
+                fontSize: { xs: 30, sm: 40 },
+                color: "primary.main",
+                cursor: "pointer",
+              }}
+            >
+              <TableRowsIcon />
+            </IconButton>
           </Box>
         </Box>
       </Box>
@@ -872,7 +1018,15 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
       {singleItemModal && selectedProduct && (
         <div>
-          <UserSingleProduct item={selectedProduct} onClose={closeModal} buttonText="Edit" onEdit={() => {closeModal(); handleEdit(selectedProduct)}}/>
+          <UserSingleProduct
+            item={selectedProduct}
+            onClose={closeModal}
+            buttonText="Edit"
+            onEdit={() => {
+              closeModal();
+              handleEdit(selectedProduct);
+            }}
+          />
         </div>
       )}
     </div>

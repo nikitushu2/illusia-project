@@ -11,6 +11,7 @@ import {
   // Typography,
   Collapse,
   Typography,
+  IconButton,
   //TextField,
 } from "@mui/material";
 // import AppsIcon from "@mui/icons-material/Apps";
@@ -28,6 +29,9 @@ import UserBookings from "./UserBookings";
 import categoryService from "../../services/categoryService";
 //import UserSingleProduct from "./UserSingleProduct";
 
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+
 const UserDashboard = () => {
   const [sideLink, setsideLink] = useState<string | null>(null);
   const [categories, setCategories] = useState<{ id: number; name: string }[]>(
@@ -38,7 +42,7 @@ const UserDashboard = () => {
 
   const [productsOpen, setProductsOpen] = useState(false);
   const [bookingsOpen, setBookingsOpen] = useState(false);
-  //const [component, setComponent] = useState<JSX.Element | null>(<UserProducts />);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [component, setComponent] = useState<React.ReactElement | null>(null);
 
   // Fetch categories when component mounts
@@ -79,7 +83,9 @@ const UserDashboard = () => {
     }
   };
 
-  
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
 
   // handle arrow up/down for products
   const handleProductsClick = () => {
@@ -102,9 +108,8 @@ const UserDashboard = () => {
         {/* whole container for dashboard  with 2 sections sidebar and main dashboard component*/}
         <Box
           sx={{
-            display: "grid",
-            gridTemplateColumns: "15% 85%",
-            gap: "30px",
+            display: "flex",
+            gap: "20px",
             margin: "10px",
           }}
         >
@@ -112,24 +117,47 @@ const UserDashboard = () => {
           <Box
             sx={{
               minHeight: "100vh",
-              backgroundColor: "#f5f5f5",
+              backgroundColor: "#44195b",
               padding: "20px",
               borderRadius: "8px 0 0 8px", // Rounded corners only on the right side
+              width: isCollapsed ? "80px" : "290px",
+              transition: "width 0.3s ease-in-out",
+              position: "relative",
+          
             }}
           >
-            <Typography
-              variant="h5"
-              alignContent="center"
-              justifyContent="center"
+            <Box
               sx={{
-                marginLeft: "50px",
-                fontWeight: "bold",
-                marginTop: "50px",
-                marginBottom: "20px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              User Dashboard
-            </Typography>
+              {!isCollapsed && (
+                <Typography
+                  variant="h5"
+                  color="white"
+                  sx={{
+                    fontWeight: "bold",
+                    marginTop: "50px",
+                    marginBottom: "50px",
+                  }}
+                >
+                  User Dashboard
+                </Typography>
+              )}
+              <IconButton
+                onClick={toggleSidebar}
+                sx={{
+                  position: "absolute",
+                  right: 0,
+                  top: "60px",
+                }}
+                style={{ color: "white" }}
+              >
+                {isCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+              </IconButton>
+            </Box>
 
             <Box
               sx={{
@@ -142,72 +170,132 @@ const UserDashboard = () => {
               <List>
                 <ListItem disablePadding>
                   <ListItemButton onClick={handleProductsClick}>
-                    <ListItemIcon>
+                    <ListItemIcon style={{ color: "white" }}>
                       <LeaderboardIcon />
                     </ListItemIcon>
-                    <ListItemText
-                      primary="Products"
-                      onClick={() =>
-                        handleSideBar(
-                          <UserProducts
-                            onEdit={(item) => console.log("Edit item:", item)}
-                            categories={categories}
-                          />
-                        )
-                      }
-                    />
-                  </ListItemButton>
-                </ListItem>
-
-                <Divider />
-                <ListItem disablePadding>
-                  <ListItemButton onClick={handleBookingsClick}>
-                    <ListItemIcon>
-                      <BookmarksIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Bookings" />
-                    {bookingsOpen ? <ExpandLess /> : <ExpandMore />}
-                  </ListItemButton>
-                </ListItem>
-                <Collapse in={bookingsOpen} timeout="auto" unmountOnExit>
-                  <ListItem disablePadding>
-                    <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 6 }}>
-                        <ListItemIcon>
-                          <DraftsIcon />
-                        </ListItemIcon>
+                    {!isCollapsed && (
+                      <>
                         <ListItemText
-                          primary="Pending"
-                          onClick={() => handleSideBar(<UserBookings />)}
-                        />
-                      </ListItemButton>
-                      <ListItemButton sx={{ pl: 6 }}>
-                        <ListItemIcon>
-                          <DraftsIcon />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="Reservations"
+                          primary="Products"
+                          slotProps={{
+                            primary: { style: { color: "white" } },
+                          }}
                           onClick={() =>
                             handleSideBar(
-                              "<UserSingleProduct/> in case we want to remove modal view"
+                              <UserProducts
+                                onEdit={(item) =>
+                                  console.log("Edit item:", item)
+                                }
+                                categories={categories}
+                              />
                             )
                           }
                         />
+                        {productsOpen ? <ExpandLess style={{color:"white"}}  /> : <ExpandMore style={{color:"white"}}/>}
+                      </>
+                    )}
+                  </ListItemButton>
+                </ListItem>
+                <Collapse
+                  in={productsOpen && !isCollapsed}
+                  timeout="auto"
+                  unmountOnExit
+                >
+                  <ListItem disablePadding>
+                    <List component="div" disablePadding>
+                      <ListItemButton sx={{ pl: 6 }}>
+                        <ListItemIcon style={{ color: "white" }}>
+                          <LeaderboardIcon />
+                        </ListItemIcon>
+                        {!isCollapsed && (
+                          <ListItemText
+                            primary="Inventory"
+                            slotProps={{
+                              primary: { style: { color: "white" } },
+                            }}
+                            onClick={() => handleSideBar("Display inventory")}
+                          />
+                        )}
                       </ListItemButton>
                     </List>
                   </ListItem>
                 </Collapse>
-                <Divider />
+
+                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} />
+                <ListItem disablePadding>
+                  <ListItemButton onClick={handleBookingsClick}>
+                    <ListItemIcon style={{ color: "white" }}>
+                      <BookmarksIcon />
+                    </ListItemIcon>
+                    {!isCollapsed && (
+                      <>
+                        <ListItemText
+                          primary="Bookings"
+                          slotProps={{
+                            primary: { style: { color: "white" } },
+                          }}
+                        />
+                        {bookingsOpen ? <ExpandLess  style={{color:"white"}}/> : <ExpandMore style={{color:"white"}} />}
+                      </>
+                    )}
+                  </ListItemButton>
+                </ListItem>
+                <Collapse
+                  in={bookingsOpen && !isCollapsed}
+                  timeout="auto"
+                  unmountOnExit
+                >
+                  <ListItem disablePadding>
+                    <List component="div" disablePadding>
+                      <ListItemButton sx={{ pl: 6 }}>
+                        <ListItemIcon style={{ color: "white" }}>
+                          <DraftsIcon />
+                        </ListItemIcon>
+                        {!isCollapsed && (
+                          <ListItemText
+                            primary="Pending"
+                            slotProps={{
+                              primary: { style: { color: "white" } },
+                            }}
+                            onClick={() => handleSideBar(<UserBookings />)}
+                          />
+                        )}
+                      </ListItemButton>
+                      <ListItemButton sx={{ pl: 6 }}>
+                        <ListItemIcon style={{ color: "white" }}>
+                          <DraftsIcon />
+                        </ListItemIcon>
+                        {!isCollapsed && (
+                          <ListItemText
+                            primary="Reservations"
+                            slotProps={{
+                              primary: { style: { color: "white" } },
+                            }}
+                            onClick={() =>
+                              handleSideBar("Display reservations")
+                            }
+                          />
+                        )}
+                      </ListItemButton>
+                    </List>
+                  </ListItem>
+                </Collapse>
+                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }}/>
 
                 <ListItem disablePadding>
                   <ListItemButton>
-                    <ListItemIcon>
+                    <ListItemIcon style={{ color: "white" }}>
                       <DraftsIcon />
                     </ListItemIcon>
-                    <ListItemText
-                      primary="Messages"
-                      onClick={() => handleSideBar("Display messages")}
-                    />
+                    {!isCollapsed && (
+                      <ListItemText
+                        primary="Messages"
+                        slotProps={{
+                          primary: { style: { color: "white" } },
+                        }}
+                        onClick={() => handleSideBar("Display messages")}
+                      />
+                    )}
                   </ListItemButton>
                 </ListItem>
                 <Divider />
@@ -216,7 +304,13 @@ const UserDashboard = () => {
           </Box>
 
           {/* <h2>(main dashboard component)</h2> */}
-          <Box sx={{ margin: "10px" }}>
+          <Box
+            sx={{
+              margin: "10px",
+              width: isCollapsed ? "calc(100% - 100px)" : "calc(100% - 270px)", //
+              transition: "width 0.3s ease-in-out",
+            }}
+          >
             <Box
               sx={{
                 display: "flex",

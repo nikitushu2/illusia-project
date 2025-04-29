@@ -35,10 +35,10 @@ const UserSingleProduct: React.FC<UserSingleProductProps> = ({ item, onClose, bu
       open={!!item} // Open if 'item' prop exists
       onClose={onClose}
     >
-      <Box sx={modalStyle}>
+      <Box sx={{ ...modalStyle, width: { xs: '90%', sm: 900 }, maxHeight: { xs: '95vh', sm: '90vh' } }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography id="single-product-modal-title" variant="h6" component="h2">
-            {item.name} Details
+            {/* {item.name} Details */}
           </Typography>
           <IconButton aria-label="close" onClick={onClose}>
             <CloseIcon />
@@ -48,25 +48,27 @@ const UserSingleProduct: React.FC<UserSingleProductProps> = ({ item, onClose, bu
         <Box>
           <CardMedia
             component="img"
-            // height="auto"
             image={item.imageUrl || camera}
-            alt={item.description}
-            sx={{ display: "block",margin: "0 auto", maxWidth: "400px", maxHeight:"400px",  objectFit: "contain", padding: 2 }}
+            alt={item.name}
+            sx={{ display: "block", margin: "0 auto", maxWidth: "400px", maxHeight: "400px", objectFit: "contain", padding: 2 }}
           />
         </Box>
 
         <Box sx={{ padding: 2, textAlign: "center" }}>
-          <Typography variant="h4">{item.name}</Typography>
-          <Typography variant="body1">Description: {item.description}</Typography>
-          <Typography variant="body1">Quantity: {item.quantity}</Typography>
-          <Typography variant="body1">Price: ${item.price}</Typography>
-          <Typography variant="body1">Location: {item.itemLocation}</Typography>
-        
+          <Typography variant="h4" sx={{ mb: 2 }}>{item.name}</Typography>
+          <Typography variant="body1" sx={{ fontStyle: 'italic' }}>{item.description}</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-around', mt: 2, flexWrap: 'wrap' }}>
+            <Typography variant="body1"><strong>Quantity:</strong> {item.quantity}</Typography>
+            <Typography variant="body1"><strong>Price:</strong> €{item.price}</Typography>
+            <Typography variant="body1"><strong>Color:</strong> {item.color || "n/a"}</Typography>
+            <Typography variant="body1"><strong>Size:</strong> {item.size || "n/a"}</Typography>
+            <Typography variant="body1"><strong>Location:</strong> {item.itemLocation || "n/a"}</Typography>
+          </Box>
         </Box>
 
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mt: 2 }}>
-          <Button variant="contained" color="primary" onClick={() => {if(onEdit) onEdit();}} >
-            {buttonText || "Add to Cart"}
+          <Button variant="contained" color="primary" onClick={() => { if (onEdit) onEdit(); }}>
+            {buttonText || "Book"}
           </Button>
         </Box>
       </Box>
