@@ -20,6 +20,9 @@ import {
   SelectChangeEvent,
   Stack,
   Pagination,
+  useTheme,
+  useMediaQuery,
+  Typography,
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
@@ -39,6 +42,9 @@ interface ItemListProps {
 }
 
 const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  
   const [modeDisplay, setModeDisplay] = React.useState("table"); // for table and grid view
 
   // fetching items from the backend
@@ -119,6 +125,66 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
 
   //HANDLE TABLE VIEW
   const handleListView = () => {
+
+    if (isMobile) {
+      // 📱 Stacked layout for mobile
+      return (
+        <Box sx={{ mt: 2 }}>
+          {currentItems.map((item) => {
+            const category = categories.find((c) => c.id === item.categoryId);
+            return (
+              <Paper key={item.id} sx={{ p: 2, mb: 2 }}>
+                <Box sx={{ display: "flex", gap: 2 }}>
+                  <Box
+                    sx={{
+                      minWidth: 80,
+                      height: 80,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 1,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <img
+                      src={item.imageUrl || camera}
+                      alt={item.description || "No Image"}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  </Box>
+                  <Box>
+                    <Typography variant="subtitle2"><strong>Name:</strong> {item.name}</Typography>
+                    <Typography variant="body2"><strong>Description:</strong> {item.description}</Typography>
+                    {/* <Typography variant="body2"><strong>Size:</strong> {item.size}</Typography>
+                    <Typography variant="body2"><strong>Color:</strong> {item.color}</Typography> */}
+                    <Typography variant="body2"><strong>Quantity:</strong> {item.quantity}</Typography>
+                    <Typography variant="body2"><strong>Location:</strong> {item.itemLocation}</Typography>
+                    <Typography variant="body2">
+                      <strong>Category:</strong>{" "}
+                      {category ? category.name : `Category ${item.categoryId}`}
+                    </Typography>
+                    <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          navigate(`/product/${item.id}`);
+                        }}
+                      >
+                        Book
+                      </Button>
+                    </Box>
+                  </Box>
+                </Box>
+              </Paper>
+            );
+          })}
+        </Box>
+      );
+    }
+
+    
     return (
       <Box
         sx={{

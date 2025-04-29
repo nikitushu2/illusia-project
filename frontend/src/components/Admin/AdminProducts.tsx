@@ -29,6 +29,9 @@ import {
   TextField,
   Pagination,
   Stack,
+  useTheme,
+  useMediaQuery,
+  Typography,
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
@@ -56,6 +59,9 @@ interface ItemListProps {
 }
 
 const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const { isLoggedIn, isAdmin } = useAuth();
   const [modeDisplay, setModeDisplay] = React.useState("table");
 
@@ -272,6 +278,86 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   //HANDLE TABLE VIEW
   const handleListView = () => {
+  
+    if (isMobile) {
+      // 📱 Stacked layout for mobile
+      return (
+        <Box sx={{ mt: 2 }}>
+          {currentItems.map((item) => {
+            const category = categories.find((c) => c.id === item.categoryId);
+            return (
+              <Paper key={item.id} sx={{ p: 2, mb: 2 }}>
+                <Box sx={{ display: "flex", gap: 2 }}>
+                  <Box
+                    sx={{
+                      minWidth: 80,
+                      height: 80,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 1,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <img
+                      src={item.imageUrl || camera}
+                      alt={item.description || "No Image"}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  </Box>
+                  <Box>
+                    <Typography variant="subtitle2"><strong>Name:</strong> {item.name}</Typography>
+                    <Typography variant="body2"><strong>Description:</strong> {item.description}</Typography>
+                    <Typography variant="body2"><strong>Size:</strong> {item.size}</Typography>
+                    <Typography variant="body2"><strong>Color:</strong> {item.color}</Typography>
+                    <Typography variant="body2"><strong>Quantity:</strong> {item.quantity}</Typography>
+                    <Typography variant="body2"><strong>Location:</strong> {item.itemLocation}</Typography>
+                    <Typography variant="body2">
+                      <strong>Category:</strong>{" "}
+                      {category ? category.name : `Category ${item.categoryId}`}
+                    </Typography>
+                    <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
+                      <IconButton
+                        color="primary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(item);
+                        }}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        color="primary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          confirmDelete(item.id);
+                        }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        color="primary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          visibilityToggle(item);
+                        }}
+                      >
+                        {itemVisibility[item.id] ? (
+                          <VisibilityIcon fontSize="small" />
+                        ) : (
+                          <VisibilityOffIcon fontSize="small" />
+                        )}
+                      </IconButton>
+                    </Box>
+                  </Box>
+                </Box>
+              </Paper>
+            );
+          })}
+        </Box>
+      );
+    }
+
     return (
       <Box
         sx={{
