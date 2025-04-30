@@ -52,7 +52,6 @@ import UserSingleProduct from "../User/UserSingleProduct";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
-
 interface ItemListProps {
   onEdit?: (item: Item) => void;
   categories?: { id: number; name: string }[];
@@ -60,7 +59,11 @@ interface ItemListProps {
 
 const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  // Add debug logging
+  console.log("isMobile:", isMobile);
+  console.log("window.innerWidth:", window.innerWidth);
 
   const { isLoggedIn, isAdmin } = useAuth();
   const [modeDisplay, setModeDisplay] = React.useState("table");
@@ -278,7 +281,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   //HANDLE TABLE VIEW
   const handleListView = () => {
-  
     if (isMobile) {
       // 📱 Stacked layout for mobile
       return (
@@ -302,16 +304,32 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     <img
                       src={item.imageUrl || camera}
                       alt={item.description || "No Image"}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
                     />
                   </Box>
                   <Box>
-                    <Typography variant="subtitle2"><strong>Name:</strong> {item.name}</Typography>
-                    <Typography variant="body2"><strong>Description:</strong> {item.description}</Typography>
-                    <Typography variant="body2"><strong>Size:</strong> {item.size}</Typography>
-                    <Typography variant="body2"><strong>Color:</strong> {item.color}</Typography>
-                    <Typography variant="body2"><strong>Quantity:</strong> {item.quantity}</Typography>
-                    <Typography variant="body2"><strong>Location:</strong> {item.itemLocation}</Typography>
+                    <Typography variant="subtitle2">
+                      <strong>Name:</strong> {item.name}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Description:</strong> {item.description}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Size:</strong> {item.size}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Color:</strong> {item.color}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Quantity:</strong> {item.quantity}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Location:</strong> {item.itemLocation}
+                    </Typography>
                     <Typography variant="body2">
                       <strong>Category:</strong>{" "}
                       {category ? category.name : `Category ${item.categoryId}`}
@@ -817,14 +835,14 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               // fontWeight: "bold",
               backgroundColor: "primary.main",
               color: "white",
-              "&:hover": { backgroundColor: "primary.dark",}
+              "&:hover": { backgroundColor: "primary.dark" },
             }}
           >
             ADD NEW ITEM
           </Button>
         </Box>
-        </Box>
-        <Box sx={{marginBottom:"10px"}}>
+      </Box>
+      <Box sx={{ marginBottom: "10px" }}>
         {/* filter by category */}
         <Box
           sx={{
