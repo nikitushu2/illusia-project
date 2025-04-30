@@ -4,7 +4,6 @@ import { Router } from "express";
 import BookingItem from "../models/bookingItem";
 import * as bookingItemService from "../services/bookingItemService";
 import { RequestWithSession } from "../types/requestWithSession";
-import { verifySession, verifyAdminSession } from "../middleware/verifySession";
 import Booking from "../models/booking";
 import User from "../models/user";
 import { UserRole } from "../types/applicationUser";
@@ -13,7 +12,9 @@ interface BookingItemRequest extends RequestWithSession {
   bookingItem?: BookingItem;
 }
 
-const bookingItemsRouter = Router();
+// separate routers according to the application structure
+const privateBookingItemsRouter = Router();
+const adminBookingItemsRouter = Router();
 
 // Middleware to find booking item by ID
 const findBookingItemById = async (
@@ -56,13 +57,10 @@ const findBookingItemById = async (
   }
 };
 
-bookingItemsRouter.use(verifySession);
-
 // ADMIN ROUTES
 // GET all booking items - admin only
-bookingItemsRouter.get(
-  "/admin",
-  verifyAdminSession,
+adminBookingItemsRouter.get(
+  "/",
   async (_req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
       const bookingItems = await bookingItemService.findAll();
@@ -74,9 +72,8 @@ bookingItemsRouter.get(
 );
 
 // GET booking item by ID - admin only
-bookingItemsRouter.get(
-  "/admin/:id",
-  verifyAdminSession,
+adminBookingItemsRouter.get(
+  "/id/:id",
   findBookingItemById,
   (req: BookingItemRequest, res: Response) => {
     res.json(req.bookingItem);
@@ -84,9 +81,8 @@ bookingItemsRouter.get(
 );
 
 // GET booking items by booking ID - admin only
-bookingItemsRouter.get(
-  "/admin/booking/:bookingId",
-  verifyAdminSession,
+adminBookingItemsRouter.get(
+  "/booking/:bookingId",
   async (req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
       const bookingItems = await bookingItemService.findByBookingId(
@@ -100,9 +96,8 @@ bookingItemsRouter.get(
 );
 
 // POST create new booking item - admin only
-bookingItemsRouter.post(
-  "/admin",
-  verifyAdminSession,
+adminBookingItemsRouter.post(
+  "/",
   async (req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
       const newBookingItem = await bookingItemService.create(
@@ -116,9 +111,8 @@ bookingItemsRouter.post(
 );
 
 // POST create multiple booking items - admin only
-bookingItemsRouter.post(
-  "/admin/bulk",
-  verifyAdminSession,
+adminBookingItemsRouter.post(
+  "/bulk",
   async (
     req: RequestWithSession,
     res: Response,
@@ -147,9 +141,8 @@ bookingItemsRouter.post(
 );
 
 // PUT update booking item - admin only
-bookingItemsRouter.put(
-  "/admin/:id",
-  verifyAdminSession,
+adminBookingItemsRouter.put(
+  "/id/:id",
   findBookingItemById,
   async (req: BookingItemRequest, res: Response, next: NextFunction) => {
     try {
@@ -165,9 +158,8 @@ bookingItemsRouter.put(
 );
 
 // PATCH update booking item quantity - admin only
-bookingItemsRouter.patch(
-  "/admin/:id/quantity",
-  verifyAdminSession,
+adminBookingItemsRouter.patch(
+  "/id/:id/quantity",
   findBookingItemById,
   async (
     req: BookingItemRequest,
@@ -193,9 +185,8 @@ bookingItemsRouter.patch(
 );
 
 // DELETE booking item - admin only
-bookingItemsRouter.delete(
-  "/admin/:id",
-  verifyAdminSession,
+adminBookingItemsRouter.delete(
+  "/id/:id",
   findBookingItemById,
   async (req: BookingItemRequest, res: Response, next: NextFunction) => {
     try {
@@ -208,9 +199,8 @@ bookingItemsRouter.delete(
 );
 
 // DELETE all booking items for a booking - admin only
-bookingItemsRouter.delete(
-  "/admin/booking/:bookingId",
-  verifyAdminSession,
+adminBookingItemsRouter.delete(
+  "/booking/:bookingId",
   async (req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
       await bookingItemService.removeByBookingId(Number(req.params.bookingId));
@@ -221,10 +211,10 @@ bookingItemsRouter.delete(
   }
 );
 
-// USER ROUTES
+// USER ROUTES (PRIVATE)
 // GET booking items for the current user's bookings
-bookingItemsRouter.get(
-  "/my-items",
+privateBookingItemsRouter.get(
+  "/",
   async (req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
       if (!req.applicationUser) {
@@ -249,7 +239,7 @@ bookingItemsRouter.get(
 );
 
 // GET booking items for a specific booking owned by the current user
-bookingItemsRouter.get(
+privateBookingItemsRouter.get(
   "/booking/:bookingId",
   async (req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
@@ -283,7 +273,7 @@ bookingItemsRouter.get(
 );
 
 // GET a specific booking item owned by the current user
-bookingItemsRouter.get(
+privateBookingItemsRouter.get(
   "/:id",
   findBookingItemById,
   (req: BookingItemRequest, res: Response) => {
@@ -292,7 +282,7 @@ bookingItemsRouter.get(
 );
 
 // POST create booking item for the current user's booking
-bookingItemsRouter.post(
+privateBookingItemsRouter.post(
   "/",
   async (req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
@@ -328,7 +318,7 @@ bookingItemsRouter.post(
 );
 
 // PUT update booking item owned by the current user
-bookingItemsRouter.put(
+privateBookingItemsRouter.put(
   "/:id",
   findBookingItemById,
   async (req: BookingItemRequest, res: Response, next: NextFunction) => {
@@ -345,7 +335,7 @@ bookingItemsRouter.put(
 );
 
 // PATCH update quantity of a booking item owned by the current user
-bookingItemsRouter.patch(
+privateBookingItemsRouter.patch(
   "/:id/quantity",
   findBookingItemById,
   async (
@@ -372,7 +362,7 @@ bookingItemsRouter.patch(
 );
 
 // DELETE a booking item owned by the current user
-bookingItemsRouter.delete(
+privateBookingItemsRouter.delete(
   "/:id",
   findBookingItemById,
   async (req: BookingItemRequest, res: Response, next: NextFunction) => {
@@ -385,4 +375,4 @@ bookingItemsRouter.delete(
   }
 );
 
-export { bookingItemsRouter };
+export { privateBookingItemsRouter, adminBookingItemsRouter };

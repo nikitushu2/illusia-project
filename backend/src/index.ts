@@ -20,8 +20,14 @@ import {
 import cookieParser from "cookie-parser";
 import { categoriesRouter } from "./controllers/categories";
 import { admin } from "./controllers/admin";
-import { bookingsRouter } from "./controllers/bookings";
-import { bookingItemsRouter } from "./controllers/bookingItems";
+import {
+  privateBookingsRouter,
+  adminBookingsRouter,
+} from "./controllers/bookings";
+import {
+  privateBookingItemsRouter,
+  adminBookingItemsRouter,
+} from "./controllers/bookingItems";
 
 const app = express();
 
@@ -36,6 +42,7 @@ app.use(
   })
 );
 
+// Add the app.use(express.json()) middleware
 app.use(express.json());
 
 // all the backend Api should start with /api
@@ -71,24 +78,27 @@ adminApiRouter.use(verifyAdminSession);
 // admin related endpoints goes here
 adminApiRouter.use("/", admin);
 adminApiRouter.use("/items", adminItemsRouter);
-adminApiRouter.use("/", admin);
+adminApiRouter.use("/bookings", adminBookingsRouter);
+adminApiRouter.use("/booking-items", adminBookingItemsRouter);
+
 privateApiRouter.use("/admin", adminApiRouter);
 
 // all common endpoints for logged in user should use privateApiRouter
 privateApiRouter.use("/items", privateItemsRouter);
+privateApiRouter.use("/bookings", privateBookingsRouter);
+privateApiRouter.use("/booking-items", privateBookingItemsRouter);
 
 apiRouter.use("/private", privateApiRouter);
 
-apiRouter.use("/bookings", bookingsRouter);
-apiRouter.use("/booking-items", bookingItemsRouter);
+app.use("/api", apiRouter);
+
 
 const errorHandlerMiddleware: ErrorRequestHandler = (err, req, res, next) => {
   errorHandler(err as AppError, req, res, next);
 };
-
 apiRouter.use(errorHandlerMiddleware);
-app.use("/api", apiRouter);
 
+// Start the server
 const start = async () => {
   await connectToDatabase();
   app.listen(PORT, () => {

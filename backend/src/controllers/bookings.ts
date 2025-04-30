@@ -3,7 +3,6 @@ import { Router } from "express";
 import Booking from "../models/booking";
 import * as bookingService from "../services/bookingService";
 import { RequestWithSession } from "../types/requestWithSession";
-import { verifySession, verifyAdminSession } from "../middleware/verifySession";
 import User from "../models/user";
 import { UserRole } from "../types/applicationUser";
 
@@ -20,7 +19,9 @@ export interface BookingRequest extends RequestWithSession {
   booking?: BookingAttributes;
 }
 
-const bookingsRouter = Router();
+// separate routers according to the application structure
+const privateBookingsRouter = Router();
+const adminBookingsRouter = Router();
 
 // Middleware to find booking by ID
 const findBookingById = async (
@@ -58,13 +59,10 @@ const findBookingById = async (
   }
 };
 
-bookingsRouter.use(verifySession);
-
 // ADMIN ROUTES
 // GET all bookings - admin only
-bookingsRouter.get(
-  "/admin",
-  verifyAdminSession,
+adminBookingsRouter.get(
+  "/",
   async (_req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
       const bookings = await bookingService.findAll();
@@ -76,9 +74,8 @@ bookingsRouter.get(
 );
 
 // GET booking by ID - admin only
-bookingsRouter.get(
-  "/admin/:id",
-  verifyAdminSession,
+adminBookingsRouter.get(
+  "/id/:id",
   findBookingById,
   (req: BookingRequest, res: Response) => {
     res.json(req.booking);
@@ -86,9 +83,8 @@ bookingsRouter.get(
 );
 
 // GET bookings by user ID - admin only
-bookingsRouter.get(
-  "/admin/user/:userId",
-  verifyAdminSession,
+adminBookingsRouter.get(
+  "/user/:userId",
   async (req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
       const bookings = await bookingService.findByUserId(
@@ -102,9 +98,8 @@ bookingsRouter.get(
 );
 
 // POST create new booking - admin only
-bookingsRouter.post(
-  "/admin",
-  verifyAdminSession,
+adminBookingsRouter.post(
+  "/",
   async (
     req: Request<{}, {}, BookingAttributes>,
     res: Response,
@@ -120,9 +115,8 @@ bookingsRouter.post(
 );
 
 // PUT update booking - admin only
-bookingsRouter.put(
-  "/admin/:id",
-  verifyAdminSession,
+adminBookingsRouter.put(
+  "/id/:id",
   findBookingById,
   async (req: BookingRequest, res: Response, next: NextFunction) => {
     try {
@@ -138,9 +132,8 @@ bookingsRouter.put(
 );
 
 // PATCH update booking status - admin only
-bookingsRouter.patch(
-  "/admin/:id/status",
-  verifyAdminSession,
+adminBookingsRouter.patch(
+  "/id/:id/status",
   findBookingById,
   async (
     req: BookingRequest,
@@ -166,9 +159,8 @@ bookingsRouter.patch(
 );
 
 // DELETE booking - admin only
-bookingsRouter.delete(
-  "/admin/:id",
-  verifyAdminSession,
+adminBookingsRouter.delete(
+  "/id/:id",
   findBookingById,
   async (req: BookingRequest, res: Response, next: NextFunction) => {
     try {
@@ -180,9 +172,9 @@ bookingsRouter.delete(
   }
 );
 
-// USER ROUTES
+// USER ROUTES (PRIVATE)
 // GET bookings for the current user
-bookingsRouter.get(
+privateBookingsRouter.get(
   "/my-bookings",
   async (req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
@@ -208,7 +200,7 @@ bookingsRouter.get(
 );
 
 // GET a specific booking owned by the current user
-bookingsRouter.get(
+privateBookingsRouter.get(
   "/:id",
   findBookingById,
   (req: BookingRequest, res: Response) => {
@@ -217,7 +209,7 @@ bookingsRouter.get(
 );
 
 // POST create new booking for the current user
-bookingsRouter.post(
+privateBookingsRouter.post(
   "/",
   async (req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
@@ -255,7 +247,7 @@ bookingsRouter.post(
 );
 
 // PUT update booking owned by the current user
-bookingsRouter.put(
+privateBookingsRouter.put(
   "/:id",
   findBookingById,
   async (req: BookingRequest, res: Response, next: NextFunction) => {
@@ -273,7 +265,7 @@ bookingsRouter.put(
 );
 
 // DELETE a booking owned by the current user
-bookingsRouter.delete(
+privateBookingsRouter.delete(
   "/:id",
   findBookingById,
   async (req: BookingRequest, res: Response, next: NextFunction) => {
@@ -287,4 +279,4 @@ bookingsRouter.delete(
   }
 );
 
-export { bookingsRouter };
+export { privateBookingsRouter, adminBookingsRouter };

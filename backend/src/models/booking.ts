@@ -1,4 +1,4 @@
-import { Model, DataTypes } from "sequelize";
+import { Model, DataTypes, Optional } from "sequelize";
 import { sequelize } from "../util/db";
 
 export enum BookingStatus {
@@ -10,16 +10,24 @@ export enum BookingStatus {
   "IN_QUEUE" = 6,
 }
 
+// Interface for all attributes a Booking can have
 export interface BookingAttributes {
-  id?: number;
+  id: number;
   userId: number;
   startDate: Date;
   endDate: Date;
   statusId: number;
-  createdAt?: Date;
+  createdAt: Date;
 }
 
-class Booking extends Model<BookingAttributes> implements BookingAttributes {
+// Interface for attributes when creating a Booking (id and createdAt are optional)
+export interface BookingCreationAttributes
+  extends Optional<BookingAttributes, "id" | "createdAt"> {}
+
+class Booking
+  extends Model<BookingAttributes, BookingCreationAttributes>
+  implements BookingAttributes
+{
   public id!: number;
   public userId!: number;
   public startDate!: Date;
