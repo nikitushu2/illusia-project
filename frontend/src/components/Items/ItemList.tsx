@@ -94,7 +94,7 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   }, [categories]);
 
   // Show delete confirmation dialog
- /*  const confirmDelete = (id: number) => {
+  /*  const confirmDelete = (id: number) => {
     setItemToDelete(id);
     setDeleteConfirmOpen(true);
   }; */
@@ -254,7 +254,7 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                   >
                     Category
                   </TableCell>
-                  
+
                   <TableCell
                     sx={{
                       color: "white",
@@ -265,7 +265,7 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                     location
                   </TableCell>
 
-                 {/*  <TableCell
+                  {/*  <TableCell
                     sx={{
                       color: "white",
                       fontWeight: "bold",
@@ -314,7 +314,7 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                           {item.itemLocation}
                         </TableCell>
 
-                    {/*     <TableCell>
+                        {/*     <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <IconButton
                             color="primary"

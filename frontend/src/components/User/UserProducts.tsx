@@ -18,30 +18,30 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
 import itemService from "../../services/itemService";
 import { Item } from "../../services/itemService";
+import { useBookingCart } from "../../context/BookingContext";
 
 //import { Link } from "react-router-dom";
 //import Helmet from "../../images/helmet.jpeg";
 
 interface ItemListProps {
-  onEdit: (item: Item) => void;
   categories?: { id: number; name: string }[];
 }
 
-const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
+const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const [modeDisplay, setModeDisplay] = React.useState("table"); // for table and grid view
 
   // fetching items from the backend
   const [items, setItems] = React.useState<Item[]>([]);
-  const [loading, setLoading] = React.useState(false);
 
   //modal view for single product
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -53,7 +53,11 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
 
-  const navigate = useNavigate();
+  // snackbar for add-to-cart feedback
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
+  const { addItem } = useBookingCart();
 
   const toggleDisplayMode = () => {
     setModeDisplay((prevMode) => (prevMode === "table" ? "grid" : "table"));
@@ -72,7 +76,6 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   //FETCH ALL ITEMS
   const fetchItems = async () => {
     try {
-      setLoading(true);
       console.log("Fetching items...");
       const data = await itemService.getAll();
       console.log("Fetched items:", data);
@@ -80,8 +83,6 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     } catch (error) {
       console.error("Error fetching items:", error);
       // message.error("Failed to fetch items");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -250,14 +251,20 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                   {/* <TableCell>{item.storageLocation}</TableCell>  */}
                   {/* <TableCell>{item.storageLocation}</TableCell>  */}
                   {/* <TableCell><Button onClick={handleBooking}>Book</Button></TableCell> */}
-                  <TableCell>
+                  <TableCell
+                    sx={{ display: "flex", justifyContent: "center", p: 2 }}
+                  >
                     <Button
-                      onClick={(event) => {
-                        event.stopPropagation(); // Prevent row click when clicking the button
-                        navigate(`/product/${item.id}`);
+                      variant="contained"
+                      color="primary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addItem(item);
+                        setSnackbarMessage(`${item.name} added to cart`);
+                        setSnackbarOpen(true);
                       }}
                     >
-                      Book
+                      Add to Cart
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -319,16 +326,18 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                       : "N/A"}
                   </p>
                 </CardContent>
-                <CardActions>
+                <CardActions sx={{ justifyContent: "center", p: 2 }}>
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={(event) => {
-                      event.stopPropagation(); // Prevent row click when clicking the button
-                      navigate(`/product/${item.id}`);
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addItem(item);
+                      setSnackbarMessage(`${item.name} added to cart`);
+                      setSnackbarOpen(true);
                     }}
                   >
-                    Book
+                    Add to Cart
                   </Button>
                 </CardActions>
               </Card>
@@ -454,6 +463,22 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
           <UserSingleProduct item={selectedProduct} onClose={closeModal} />
         </div>
       )}
+
+      {/* Success Snackbar */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity="success"
+          variant="filled"
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

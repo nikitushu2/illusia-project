@@ -194,29 +194,28 @@ const ItemManagement: React.FC = () => {
           >
             Item display for All
           </Typography>
-          {/* Add New Item button removed */}
         </Box>
 
         <Divider sx={{ mb: 3 }} />
-
-        {categoriesError && (
-          <Alert severity="warning" sx={{ mb: 2 }}>
-            {categoriesError}
-          </Alert>
-        )}
 
         {categoriesLoading ? (
           <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
             <CircularProgress />
           </Box>
-        ) : (
-          <ItemList
-            key={refreshKey}
-            onEdit={handleEdit}
-            categories={categories}
-          />
-        )}
+        ) : categoriesError ? (
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            {categoriesError}
+          </Alert>
+        ) : null}
 
+        {/* ItemList component with key to force refresh */}
+        <ItemList
+          key={refreshKey}
+          onEdit={handleEdit}
+          categories={categories}
+        />
+
+        {/* Edit Item Modal */}
         <Dialog
           open={isModalOpen}
           onClose={handleCancel}
@@ -224,13 +223,14 @@ const ItemManagement: React.FC = () => {
           fullWidth
         >
           <DialogTitle>Edit Item</DialogTitle>
-          <DialogContent dividers>
-            <ItemForm
-              initialValues={selectedItem}
-              onSubmit={handleSubmit}
-              onCancel={handleCancel}
-              categories={categories}
-            />
+          <DialogContent>
+            {selectedItem && (
+              <ItemForm
+                initialValues={selectedItem}
+                onSubmit={handleSubmit}
+                categories={categories}
+              />
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCancel}>Cancel</Button>

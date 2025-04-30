@@ -12,38 +12,43 @@ import { Header } from "./components/Header";
 import { UserManagement } from "./components/userManagement/UserManagement";
 import Footer from "./components/Footer";
 
-
 import UserDashboard from "./components/User/UserDashboard";
+import UserBookingsList from "./components/UserBookingsList";
+import ItemAvailabilitySearch from "./components/User/ItemAvailabilitySearch";
 
 import AdminNewProductForm from "./components/Admin/AdminNewProductForm";
 import AdminDashboard from "./components/Admin/AdminDashboard";
-
-
 
 const App: React.FC = () => {
   return (
     <Router>
       <CssBaseline />
-      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}> 
+      <Box
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      >
         <Header />
-         <Routes>
-            <Route path="/" element={<LandingPage />} />
-            {/* <Route path="/sideBar" element={<Sidebar />} /> */}
-            <Route path="/logoutPage" element={<LogoutPage />} />
-            <Route path="/items" element={<ItemManagement />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/login" element={<Login />} />
-            { /* TODO: show error page for /users if user is not admin, once the error page is created */}
-            <Route path="/users" element={<UserManagement />} />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          {/* <Route path="/sideBar" element={<Sidebar />} /> */}
+          <Route path="/logoutPage" element={<LogoutPage />} />
+          <Route path="/items" element={<ItemManagement />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
+          {/* TODO: show error page if user is not admin */}
+          <Route path="/users" element={<UserManagement />} />
 
-            {/* User Routes */}
-            <Route path="/userDashboard" element={<UserDashboard />} />
+          {/* User Routes */}
+          <Route path="/userDashboard" element={<UserDashboard />} />
+          <Route path="/userBookingsList" element={<UserBookingsList />} />
+          <Route
+            path="/itemAvailability"
+            element={<ItemAvailabilitySearch />}
+          />
 
-            {/* Admin Routes */}
-            <Route path="/adminDashboard" element={<AdminDashboard/>} />
-            <Route path="/adminNewProduct" element={<AdminNewProductForm/>} />
-            
-          </Routes>
+          {/* Admin Routes */}
+          <Route path="/adminDashboard" element={<AdminDashboard />} />
+          <Route path="/adminNewProduct" element={<AdminNewProductForm />} />
+        </Routes>
         <Footer />
       </Box>
     </Router>

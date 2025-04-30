@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Button,
@@ -10,12 +10,33 @@ import {
   Grid,
   Divider,
   Paper,
+  FormControl,
+  InputLabel,
+  Select,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
 import {
   Item,
   CreateItemData,
   UpdateItemData,
 } from "../../services/itemService";
+import FolderOpenIcon from "@mui/icons-material/FolderOpen";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+
+// Local project images
+const LOCAL_IMAGES = [
+  { path: "/src/images/helmet.jpeg", name: "Helmet" },
+  { path: "/src/images/camera.png", name: "Camera" },
+  { path: "/src/images/logo.png", name: "Logo" },
+  { path: "/src/images/image1.png", name: "Image 1" },
+  { path: "/src/images/image2.png", name: "Image 2" },
+  { path: "/src/images/image3.png", name: "Image 3" },
+  { path: "/src/images/image4.png", name: "Image 4" },
+  { path: "/src/images/gaming1.png", name: "Gaming 1" },
+  { path: "/src/images/game2.png", name: "Game 2" },
+  { path: "/src/images/game3.png", name: "Game 3" },
+];
 
 interface ItemFormProps {
   initialValues?: Item;
@@ -59,6 +80,29 @@ const ItemForm: React.FC<ItemFormProps> = ({
     severity: "success",
   });
 
+  const [imageType, setImageType] = React.useState<"url" | "local">(
+    formValues.imageUrl && !formValues.imageUrl.startsWith("/src/images")
+      ? "url"
+      : "local"
+  );
+  const [selectedLocalImage, setSelectedLocalImage] = React.useState<string>(
+    formValues.imageUrl && formValues.imageUrl.startsWith("/src/images")
+      ? formValues.imageUrl
+      : ""
+  );
+  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
+
+  // Update image preview when image changes
+  useEffect(() => {
+    if (imageType === "url" && formValues.imageUrl) {
+      setImagePreview(formValues.imageUrl);
+    } else if (imageType === "local" && selectedLocalImage) {
+      setImagePreview(selectedLocalImage);
+    } else {
+      setImagePreview(null);
+    }
+  }, [imageType, formValues.imageUrl, selectedLocalImage]);
+
   const validate = () => {
     const newErrors: Record<string, string> = {};
 
@@ -91,6 +135,33 @@ const ItemForm: React.FC<ItemFormProps> = ({
         name === "price" || name === "quantity" || name === "categoryId"
           ? Number(value)
           : value,
+    }));
+  };
+
+  const handleChangeImageType = (event: any) => {
+    const newType = event.target.value as "url" | "local";
+    setImageType(newType);
+
+    // Reset image URL when switching types
+    if (newType === "local") {
+      setFormValues((prev) => ({
+        ...prev,
+        imageUrl: selectedLocalImage || "",
+      }));
+    } else {
+      setFormValues((prev) => ({
+        ...prev,
+        imageUrl: "",
+      }));
+    }
+  };
+
+  const handleLocalImageChange = (event: any) => {
+    const imagePath = event.target.value as string;
+    setSelectedLocalImage(imagePath);
+    setFormValues((prev) => ({
+      ...prev,
+      imageUrl: imagePath,
     }));
   };
 
@@ -203,17 +274,84 @@ const ItemForm: React.FC<ItemFormProps> = ({
         </Grid>
 
         <Grid item xs={12}>
-          <TextField
-            fullWidth
-            label="Image URL"
-            name="imageUrl"
-            value={formValues.imageUrl || ""}
-            onChange={handleChange}
-            variant="outlined"
-            InputLabelProps={{
-              sx: { fontWeight: "bold", color: "#444" },
-            }}
-          />
+          <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
+            <InputLabel id="image-source-label">Image Source</InputLabel>
+            <Select
+              labelId="image-source-label"
+              value={imageType}
+              onChange={handleChangeImageType}
+              label="Image Source"
+            >
+              <MenuItem value="url">External URL</MenuItem>
+              <MenuItem value="local">Local Project Image</MenuItem>
+            </Select>
+          </FormControl>
+
+          {imageType === "url" ? (
+            <TextField
+              fullWidth
+              label="Image URL"
+              name="imageUrl"
+              value={formValues.imageUrl || ""}
+              onChange={handleChange}
+              variant="outlined"
+              InputLabelProps={{
+                sx: { fontWeight: "bold", color: "#444" },
+              }}
+              InputProps={{
+                endAdornment: formValues.imageUrl ? (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setImagePreview(formValues.imageUrl)}
+                      edge="end"
+                    >
+                      <VisibilityIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ) : undefined,
+              }}
+            />
+          ) : (
+            <FormControl fullWidth variant="outlined">
+              <InputLabel id="local-image-label">
+                Select Project Image
+              </InputLabel>
+              <Select
+                labelId="local-image-label"
+                value={selectedLocalImage}
+                onChange={handleLocalImageChange}
+                label="Select Project Image"
+              >
+                <MenuItem value="" disabled>
+                  <em>Select an image from the project</em>
+                </MenuItem>
+                {LOCAL_IMAGES.map((img) => (
+                  <MenuItem key={img.path} value={img.path}>
+                    {img.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+
+          {imagePreview && (
+            <Box sx={{ mt: 2, textAlign: "center" }}>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Image Preview:
+              </Typography>
+              <img
+                src={imagePreview}
+                alt="Preview"
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "200px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                }}
+                onError={() => setImagePreview("/src/images/logo.png")}
+              />
+            </Box>
+          )}
         </Grid>
 
         <Grid item xs={12} sm={6}>
