@@ -8,12 +8,12 @@ import User from "../models/user";
 import { UserRole } from "../types/applicationUser";
 
 export interface BookingAttributes {
-  id?: number;
+  id: number;
   userId: number;
   startDate: Date;
   endDate: Date;
   statusId: number;
-  createdAt?: Date;
+  createdAt: Date;
 }
 
 export interface BookingRequest extends RequestWithSession {
