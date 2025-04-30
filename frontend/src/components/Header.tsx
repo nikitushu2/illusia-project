@@ -66,22 +66,22 @@ export const Header = () => {
       <List>
         <ListItem disablePadding>
           <ListItemButton component={Link} to="/">
-            <ListItemText primary="HOME" />
+            <ListItemText primary={<Typography sx={{fontSize: {xs: "0.8rem", sm: "1rem" }}}>HOME</Typography> }/>
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
           <ListItemButton component={Link} to="/items">
-            <ListItemText primary="ITEMS" />
+          <ListItemText primary={<Typography sx={{fontSize: {xs: "0.8rem", sm: "1rem" }}}>ITEMS</Typography> }/>
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
           <ListItemButton component={Link} to="/events">
-            <ListItemText primary="EVENTS" />
+          <ListItemText primary={<Typography sx={{fontSize: {xs: "0.8rem", sm: "1rem" }}}>EVENTS</Typography> }/>
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
           <ListItemButton>
-            <ListItemText primary="INFO" />
+          <ListItemText primary={ <Typography sx={{fontSize: {xs: "0.8rem", sm: "1rem" }}}>INFO</Typography>}/>
           </ListItemButton>
         </ListItem>
         {isLoggedIn ? (
