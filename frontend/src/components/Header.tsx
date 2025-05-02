@@ -66,63 +66,67 @@ export const Header = () => {
       <List>
         <ListItem disablePadding>
           <ListItemButton component={Link} to="/">
-            <ListItemText primary={<Typography sx={{fontSize: {xs: "0.8rem", sm: "1rem" }}}>HOME</Typography> }/>
+            <ListItemText
+              primary={
+                <Typography sx={{ fontSize: { xs: "0.8rem", sm: "1rem" } }}>
+                  HOME
+                </Typography>
+              }
+            />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
           <ListItemButton component={Link} to="/items">
-          <ListItemText primary={<Typography sx={{fontSize: {xs: "0.8rem", sm: "1rem" }}}>ITEMS</Typography> }/>
+            <ListItemText
+              primary={
+                <Typography sx={{ fontSize: { xs: "0.8rem", sm: "1rem" } }}>
+                  ITEMS
+                </Typography>
+              }
+            />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
           <ListItemButton component={Link} to="/events">
-          <ListItemText primary={<Typography sx={{fontSize: {xs: "0.8rem", sm: "1rem" }}}>EVENTS</Typography> }/>
+            <ListItemText
+              primary={
+                <Typography sx={{ fontSize: { xs: "0.8rem", sm: "1rem" } }}>
+                  EVENTS
+                </Typography>
+              }
+            />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
           <ListItemButton>
-          <ListItemText primary={ <Typography sx={{fontSize: {xs: "0.8rem", sm: "1rem" }}}>INFO</Typography>}/>
+            <ListItemText
+              primary={
+                <Typography sx={{ fontSize: { xs: "0.8rem", sm: "1rem" } }}>
+                  INFO
+                </Typography>
+              }
+            />
           </ListItemButton>
         </ListItem>
-        {isLoggedIn ? (
-          <>
-            <ListItem>
-              <Chip
-                sx={{ py: 3, pl: 1 }}
-                avatar={
-                  <Avatar
-                    src={applicationUser?.picture}
-                    alt={applicationUser?.email}
-                  />
-                }
-                label={
-                  <Typography
-                    variant="body1"
-                    sx={{ color: "primary.main", fontWeight: "bold" }}
-                  >{`${applicationUser?.email} (${applicationUser?.role})`}</Typography>
-                }
-                variant="outlined"
-              />
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton onClick={handleLogout}>
-                <ListItemText primary="Logout" />
-              </ListItemButton>
-            </ListItem>
-          </>
-        ) : (
-          <>
-            <ListItem disablePadding>
-              <ListItemButton onClick={signUp}>
-                <ListItemText primary="Sign Up" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton component={Link} to="/login">
-                <ListItemText primary="Log In" />
-              </ListItemButton>
-            </ListItem>
-          </>
+        {isLoggedIn && (
+          <ListItem>
+            <Chip
+              sx={{ py: 3, pl: 1 }}
+              avatar={
+                <Avatar
+                  src={applicationUser?.picture}
+                  alt={applicationUser?.email}
+                />
+              }
+              label={
+                <Typography
+                  variant="body1"
+                  sx={{ color: "primary.main", fontWeight: "bold" }}
+                >{`${applicationUser?.email} (${applicationUser?.role})`}</Typography>
+              }
+              variant="outlined"
+            />
+          </ListItem>
         )}
       </List>
     </Box>
@@ -189,37 +193,55 @@ export const Header = () => {
 
             <Box
               sx={{
-                display: { xs: "none", md: "flex" },
+                display: "flex",
                 alignItems: "center",
                 gap: "30px",
               }}
             >
               {isLoggedIn ? (
                 <>
-                  <Chip
-                    sx={{ py: 3, pl: 1 }}
-                    avatar={
-                      <Avatar
-                        src={applicationUser?.picture}
-                        alt={applicationUser?.email}
-                      />
-                    }
-                    label={
-                      <Typography
-                        variant="body1"
-                        sx={{ color: "primary.main", fontWeight: "bold" }}
-                      >{`${applicationUser?.email} (${applicationUser?.role})`}</Typography>
-                    }
-                    variant="outlined"
-                  />
-                  <Button
-                    onClick={handleLogout}
-                    color="inherit"
-                    variant="contained"
-                    sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                  <Box
+                    sx={{
+                      display: { xs: "none", md: "flex" },
+                      alignItems: "center",
+                      gap: "30px",
+                    }}
                   >
-                    Logout
-                  </Button>
+                    <Chip
+                      sx={{ py: 3, pl: 1 }}
+                      avatar={
+                        <Avatar
+                          src={applicationUser?.picture}
+                          alt={applicationUser?.email}
+                        />
+                      }
+                      label={
+                        <Typography
+                          variant="body1"
+                          sx={{ color: "primary.main", fontWeight: "bold" }}
+                        >{`${applicationUser?.email} (${applicationUser?.role})`}</Typography>
+                      }
+                      variant="outlined"
+                    />
+                    <Button
+                      onClick={handleLogout}
+                      color="inherit"
+                      variant="contained"
+                      sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                    >
+                      Logout
+                    </Button>
+                  </Box>
+                  <Box sx={{ display: { xs: "block", md: "none" } }}>
+                    <Button
+                      onClick={handleLogout}
+                      color="inherit"
+                      variant="contained"
+                      sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                    >
+                      Logout
+                    </Button>
+                  </Box>
                 </>
               ) : (
                 <>
@@ -242,17 +264,17 @@ export const Header = () => {
                   </Button>
                 </>
               )}
-            </Box>
 
-            <Box sx={{ display: { xs: "block", md: "none" } }}>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                edge="end"
-                onClick={handleDrawerToggle}
-              >
-                <MenuIcon />
-              </IconButton>
+              <Box sx={{ display: { xs: "block", md: "none" } }}>
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="end"
+                  onClick={handleDrawerToggle}
+                >
+                  <MenuIcon />
+                </IconButton>
+              </Box>
             </Box>
           </Toolbar>
         </Container>
