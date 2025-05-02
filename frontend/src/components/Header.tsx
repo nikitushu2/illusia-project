@@ -186,7 +186,7 @@ export const Header = () => {
               >
                 <Typography variant="body1">EVENTS</Typography>
               </Button>
-              <Button color="inherit" variant="text">
+              <Button color="inherit" variant="text" component={Link} to="/info">
                 <Typography variant="body1">INFO</Typography>
               </Button>
             </Box>

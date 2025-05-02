@@ -18,6 +18,7 @@ import UserDashboard from "./components/User/UserDashboard";
 import AdminNewProductForm from "./components/Admin/AdminNewProductForm";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import Events from "./components/Events";
+import Info from "./components/Info";
 
 
 
@@ -33,6 +34,7 @@ const App: React.FC = () => {
             <Route path="/logoutPage" element={<LogoutPage />} />
             <Route path="/items" element={<ItemManagement />} />
             <Route path="/events" element={<Events/>} />
+            <Route path="/info" element={<Info/>} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
             { /* TODO: show error page for /users if user is not admin, once the error page is created */}
@@ -44,6 +46,7 @@ const App: React.FC = () => {
             {/* Admin Routes */}
             <Route path="/adminDashboard" element={<AdminDashboard/>} />
             <Route path="/adminNewProduct" element={<AdminNewProductForm/>} />
+
             
           </Routes>
         <Footer />
