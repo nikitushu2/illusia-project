@@ -113,3 +113,63 @@ export const createCompleteBooking = async (data: CreateBookingData) => {
     throw error;
   }
 };
+
+export interface UpdateBookingData {
+  id: number;
+  userId: number;
+  startDate?: Date;
+  endDate?: Date;
+  statusId?: number;
+  items?: Array<{
+    id?: number;
+    itemId: number;
+    quantity: number;
+  }>;
+}
+
+export const updateCompleteBooking = async (data: UpdateBookingData) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    // Update booking details
+    const bookingUpdateData: Partial<BookingCreationAttributes> = {};
+    if (data.startDate) bookingUpdateData.startDate = data.startDate;
+    if (data.endDate) bookingUpdateData.endDate = data.endDate;
+    if (data.statusId) bookingUpdateData.statusId = data.statusId;
+
+    await Booking.update(bookingUpdateData, {
+      where: { id: data.id },
+      transaction,
+    });
+
+    // Handle booking items if provided
+    if (data.items !== undefined) {
+      for (const item of data.items) {
+        if (item.id) {
+          // Update existing item
+          await BookingItem.update(
+            { quantity: item.quantity, itemId: item.itemId },
+            { where: { id: item.id, bookingId: data.id }, transaction }
+          );
+        } else {
+          // Create new item
+          await BookingItem.create(
+            {
+              bookingId: data.id,
+              itemId: item.itemId,
+              quantity: item.quantity,
+            },
+            { transaction }
+          );
+        }
+      }
+    }
+
+    await transaction.commit();
+
+    return await findById(data.id);
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};

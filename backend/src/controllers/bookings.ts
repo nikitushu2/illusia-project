@@ -262,10 +262,44 @@ privateBookingsRouter.put(
   async (req: BookingRequest, res: Response, next: NextFunction) => {
     try {
       // findBookingById middleware already checks ownership
-      const updatedBooking = await bookingService.update(
-        Number(req.params.id),
-        req.body as Partial<BookingAttributes>
-      );
+      const bookingId = Number(req.params.id);
+
+      const user = await User.findOne({
+        where: { email: req.applicationUser?.email },
+      });
+      if (!user) {
+        res.status(404).json({ error: "User not found" });
+        return;
+      }
+
+      const { startDate, endDate, statusId, items } = req.body as {
+        startDate: Date;
+        endDate: Date;
+        statusId: number;
+        items: Array<{
+          itemId: number;
+          quantity: number;
+        }>;
+      };
+
+      // Validate required fields based on what's being updated
+      if (!startDate && !endDate && !statusId && !items) {
+        res.status(400).json({
+          success: false,
+          message: "At least one field must be provided for update",
+        });
+        return;
+      }
+
+      const updatedBooking = await bookingService.updateCompleteBooking({
+        id: bookingId,
+        userId: user.id,
+        startDate,
+        endDate,
+        statusId,
+        items,
+      });
+
       res.json(updatedBooking);
     } catch (error) {
       next(error);
