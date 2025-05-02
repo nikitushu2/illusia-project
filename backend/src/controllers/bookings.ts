@@ -13,6 +13,11 @@ export interface BookingAttributes {
   endDate: Date;
   statusId: number;
   createdAt: Date;
+  items: Array<{
+    id?: number;
+    itemId: number;
+    quantity: number;
+  }>;
 }
 
 export interface BookingRequest extends RequestWithSession {
@@ -106,7 +111,25 @@ adminBookingsRouter.post(
     next: NextFunction
   ) => {
     try {
-      const newBooking = await bookingService.create(req.body);
+      const { startDate, endDate, statusId, userId, items } = req.body;
+
+      if (!startDate || !endDate || !statusId || !userId || !items) {
+        res.status(400).json({
+          success: false,
+          message:
+            "Missing required fields: startDate, endDate, statusId, userId, and items are required",
+        });
+        return;
+      }
+
+      const newBooking = await bookingService.createCompleteBooking({
+        userId,
+        startDate,
+        endDate,
+        statusId,
+        items,
+      });
+
       res.status(201).json(newBooking);
     } catch (error) {
       next(error);
@@ -120,10 +143,36 @@ adminBookingsRouter.put(
   findBookingById,
   async (req: BookingRequest, res: Response, next: NextFunction) => {
     try {
-      const updatedBooking = await bookingService.update(
-        Number(req.params.id),
-        req.body as Partial<BookingAttributes>
-      );
+      const bookingId = Number(req.params.id);
+
+      const { startDate, endDate, statusId, items } = req.body as {
+        startDate: Date;
+        endDate: Date;
+        statusId: number;
+        items: Array<{
+          id?: number;
+          itemId: number;
+          quantity: number;
+        }>;
+      };
+
+      // Validate required fields based on what's being updated
+      if (!startDate && !endDate && !statusId && !items) {
+        res.status(400).json({
+          success: false,
+          message: "At least one field must be provided for update",
+        });
+        return;
+      }
+
+      const updatedBooking = await bookingService.updateCompleteBooking({
+        id: bookingId,
+        startDate,
+        endDate,
+        statusId,
+        items,
+      });
+
       res.json(updatedBooking);
     } catch (error) {
       next(error);

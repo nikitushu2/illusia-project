@@ -116,7 +116,7 @@ export const createCompleteBooking = async (data: CreateBookingData) => {
 
 export interface UpdateBookingData {
   id: number;
-  userId: number;
+  userId?: number;
   startDate?: Date;
   endDate?: Date;
   statusId?: number;
