@@ -1,14 +1,6 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import { sequelize } from "../util/db";
-
-export enum BookingStatus {
-  "RESERVED" = 1,
-  "CANCELLED" = 2,
-  "PENDING_APPROVAL" = 3,
-  "IN_PROGRESS" = 4,
-  "CLOSED" = 5,
-  "IN_QUEUE" = 6,
-}
+import { BookingStatus } from "../types/booking";
 
 // Interface for all attributes a Booking can have
 export interface BookingAttributes {
@@ -16,7 +8,7 @@ export interface BookingAttributes {
   userId: number;
   startDate: Date;
   endDate: Date;
-  statusId: number;
+  status: string;
   createdAt: Date;
 }
 
@@ -32,7 +24,7 @@ class Booking
   public userId!: number;
   public startDate!: Date;
   public endDate!: Date;
-  public statusId!: number;
+  public status!: string;
   public readonly createdAt!: Date;
 }
 
@@ -56,12 +48,12 @@ Booking.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
-    statusId: {
-      type: DataTypes.INTEGER,
+    status: {
+      type: DataTypes.STRING,
       allowNull: false,
       validate: {
         isIn: [
-          Object.values(BookingStatus).filter((v) => typeof v === "number"),
+          Object.values(BookingStatus),
         ],
       },
     },

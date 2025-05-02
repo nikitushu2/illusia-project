@@ -8,13 +8,13 @@ module.exports = {
                 user_id: 5,
                 start_date: '2025-01-01',
                 end_date: '2025-01-30',
-                status_id: 1
+                status: 'RESERVED'
             },
             {
               user_id: 6,
               start_date: '2025-03-01',
               end_date: '2025-03-30',
-              status_id: 3
+              status: 'PENDING_APPROVAL'
           }
             
         ], {});

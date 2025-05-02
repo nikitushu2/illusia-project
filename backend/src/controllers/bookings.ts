@@ -1,17 +1,16 @@
 import { Request, Response, NextFunction } from "express";
 import { Router } from "express";
-import Booking from "../models/booking";
 import * as bookingService from "../services/bookingService";
 import { RequestWithSession } from "../types/requestWithSession";
-import User from "../models/user";
 import { UserRole } from "../types/applicationUser";
+import { BookingStatus, BookingWithDetails, CreateBookingData, UpdateBookingData } from "../types/booking";
 
 export interface BookingAttributes {
   id: number;
   userId: number;
   startDate: Date;
   endDate: Date;
-  statusId: number;
+  status: BookingStatus;
   createdAt: Date;
   items: Array<{
     id?: number;
@@ -21,7 +20,7 @@ export interface BookingAttributes {
 }
 
 export interface BookingRequest extends RequestWithSession {
-  booking?: BookingAttributes;
+  booking?: BookingWithDetails;
 }
 
 // separate routers according to the application structure
@@ -36,28 +35,19 @@ const findBookingById = async (
 ): Promise<void> => {
   try {
     const id = parseInt(req.params.id);
-    const booking = await Booking.findByPk(id);
+    const booking = await bookingService.findById(id);
 
     if (!booking) {
       res.status(404).json({ error: "Booking not found" });
       return;
     }
 
-    if (
-      req.applicationUser?.role !== UserRole.ADMIN &&
-      req.applicationUser?.role !== UserRole.SUPER_ADMIN
-    ) {
-      const user = await User.findOne({
-        where: { email: req.applicationUser?.email },
-      });
-
-      if (!user || booking.userId !== user.id) {
-        res.status(403).json({ error: "Access denied" });
+    if (req.applicationUser?.role === UserRole.USER && booking.user.id !== req.applicationUser.id) {
+        res.status(404).json({ error: `Booking not found for user ${req.applicationUser.email}` });
         return;
-      }
     }
 
-    req.booking = booking.get({ plain: true }) as BookingAttributes;
+    req.booking = booking
     next();
   } catch (error) {
     next(error);
@@ -111,13 +101,13 @@ adminBookingsRouter.post(
     next: NextFunction
   ) => {
     try {
-      const { startDate, endDate, statusId, userId, items } = req.body;
+      const { startDate, endDate, status, userId, items } = req.body as CreateBookingData;
 
-      if (!startDate || !endDate || !statusId || !userId || !items) {
+      if (!startDate || !endDate || !status || !userId || !items) {
         res.status(400).json({
           success: false,
           message:
-            "Missing required fields: startDate, endDate, statusId, userId, and items are required",
+            "Missing required fields: startDate, endDate, status, userId, and items are required",
         });
         return;
       }
@@ -126,7 +116,7 @@ adminBookingsRouter.post(
         userId,
         startDate,
         endDate,
-        statusId,
+        status,
         items,
       });
 
@@ -145,19 +135,10 @@ adminBookingsRouter.put(
     try {
       const bookingId = Number(req.params.id);
 
-      const { startDate, endDate, statusId, items } = req.body as {
-        startDate: Date;
-        endDate: Date;
-        statusId: number;
-        items: Array<{
-          id?: number;
-          itemId: number;
-          quantity: number;
-        }>;
-      };
+      const { startDate, endDate, status, items } = req.body as UpdateBookingData;
 
       // Validate required fields based on what's being updated
-      if (!startDate && !endDate && !statusId && !items) {
+      if (!startDate && !endDate && !status && !items) {
         res.status(400).json({
           success: false,
           message: "At least one field must be provided for update",
@@ -169,7 +150,7 @@ adminBookingsRouter.put(
         id: bookingId,
         startDate,
         endDate,
-        statusId,
+        status,
         items,
       });
 
@@ -190,15 +171,15 @@ adminBookingsRouter.patch(
     next: NextFunction
   ): Promise<void> => {
     try {
-      const { statusId } = req.body as { statusId: number };
-      if (!statusId) {
-        res.status(400).json({ error: "Status ID is required" });
+      const { status } = req.body as { status: BookingStatus };
+      if (!status) {
+        res.status(400).json({ error: "Status is required" });
         return;
       }
 
       const updatedBooking = await bookingService.updateStatus(
         Number(req.params.id),
-        statusId
+        status
       );
       res.json(updatedBooking);
     } catch (error) {
@@ -227,20 +208,7 @@ privateBookingsRouter.get(
   "/my-bookings",
   async (req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
-      if (!req.applicationUser) {
-        res.status(401).json({ error: "Authentication required" });
-        return;
-      }
-
-      const user = await User.findOne({
-        where: { email: req.applicationUser.email },
-      });
-      if (!user) {
-        res.status(404).json({ error: "User not found" });
-        return;
-      }
-
-      const bookings = await bookingService.findByUserId(user.id);
+      const bookings = await bookingService.findByUserId(req.applicationUser!.id);
       res.json(bookings);
     } catch (error) {
       next(error);
@@ -262,25 +230,9 @@ privateBookingsRouter.post(
   "/",
   async (req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
-      const user = await User.findOne({
-        where: { email: req.applicationUser?.email },
-      });
-      if (!user) {
-        res.status(404).json({ error: "User not found" });
-        return;
-      }
+      const { startDate, endDate, status, items } = req.body as CreateBookingData;
 
-      const { startDate, endDate, statusId, items } = req.body as {
-        startDate: Date;
-        endDate: Date;
-        statusId: number;
-        items: Array<{
-          itemId: number;
-          quantity: number;
-        }>;
-      };
-
-      if (!startDate || !endDate || !statusId || !items) {
+      if (!startDate || !endDate || !status || !items) {
         res.status(400).json({
           success: false,
           message:
@@ -290,10 +242,10 @@ privateBookingsRouter.post(
       }
 
       const newBooking = await bookingService.createCompleteBooking({
-        userId: user.id,
+        userId: req.applicationUser!.id,
         startDate,
         endDate,
-        statusId,
+        status,
         items,
       });
 
@@ -310,29 +262,10 @@ privateBookingsRouter.put(
   findBookingById,
   async (req: BookingRequest, res: Response, next: NextFunction) => {
     try {
-      // findBookingById middleware already checks ownership
-      const bookingId = Number(req.params.id);
-
-      const user = await User.findOne({
-        where: { email: req.applicationUser?.email },
-      });
-      if (!user) {
-        res.status(404).json({ error: "User not found" });
-        return;
-      }
-
-      const { startDate, endDate, statusId, items } = req.body as {
-        startDate: Date;
-        endDate: Date;
-        statusId: number;
-        items: Array<{
-          itemId: number;
-          quantity: number;
-        }>;
-      };
+      const { startDate, endDate, items } = req.body as UpdateBookingData;
 
       // Validate required fields based on what's being updated
-      if (!startDate && !endDate && !statusId && !items) {
+      if (!startDate && !endDate && !items) {
         res.status(400).json({
           success: false,
           message: "At least one field must be provided for update",
@@ -341,11 +274,11 @@ privateBookingsRouter.put(
       }
 
       const updatedBooking = await bookingService.updateCompleteBooking({
-        id: bookingId,
-        userId: user.id,
+        id: req.booking!.id,
+        userId: req.applicationUser!.id,
         startDate,
         endDate,
-        statusId,
+        status: req.booking!.status,
         items,
       });
 
@@ -363,7 +296,7 @@ privateBookingsRouter.delete(
   async (req: BookingRequest, res: Response, next: NextFunction) => {
     try {
       // findBookingById middleware already checks ownership
-      await bookingService.remove(Number(req.params.id));
+      await bookingService.remove(req.booking!.id);
       res.status(204).end();
     } catch (error) {
       next(error);

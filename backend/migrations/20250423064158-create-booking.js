@@ -4,9 +4,9 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('bookings', {
       id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
+      type: Sequelize.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
       },
       user_id: {
         type: Sequelize.INTEGER,
@@ -26,13 +26,16 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false
       },
-      status_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        validate: {
-          min: 1,
-          max: 6
-        }
+      status: {
+        type: Sequelize.ENUM(
+          'RESERVED',
+          'CANCELLED',
+          'PENDING_APPROVAL',
+          'IN_PROGRESS',
+          'CLOSED',
+          'IN_QUEUE'
+        ),
+        allowNull: false
       },
       created_at: {
         type: Sequelize.DATE,

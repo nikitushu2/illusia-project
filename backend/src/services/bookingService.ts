@@ -4,84 +4,125 @@ import BookingItem from "../models/bookingItem";
 import Item from "../models/item";
 import { InferCreationAttributes } from "sequelize";
 import { sequelize } from "../util/db";
+import { BookingStatus, BookingWithDetails, CreateBookingData, UpdateBookingData } from "../types/booking";
 
 export type BookingCreationAttributes = Omit<
   InferCreationAttributes<Booking>,
   "id" | "createdAt"
 >;
 
-export const findAll = async () => {
-  return await Booking.findAll({
-    include: [
-      { model: User, as: "user" },
-      {
-        model: BookingItem,
-        as: "bookingItems",
-        include: [{ model: Item, as: "item" }],
-      },
-    ],
-  });
-};
 
-export const findById = async (id: number) => {
-  return await Booking.findByPk(id, {
-    include: [
-      { model: User, as: "user" },
-      {
-        model: BookingItem,
-        as: "bookingItems",
-        include: [{ model: Item, as: "item" }],
-      },
-    ],
-  });
-};
+export function mapBookingToDetails(booking: any): BookingWithDetails {
+  const plain = booking.get ? booking.get({ plain: true }) : booking;
 
-export const findByUserId = async (userId: number) => {
-  return await Booking.findAll({
-    where: { userId },
-    include: [
-      {
-        model: BookingItem,
-        as: "bookingItems",
-        include: [{ model: Item, as: "item" }],
-      },
-    ],
-  });
-};
-
-export const create = async (booking: BookingCreationAttributes) => {
-  return await Booking.create(booking);
-};
-
-export const update = async (
-  id: number,
-  booking: Partial<BookingCreationAttributes>
-) => {
-  await Booking.update(booking, { where: { id } });
-  return await findById(id);
-};
-
-export const updateStatus = async (id: number, statusId: number) => {
-  await Booking.update({ statusId }, { where: { id } });
-  return await findById(id);
-};
-
-export const remove = async (id: number) => {
-  return await Booking.destroy({ where: { id } });
-};
-
-export interface CreateBookingData {
-  userId: number;
-  startDate: Date;
-  endDate: Date;
-  statusId: number;
-  items: Array<{
-    itemId: number;
-    quantity: number;
-  }>;
+  return {
+    id: plain.id,
+    user: {
+      id: plain.user.id,
+      email: plain.user.email,
+      displayName: plain.user.displayName,
+    },
+    startDate: plain.startDate,
+    endDate: plain.endDate,
+    status: plain.status,
+    createdAt: plain.createdAt,
+    items: (plain.bookingItems || []).map((bi: any) => ({
+      id: bi.id,
+      itemId: bi.itemId,
+      quantity: bi.quantity,
+    })),
+  };
 }
 
-export const createCompleteBooking = async (data: CreateBookingData) => {
+export const findAll = async (): Promise<BookingWithDetails[]> => {
+  try {
+    const bookings =  await Booking.findAll({
+      include: [
+        { model: User, as: "user" },
+        {
+          model: BookingItem,
+          as: "bookingItems",
+          include: [{ model: Item, as: "item" }],
+        },
+      ],
+    });
+    return bookings.map((booking) => mapBookingToDetails(booking));
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    throw error;
+  }
+};
+
+export const findById = async (id: number): Promise<BookingWithDetails | null> => {
+  try {
+    const booking  = await Booking.findByPk(id, {
+      include: [
+        { model: User, as: "user" },
+        {
+          model: BookingItem,
+          as: "bookingItems",
+          include: [{ model: Item, as: "item" }],
+        },
+      ],
+    });
+    if (!booking) return null;
+    return mapBookingToDetails(booking);
+  } catch (error) {
+    console.error("Error fetching booking by ID:", error);
+    throw error;
+  }
+};
+
+export const findByUserId = async (userId: number): Promise<BookingWithDetails[]> => {
+  try {
+    const bookings = await Booking.findAll({
+      where: { userId },
+      include: [
+        { model: User, as: "user" },
+        {
+          model: BookingItem,
+          as: "bookingItems",
+          include: [{ model: Item, as: "item" }],
+        },
+      ],
+    });
+    return bookings.map((booking) => mapBookingToDetails(booking));
+  } catch (error) {
+    console.error("Error fetching bookings by user ID:", error);
+    throw error;
+  }
+};
+
+export const updateStatus = async (id: number, status: BookingStatus): Promise<BookingWithDetails> => {
+  try {
+    const [rowsUpdated, updatedBookings] = await Booking.update({ status }, 
+      {
+        where: { id },
+        returning: true
+      });
+    if (rowsUpdated === 0) {
+      throw new Error("Booking not found");
+    }
+    return updatedBookings.map((booking) => mapBookingToDetails(booking))[0];
+  } catch (error) {
+    console.error("Error updating booking status:", error);
+    throw error;
+  }
+};
+
+export const remove = async (id: number): Promise<void> => {
+  try {
+    const deletedCount = await BookingItem.destroy({ where: { id } });
+    if (deletedCount === 0) {
+      throw new Error("Booking not found");
+    }
+  } catch (error) {
+    console.error("Error deleting booking:", error);
+    throw error;
+  }
+};
+
+export const createCompleteBooking = async (data: CreateBookingData): Promise<BookingWithDetails> => {
   const transaction = await sequelize.transaction();
 
   try {
@@ -90,7 +131,7 @@ export const createCompleteBooking = async (data: CreateBookingData) => {
         userId: data.userId,
         startDate: data.startDate,
         endDate: data.endDate,
-        statusId: data.statusId,
+        status: data.status,
       },
       { transaction }
     );
@@ -107,55 +148,49 @@ export const createCompleteBooking = async (data: CreateBookingData) => {
 
     await transaction.commit();
 
-    return await findById(booking.id);
+    const result = await findById(booking.id);
+    if (!result) {
+      throw new Error("Failed to retrieve the created booking");
+    }
+    return result;
   } catch (error) {
+    console.error("Error creating complete booking:", error);
     await transaction.rollback();
     throw error;
   }
 };
 
-export interface UpdateBookingData {
-  id: number;
-  userId?: number;
-  startDate?: Date;
-  endDate?: Date;
-  statusId?: number;
-  items?: Array<{
-    id?: number;
-    itemId: number;
-    quantity: number;
-  }>;
-}
 
-export const updateCompleteBooking = async (data: UpdateBookingData) => {
+
+export const updateCompleteBooking = async (exixtingBooking: UpdateBookingData) => {
   const transaction = await sequelize.transaction();
 
   try {
     // Update booking details
     const bookingUpdateData: Partial<BookingCreationAttributes> = {};
-    if (data.startDate) bookingUpdateData.startDate = data.startDate;
-    if (data.endDate) bookingUpdateData.endDate = data.endDate;
-    if (data.statusId) bookingUpdateData.statusId = data.statusId;
+    if (exixtingBooking.startDate) bookingUpdateData.startDate = exixtingBooking.startDate;
+    if (exixtingBooking.endDate) bookingUpdateData.endDate = exixtingBooking.endDate;
+    if (exixtingBooking.status) bookingUpdateData.status = exixtingBooking.status;
 
     await Booking.update(bookingUpdateData, {
-      where: { id: data.id },
+      where: { id: exixtingBooking.id },
       transaction,
     });
 
     // Handle booking items if provided
-    if (data.items !== undefined) {
-      for (const item of data.items) {
+    if (exixtingBooking.items !== undefined) {
+      for (const item of exixtingBooking.items) {
         if (item.id) {
           // Update existing item
           await BookingItem.update(
             { quantity: item.quantity, itemId: item.itemId },
-            { where: { id: item.id, bookingId: data.id }, transaction }
+            { where: { id: item.id, bookingId: exixtingBooking.id }, transaction }
           );
         } else {
           // Create new item
           await BookingItem.create(
             {
-              bookingId: data.id,
+              bookingId: exixtingBooking.id,
               itemId: item.itemId,
               quantity: item.quantity,
             },
@@ -167,8 +202,13 @@ export const updateCompleteBooking = async (data: UpdateBookingData) => {
 
     await transaction.commit();
 
-    return await findById(data.id);
+    const result = await findById(exixtingBooking.id);
+    if (!result) {
+      throw new Error("Failed to retrieve the created booking");
+    }
+    return result;
   } catch (error) {
+    console.error("Error updating complete booking:", error);
     await transaction.rollback();
     throw error;
   }
