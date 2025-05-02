@@ -213,30 +213,39 @@ privateBookingsRouter.post(
   "/",
   async (req: RequestWithSession, res: Response, next: NextFunction) => {
     try {
-      if (!req.applicationUser) {
-        res.status(401).json({ error: "Authentication required" });
-        return;
-      }
-
       const user = await User.findOne({
-        where: { email: req.applicationUser.email },
+        where: { email: req.applicationUser?.email },
       });
       if (!user) {
         res.status(404).json({ error: "User not found" });
         return;
       }
 
-      const { startDate, endDate, statusId } = req.body as {
+      const { startDate, endDate, statusId, items } = req.body as {
         startDate: Date;
         endDate: Date;
         statusId: number;
+        items: Array<{
+          itemId: number;
+          quantity: number;
+        }>;
       };
 
-      const newBooking = await bookingService.create({
+      if (!startDate || !endDate || !statusId || !items) {
+        res.status(400).json({
+          success: false,
+          message:
+            "Missing required fields: startDate, endDate, statusId, and items are required",
+        });
+        return;
+      }
+
+      const newBooking = await bookingService.createCompleteBooking({
         userId: user.id,
         startDate,
         endDate,
         statusId,
+        items,
       });
 
       res.status(201).json(newBooking);
