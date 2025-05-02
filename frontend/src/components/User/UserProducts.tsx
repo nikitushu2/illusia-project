@@ -43,7 +43,7 @@ interface ItemListProps {
 
 const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // changed from sm to md (and) add px: { xs: 1, sm: 2 } to mobile view
   
   const [modeDisplay, setModeDisplay] = React.useState("table"); // for table and grid view
 
@@ -129,7 +129,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     if (isMobile) {
       // 📱 Stacked layout for mobile
       return (
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{ mt: 2, px: { xs: 1, sm: 2 }}}>
           {currentItems.map((item) => {
             const category = categories.find((c) => c.id === item.categoryId);
             return (
