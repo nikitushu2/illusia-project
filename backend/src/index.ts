@@ -24,10 +24,6 @@ import {
   privateBookingsRouter,
   adminBookingsRouter,
 } from "./controllers/bookings";
-import {
-  privateBookingItemsRouter,
-  adminBookingItemsRouter,
-} from "./controllers/bookingItems";
 
 const app = express();
 
@@ -79,14 +75,12 @@ adminApiRouter.use(verifyAdminSession);
 adminApiRouter.use("/", admin);
 adminApiRouter.use("/items", adminItemsRouter);
 adminApiRouter.use("/bookings", adminBookingsRouter);
-adminApiRouter.use("/booking-items", adminBookingItemsRouter);
 
 privateApiRouter.use("/admin", adminApiRouter);
 
 // all common endpoints for logged in user should use privateApiRouter
 privateApiRouter.use("/items", privateItemsRouter);
 privateApiRouter.use("/bookings", privateBookingsRouter);
-privateApiRouter.use("/booking-items", privateBookingItemsRouter);
 
 apiRouter.use("/private", privateApiRouter);
 
