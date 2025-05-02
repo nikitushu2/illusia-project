@@ -98,7 +98,7 @@ export const Header = () => {
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
-          <ListItemButton>
+          <ListItemButton component={Link} to="/info">
             <ListItemText
               primary={
                 <Typography sx={{ fontSize: { xs: "0.8rem", sm: "1rem" } }}>
