@@ -49,6 +49,8 @@ const App: React.FC = () => {
             <Route path="/adminDashboard" element={<AdminDashboard/>} />
             <Route path="/adminNewProduct" element={<AdminNewProductForm/>} />
 
+            <Route path="/contact" element={<Contact/>} />
+
             
           </Routes>
         <Footer />
