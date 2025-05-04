@@ -3,8 +3,8 @@ import { ApplicationUser } from "../../types/applicationUser";
 import { Box, Tabs, Tab, Badge, Typography } from "@mui/material";
 import UserTable from "./UserTable";
 import { useAuth } from "../../context/AuthContext";
+import { ApiRole, useFetch } from "../../hooks/useFetch";
 
-const BACKEND_BASE_PATH = import.meta.env.VITE_BACKEND_ORIGIN + '/api/private'
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -27,6 +27,9 @@ const CustomTabPanel = (props: TabPanelProps) =>{
   }
 
 export const UserManagement = () => {
+
+    const { data: applicationUser, apiError, get } = useFetch<ApplicationUser[]>(ApiRole.ADMIN);
+
     const [users, setUsers] = useState<ApplicationUser[]>([]);
     const [tabValue, setTabValue] = useState(0);
     const { isSuperAdmin } = useAuth();
@@ -34,29 +37,19 @@ export const UserManagement = () => {
     const handleTabChange = (newValue: number) => {
         setTabValue(newValue);
     };
-    
+
     useEffect(() => {
-        const fetchUsers = async () => {  
-            try {
-                const response = await fetch(`${BACKEND_BASE_PATH}/admin/users`, {
-                    method: "GET",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: 'include',
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    setUsers(data);
-                } else {
-                    const errorText = await response.json().catch(() => "Unknown error");
-                    console.error("Server error:", response.status, errorText);
-                    
-                }
-            } catch (error) {
-                console.error('Error fetching users:', error);    
-            } 
+        get("/users");
+    } , []);
+
+    useEffect(() => {
+        if (applicationUser) {
+            setUsers(applicationUser);
+        } else if (apiError) {
+            console.error("Error fetching users:", apiError);
         }
-        fetchUsers();
-    }, []);
+    }, [applicationUser]);
+       
 
     const updateUserApprovalState = (email: string, isApproved: boolean) => {
         setUsers((prevUsers) =>

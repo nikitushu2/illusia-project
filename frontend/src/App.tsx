@@ -28,27 +28,26 @@ const App: React.FC = () => {
       <CssBaseline />
       <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}> 
         <Header />
-         <Routes>
-            <Route path="/" element={<LandingPage />} />
-            {/* <Route path="/sideBar" element={<Sidebar />} /> */}
-            <Route path="/logoutPage" element={<LogoutPage />} />
-            <Route path="/items" element={<ItemManagement />} />
-            <Route path="/events" element={<Events/>} />
-            <Route path="/info" element={<Info/>} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/login" element={<Login />} />
-            { /* TODO: show error page for /users if user is not admin, once the error page is created */}
-            <Route path="/users" element={<UserManagement />} />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          {/* <Route path="/sideBar" element={<Sidebar />} /> */}
+          <Route path="/logoutPage" element={<LogoutPage />} />
+          <Route path="/items" element={<ItemManagement />} />
+          <Route path="/events" element={<Events/>} />
+          <Route path="/info" element={<Info/>} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
+          { /* TODO: show error page for /users if user is not admin, once the error page is created */}
+          <Route path="/users" element={<UserManagement />} />
 
-            {/* User Routes */}
-            <Route path="/userDashboard" element={<UserDashboard />} />
+          {/* User Routes */}
+          <Route path="/userDashboard" element={<UserDashboard />} />
 
-            {/* Admin Routes */}
-            <Route path="/adminDashboard" element={<AdminDashboard/>} />
-            <Route path="/adminNewProduct" element={<AdminNewProductForm/>} />
-
-            
-          </Routes>
+          {/* Admin Routes */}
+          <Route path="/adminDashboard" element={<AdminDashboard/>} />
+          <Route path="/adminNewProduct" element={<AdminNewProductForm/>} />
+          
+        </Routes>
         <Footer />
       </Box>
     </Router>

@@ -3,6 +3,7 @@ import { TableCell, TableContainer, TableHead, TableRow, Paper, TableBody, Table
 import { useTheme } from '@mui/material/styles';
 import { ApplicationUser } from '../../types/applicationUser';
 import SearchIcon from '@mui/icons-material/Search';
+import { ApiRole, useFetch } from "../../hooks/useFetch";
 
 interface UserRowView {
     email: React.ReactNode, 
@@ -19,9 +20,12 @@ interface UserTableProps {
     deleteUserFromState?: (email: string) => void;
 }
 
-const BACKEND_BASE_PATH = import.meta.env.VITE_BACKEND_ORIGIN + '/api/private'
 
 const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState, deleteUserFromState }: UserTableProps) => {
+
+    const { data: updatedUser, apiError: updateApiError, put } = useFetch<ApplicationUser>(ApiRole.ADMIN);
+    const { data: deleted, apiError: deleteApiError, remove } = useFetch<ApplicationUser>(ApiRole.ADMIN);
+
     const [approveAnchorEl, setApproveAnchorEl] = React.useState<HTMLButtonElement | null>(null);
     const [deleteAnchorEl, setDeleteAnchorEl] = React.useState<HTMLButtonElement | null>(null);
     const [clickedUser, setClickedUser] = React.useState<ApplicationUser | null>(null);
@@ -62,29 +66,23 @@ const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState
             setSearchValue(searchText);
         };
 
-    const handleApproveClick = async () => {
-        try {
-            const response = await fetch(`${BACKEND_BASE_PATH}/admin/users/`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                credentials: 'include',
-                body: JSON.stringify({ 
-                    email: clickedUser?.email, 
-                    isApproved: !clickedUser?.isApproved, 
-                    role: clickedUser?.role,
-                    displayName: clickedUser?.displayName
-                })
-            });
-            if (response.ok) {
-                const updatedUser = await response.json() as ApplicationUser;
-                updateUserApprovalState(updatedUser.email, updatedUser.isApproved);
-            }
-        } catch (error) {
-            // TODO: Shoow error message
-            console.error('Error updating approval status:', error);
-        } finally {
-            handleClose();
+    useEffect(() => {
+        if (updatedUser) {
+            updateUserApprovalState(updatedUser.email, updatedUser.isApproved);
+        } else if (updateApiError) {
+            console.error("Error updating user approval state:", updateApiError);
         }
+        handleClose();
+    }, [updatedUser]);
+
+
+    const handleApproveClick = async () => {
+        await put("/users", {
+            email: clickedUser?.email, 
+            isApproved: !clickedUser?.isApproved, 
+            role: clickedUser?.role,
+            displayName: clickedUser?.displayName       
+        })
     }
 
     const promptDeleteClick = (event: React.MouseEvent<HTMLButtonElement>, user: ApplicationUser) => {
@@ -92,23 +90,20 @@ const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState
         setDeleteAnchorEl(event.currentTarget);
     };
 
-    const handleDelete = async (email: string) => {
-        try {
-            const response = await fetch(`${BACKEND_BASE_PATH}/admin/users/`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                credentials: 'include',
-                body: JSON.stringify({ email })
-            });
-            if (response.ok) {
-                deleteUserFromState!(email);
-            }
-        } catch (error) {
-            // TODO: Shoow error message
-            console.error('Error deleting user:', error);
-        } finally {
-            handleClose();
+
+    useEffect(() => {
+        if (deleted === null && clickedUser) {
+            deleteUserFromState!(clickedUser!.email);
+        } else if (deleteApiError) {
+            console.error("Error deleting user:", deleteApiError);
         }
+        handleClose();
+    }, [deleted])
+
+    const handleDelete = async () => {
+        await remove(`/users`, {
+            email: clickedUser!.email
+        });
     }
 
     // Pagination and sorting 
@@ -178,7 +173,7 @@ const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState
                         <Typography variant='body2' sx={{ fontWeight: '600' }}>Are you sure you want to delete?</Typography>
                         <Typography variant='body2'>This delete action is irrevertible.</Typography>
                         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                            <Button variant="contained" onClick={() => handleDelete(user.email)}>
+                            <Button variant="contained" onClick={() => handleDelete()}>
                                 yes
                             </Button>
                             <Button variant="contained" onClick={handleClose}>
