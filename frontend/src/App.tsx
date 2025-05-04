@@ -19,6 +19,7 @@ import AdminNewProductForm from "./components/Admin/AdminNewProductForm";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import Events from "./components/Events";
 import Info from "./components/Info";
+import { Contact } from "./components/Contact";
 
 
 
@@ -37,6 +38,7 @@ const App: React.FC = () => {
             <Route path="/info" element={<Info/>} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/contact" element={<Contact/>} />
             { /* TODO: show error page for /users if user is not admin, once the error page is created */}
             <Route path="/users" element={<UserManagement />} />
 

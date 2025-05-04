@@ -191,35 +191,10 @@ const UserDashboard = () => {
                             )
                           }
                         />
-                        {productsOpen ? <ExpandLess style={{color:"white"}}  /> : <ExpandMore style={{color:"white"}}/>}
                       </>
                     )}
                   </ListItemButton>
                 </ListItem>
-                <Collapse
-                  in={productsOpen && !isCollapsed}
-                  timeout="auto"
-                  unmountOnExit
-                >
-                  <ListItem disablePadding>
-                    <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 6 }}>
-                        <ListItemIcon style={{ color: "white" }}>
-                          <LeaderboardIcon />
-                        </ListItemIcon>
-                        {!isCollapsed && (
-                          <ListItemText
-                            primary="Inventory"
-                            slotProps={{
-                              primary: { style: { color: "white" } },
-                            }}
-                            onClick={() => handleSideBar("Display inventory")}
-                          />
-                        )}
-                      </ListItemButton>
-                    </List>
-                  </ListItem>
-                </Collapse>
 
                 <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} />
                 <ListItem disablePadding>
