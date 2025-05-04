@@ -21,7 +21,6 @@ import itemService, {
   UpdateItemData,
 } from "../../services/itemService";
 import categoryService, { Category } from "../../services/categoryService";
-import { API_URL } from "../../config";
 
 const ItemManagement: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,17 +31,12 @@ const ItemManagement: React.FC = () => {
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Log API URL to help with debugging
-    console.log("API URL being used:", API_URL);
-
     // Fetch categories for the dropdown
     const fetchCategories = async () => {
       setCategoriesLoading(true);
       setCategoriesError(null);
       try {
-        console.log("Fetching categories...");
         const data = await categoryService.getAll();
-        console.log("Categories fetched successfully:", data);
         setCategories(data);
 
         // Fallback to hardcoded values if no categories were returned
@@ -155,14 +149,11 @@ const ItemManagement: React.FC = () => {
   // update edit item not working
   const handleSubmit = async (values: CreateItemData | UpdateItemData) => {
     try {
-      console.log("Submitting form with values:", values);
       if (selectedItem) {
         // Update existing item
-        console.log("Updating item:", selectedItem.id);
         await itemService.update(selectedItem.id, values as UpdateItemData);
       } else {
         // Create new item is removed as it's not needed here
-        console.log("Creating items is not supported in this component");
         return;
       }
       setIsModalOpen(false);

@@ -226,10 +226,8 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         severity: "success",
       });
 
-      console.log("Submitting form with values:", values);
       if (selectedItem) {
         // Update existing item
-        console.log("Updating item:", selectedItem.id);
         await itemService.update(selectedItem.id, values as UpdateItemData);
         setSnackbar({
           open: true,
@@ -238,7 +236,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         });
       } else {
         // Create new item
-        console.log("Creating new item");
         await itemService.create(values as CreateItemData);
         setSnackbar({
           open: true,
@@ -265,7 +262,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   //visibility toggle function
   const visibilityToggle = (item: Item) => {
-    console.log("Visibility off for:", item);
 
     setItemVisibility((prevVisibility) => ({
       ...prevVisibility,
@@ -677,9 +673,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const fetchItems = async () => {
     try {
       setLoading(true);
-      console.log("Fetching items...");
       const data = await itemService.getAll();
-      console.log("Fetched items:", data);
       setItems(data);
       setFilteredItems(data);
 
@@ -701,7 +695,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   }, []);
 
   useEffect(() => {
-    console.log("Categories in ItemList:", categories);
   }, [categories]);
 
   // Filter items by category
@@ -764,12 +757,10 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   // SEARCH MANUALLY TYPED ITEMS
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("searching");
     event.preventDefault();
 
     const searchInput = event.target.value;
     setSearchInput(searchInput);
-    console.log("searchInput", searchInput);
 
     if (searchInput === "") {
       setFilteredItems(items);
