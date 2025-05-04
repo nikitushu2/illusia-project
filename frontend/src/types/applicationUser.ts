@@ -8,6 +8,7 @@ export enum UserRole {
 }
 
 export interface ApplicationUser {
+    id: number;
     email: string;
     displayName: string;
     role: UserRole;

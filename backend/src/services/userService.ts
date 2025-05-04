@@ -4,6 +4,7 @@ import { User } from "../models/index";
 import { FindOptions, Attributes, Op } from "sequelize";
 
 interface UserAttributes {
+    id: number;
     email: string;
     displayName: string;
     role: string;
@@ -27,6 +28,7 @@ export const findByEmail = async (email: string): Promise<ApplicationUser | null
     }
 
     return {
+        id: user.id,
         email: user.email,
         displayName: user.displayName,
         role: user.role as UserRole,
@@ -55,6 +57,7 @@ const getAplicationUsers = async (options: FindOptions<Attributes<User>>): Promi
         const users = await User.findAll(options) as unknown as UserAttributes[];
         // Map the results to the desired format
         const mappedUsers = users.map((user) => ({
+            id: user.id,
             email: user.email,
             displayName: user.displayName,
             role: user.role as UserRole,
@@ -100,6 +103,7 @@ export const updateUser = async (applicationUser: ApplicationUser): Promise<Appl
         returning: true
     });
         return {
+            id: updatedRows[0].id,
             email: updatedRows[0].email,
             displayName: updatedRows[0].displayName,
             role: updatedRows[0].role as UserRole,
