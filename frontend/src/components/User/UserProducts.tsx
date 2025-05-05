@@ -24,6 +24,8 @@ import {
   useMediaQuery,
   Typography,
   CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
@@ -36,9 +38,10 @@ import { Item } from "../../services/itemService";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 import { ApiRole, useFetch } from "../../hooks/useFetch";
+// import { BookingStatus } from "../../types/booking";
 
 interface ItemListProps {
   categories?: { id: number; name: string }[];
@@ -66,10 +69,24 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     get,
   } = useFetch<Item[]>(ApiRole.PUBLIC);
 
-  // Fetch items on component mount
+  const {
+    data: bookings,
+    loading: bookingsLoading,
+    get: getBookings,
+  } = useFetch<any[]>(ApiRole.PUBLIC);
+
+  // Fetch items and bookings on component mount
   useEffect(() => {
-    get("items");
-  }, [get]);
+    const fetchData = async () => {
+      try {
+        await get("items");
+        await getBookings("bookings");
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, [get, getBookings]);
 
   // Update filtered items when items change
   useEffect(() => {
@@ -77,6 +94,105 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
       setFilteredItems([...items]);
     }
   }, [items]);
+
+  // SEARCH AVAILABILITY BASED ON DATES
+  const searchAvailability = async () => {
+    try {
+      if (!startDate || !endDate) {
+        setSnackbar({
+          open: true,
+          message: "Please select both start and end dates",
+          severity: "error",
+        });
+        return;
+      }
+
+      if (!items || !bookings) {
+        setSnackbar({
+          open: true,
+          message: "Loading data, please try again in a moment",
+          severity: "info",
+        });
+        return;
+      }
+
+      // Step 1: Find relevant bookings (pending or approved) overlapping the selected dates
+      const activeBookings = bookings.filter(
+        (booking) =>
+          (booking.status === "pending" || booking.status === "approved") &&
+          dayjs(booking.startDate).isBefore(endDate) &&
+          dayjs(booking.endDate).isAfter(startDate)
+      );
+
+      console.log("Active bookings:", activeBookings); // Debug log
+
+      // Step 2: Get all booking items linked to these bookings
+      const activeBookingItems = activeBookings.flatMap((booking) =>
+        booking.items.map((item: any) => ({
+          item_id: item.id,
+          quantity: item.quantity,
+        }))
+      );
+
+      console.log("Active booking items:", activeBookingItems); // Debug log
+
+      // Step 3: Aggregate booked quantities per item ID
+      const bookedQuantities: Record<number, number> = {};
+      activeBookingItems.forEach((bi) => {
+        if (!bookedQuantities[bi.item_id]) {
+          bookedQuantities[bi.item_id] = 0;
+        }
+        bookedQuantities[bi.item_id] += bi.quantity;
+      });
+
+      console.log("Booked quantities:", bookedQuantities); // Debug log
+
+      // Step 4: Calculate remaining quantity and filter out fully booked items
+      const availableItems: Item[] = items
+        .map((item) => {
+          const booked = bookedQuantities[item.id] || 0;
+          const availableQty = item.quantity - booked;
+          return availableQty > 0 ? { ...item, quantity: availableQty } : null;
+        })
+        .filter((item): item is Item => item !== null);
+
+      console.log("Available items:", availableItems); // Debug log
+
+      // Step 5: Update the UI
+      setFilteredItems(availableItems);
+      setPage(1);
+
+      if (availableItems.length === 0) {
+        setSnackbar({
+          open: true,
+          message: "No items available for the selected dates",
+          severity: "info",
+        });
+      }
+    } catch (error) {
+      console.error("Error in searchAvailability:", error);
+      setSnackbar({
+        open: true,
+        message: "Error searching availability. Please try again.",
+        severity: "error",
+      });
+    }
+  };
+
+  // Add snackbar state
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "info" | "warning";
+  }>({
+    open: false,
+    message: "",
+    severity: "info",
+  });
+
+  const handleCloseSnackbar = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
 
   // Handle category filtering
   useEffect(() => {
@@ -89,23 +205,6 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
     setFilteredItems(newFilteredItems);
   }, [categoryFilter, items]);
-
-  // Search availability based on dates
-   const searchAvailability = async () => {
-    if (startDate && endDate) {
-      try {
-        const response = await get(
-          `items/availability?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
-        );
-        if (response) {
-          setFilteredItems(response);
-          setPage(1);
-        }
-      } catch (error) {
-        console.error("Error searching availability:", error);
-      }
-    }
-  }; 
 
   // Handle search input
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -661,9 +760,13 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
             />
             <Button
               onClick={searchAvailability}
-              disabled={!startDate || !endDate || isLoading}
+              disabled={!startDate || !endDate || isLoading || bookingsLoading}
+              variant="contained"
+              color="primary"
             >
-              {isLoading ? "Searching..." : "Search"}
+              {isLoading || bookingsLoading
+                ? "Loading..."
+                : "Search Availability"}
             </Button>
           </Box>
         </LocalizationProvider>
@@ -685,6 +788,22 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           shape="rounded"
         />
       </Stack>
+
+      {/* Add Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
