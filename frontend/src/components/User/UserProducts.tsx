@@ -30,8 +30,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
-import itemService from "../../services/itemService";
 import { Item } from "../../services/itemService";
+
+import { ApiRole, useFetch } from "../../hooks/useFetch";
 
 //import { Link } from "react-router-dom";
 //import Helmet from "../../images/helmet.jpeg";
@@ -44,17 +45,12 @@ interface ItemListProps {
 const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md")); // changed from sm to md (and) add px: { xs: 1, sm: 2 } to mobile view
-  
-  const [modeDisplay, setModeDisplay] = React.useState("table"); // for table and grid view
+
+  const [modeDisplay, setModeDisplay] = useState("table"); // for table and grid view
 
   // fetching items from the backend
-  const [items, setItems] = React.useState<Item[]>([]);
-  const [loading, setLoading] = React.useState(false);
-
-  const [isModalOpen, setIsModalOpen] = React.useState(false); //modal view for single product
-  const [selectedProduct, setSelectedProduct] = React.useState<Item | null>(
-    null
-  );
+  const [isModalOpen, setIsModalOpen] = useState(false); //modal view for single product
+  const [selectedProduct, setSelectedProduct] = useState<Item | null>(null);
   const [searchInput, setSearchInput] = useState<string>(""); // for search bar
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
@@ -63,6 +59,23 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const [page, setPage] = useState(1);
 
   const navigate = useNavigate();
+
+  const {
+    data: items,
+    loading: isLoading,
+    apiError,
+    get,
+  } = useFetch<Item[]>(ApiRole.PUBLIC);
+
+  useEffect(() => {
+    get("items");
+  }, [get]);
+
+  useEffect(() => {
+    if (items) {
+      setFilteredItems([...items]);
+    }
+  }, [items]);
 
   const toggleDisplayMode = () => {
     setModeDisplay((prevMode) => (prevMode === "table" ? "grid" : "table"));
@@ -78,38 +91,16 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     setIsModalOpen(false);
   };
 
-  //FETCH ALL ITEMS
-  const fetchItems = async () => {
-    try {
-      setLoading(true);
-      console.log("Fetching items...");
-      const data = await itemService.getAll();
-      console.log("Fetched items:", data);
-      setItems(data);
-    } catch (error) {
-      console.error("Error fetching items:", error);
-      // message.error("Failed to fetch items");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
   //FILTER ITEMS BY CATEGORY
   useEffect(() => {
-    if (categoryFilter === "all") {
-      setFilteredItems(items);
-    } else {
-      setFilteredItems(
-        items.filter((item) => item.categoryId === parseInt(categoryFilter))
-      );
-    }
+    if (!items) return;
 
-    //Reset to first page when filter changes
-    //setPage(0);
+    const newFilteredItems =
+      categoryFilter === "all"
+        ? [...items]
+        : items.filter((item) => item.categoryId === parseInt(categoryFilter));
+
+    setFilteredItems(newFilteredItems);
   }, [categoryFilter, items]);
 
   // Log when categories change to help debugging
@@ -125,11 +116,10 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
 
   //HANDLE TABLE VIEW
   const handleListView = () => {
-
     if (isMobile) {
       // 📱 Stacked layout for mobile
       return (
-        <Box sx={{ mt: 2, px: { xs: 1, sm: 2 }}}>
+        <Box sx={{ mt: 2, px: { xs: 1, sm: 2 } }}>
           {currentItems.map((item) => {
             const category = categories.find((c) => c.id === item.categoryId);
             return (
@@ -149,16 +139,28 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                     <img
                       src={item.imageUrl || camera}
                       alt={item.description || "No Image"}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
                     />
                   </Box>
                   <Box>
-                    <Typography variant="subtitle2"><strong>Name:</strong> {item.name}</Typography>
-                    <Typography variant="body2"><strong>Description:</strong> {item.description}</Typography>
+                    <Typography variant="subtitle2">
+                      <strong>Name:</strong> {item.name}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Description:</strong> {item.description}
+                    </Typography>
                     {/* <Typography variant="body2"><strong>Size:</strong> {item.size}</Typography>
                     <Typography variant="body2"><strong>Color:</strong> {item.color}</Typography> */}
-                    <Typography variant="body2"><strong>Quantity:</strong> {item.quantity}</Typography>
-                    <Typography variant="body2"><strong>Location:</strong> {item.itemLocation}</Typography>
+                    <Typography variant="body2">
+                      <strong>Quantity:</strong> {item.quantity}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Location:</strong> {item.itemLocation}
+                    </Typography>
                     <Typography variant="body2">
                       <strong>Category:</strong>{" "}
                       {category ? category.name : `Category ${item.categoryId}`}
@@ -184,7 +186,6 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
       );
     }
 
-    
     return (
       <Box
         sx={{
