@@ -17,8 +17,8 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useBookingCart, CartItem } from "../../context/BookingCartContext";
-import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import bookingService from "../../services/bookingService";
 
 interface BookingCartDrawerProps {
   open: boolean;
@@ -30,7 +30,6 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
   onClose,
 }) => {
   const { items, removeItem, updateQuantity, clearCart } = useBookingCart();
-  const { applicationUser } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,21 +58,36 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
     setError(null);
 
     try {
-      // Create booking with items
-      const booking = {
-        userId: applicationUser?.id,
+      // Add a startDate and endDate for the booking - use the current date and two weeks later
+      const today = new Date();
+      const twoWeeksLater = new Date(today);
+      twoWeeksLater.setDate(today.getDate() + 14);
+
+      // Create the booking with the correct data structure
+      const bookingData = {
+        startDate: today.toISOString().split("T")[0], // Format as YYYY-MM-DD
+        endDate: twoWeeksLater.toISOString().split("T")[0], // Format as YYYY-MM-DD
+        status: "PENDING",
         items: items.map((item) => ({
           itemId: item.id,
           quantity: item.quantity,
         })),
       };
 
-      // You'll need to implement a booking service method
-      console.log("Creating booking:", booking);
+      console.log("Creating booking with data:", bookingData);
 
+      // Call the real API to create the booking
+      const createdBooking = await bookingService.create(bookingData);
+      console.log("Successfully created booking:", createdBooking);
+
+      // Show success notification
+      alert("Booking created successfully! It is now pending admin approval.");
+
+      // Clear the cart and close the drawer
       clearCart();
       onClose();
-      // Navigate to bookings page or show success message
+
+      // Navigate to the user dashboard showing the bookings tab
       navigate("/userDashboard", { state: { showBookings: true } });
     } catch (err) {
       console.error("Error creating booking:", err);
@@ -223,11 +237,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                 fullWidth
                 sx={{ backgroundColor: "#3ec3ba" }}
               >
-                {loading ? (
-                  <CircularProgress size={24} />
-                ) : (
-                  "Proceed to Booking"
-                )}
+                {loading ? <CircularProgress size={24} /> : "Book Now"}
               </Button>
             </Box>
           </Box>

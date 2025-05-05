@@ -59,36 +59,36 @@ authAxios.interceptors.request.use(
 // Booking service
 const bookingService = {
   getAll: async (): Promise<Booking[]> => {
-    const response = await authAxios.get('/bookings');
+    const response = await authAxios.get('/private/bookings');
     return response.data;
   },
 
   getById: async (id: number): Promise<Booking> => {
-    const response = await authAxios.get(`/bookings/${id}`);
+    const response = await authAxios.get(`/private/bookings/${id}`);
     return response.data;
   },
 
   create: async (data: CreateBookingData): Promise<Booking> => {
-    const response = await authAxios.post('/bookings', data);
+    const response = await authAxios.post('/private/bookings', data);
     return response.data;
   },
 
   update: async (id: number, data: Partial<Booking>): Promise<Booking> => {
-    const response = await authAxios.put(`/bookings/${id}`, data);
+    const response = await authAxios.put(`/private/bookings/${id}`, data);
     return response.data;
   },
 
   delete: async (id: number): Promise<void> => {
-    await authAxios.delete(`/bookings/${id}`);
+    await authAxios.delete(`/private/bookings/${id}`);
   },
 
   cancel: async (id: number): Promise<Booking> => {
-    const response = await authAxios.post(`/bookings/${id}/cancel`);
+    const response = await authAxios.post(`/private/bookings/${id}/cancel`);
     return response.data;
   },
 
   complete: async (id: number): Promise<Booking> => {
-    const response = await authAxios.post(`/bookings/${id}/complete`);
+    const response = await authAxios.post(`/private/bookings/${id}/complete`);
     return response.data;
   }
 };
