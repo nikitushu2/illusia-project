@@ -24,7 +24,7 @@ interface UserTableProps {
 const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState, deleteUserFromState }: UserTableProps) => {
 
     const { data: updatedUser, apiError: updateApiError, put } = useFetch<ApplicationUser>(ApiRole.ADMIN);
-    const { data: deleted, apiError: deleteApiError, remove } = useFetch<ApplicationUser>(ApiRole.ADMIN);
+    const { ok, apiError: deleteApiError, remove } = useFetch<ApplicationUser>(ApiRole.ADMIN);
 
     const [approveAnchorEl, setApproveAnchorEl] = React.useState<HTMLButtonElement | null>(null);
     const [deleteAnchorEl, setDeleteAnchorEl] = React.useState<HTMLButtonElement | null>(null);
@@ -92,13 +92,13 @@ const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState
 
 
     useEffect(() => {
-        if (deleted === null && clickedUser) {
+        if (ok && clickedUser) {
             deleteUserFromState!(clickedUser!.email);
         } else if (deleteApiError) {
             console.error("Error deleting user:", deleteApiError);
         }
         handleClose();
-    }, [deleted])
+    }, [ok])
 
     const handleDelete = async () => {
         await remove(`/users`, {

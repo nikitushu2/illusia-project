@@ -17,7 +17,8 @@ export enum ApiRole {
 }
 
 interface FetchState<T> {
-  data?: T | null;
+  data: T | null;
+  ok: boolean;
   apiError: ApiErrorType | null;
   loading: boolean;
   get: (url: string) => Promise<void>;
@@ -30,9 +31,10 @@ interface FetchState<T> {
 const BACKEND_BASE_PATH = import.meta.env.VITE_BACKEND_ORIGIN + "/api";
 
 export const useFetch = <T>(role: ApiRole): FetchState<T> => {
-  const [data, setData] = useState<T | null>();
+  const [data, setData] = useState<T | null>(null);
   const [apiError, setApiError] = useState<ApiErrorType | null>(null);
   const [loading, setLoading] = useState(false);
+  const [ok, setOk] = useState(false);
 
   const fetchData = async (method: string, url: string, body: any) => {
     setLoading(true);
@@ -46,10 +48,7 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
       };
       const response = await fetch(`${BACKEND_BASE_PATH}${role}/${url}`, options);
       if (response.ok) {
-        if (response.status === 204) {
-          setData(null);
-          return;
-        }
+        setOk(true);
         const data = await response.json() as T;
         setData(data);
       } else {
@@ -89,6 +88,6 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
   const patch = useCallback((url: string, body: any) => fetchData("PATCH", url, body), []);
   const remove = useCallback((url: string, body: any) => fetchData("DELETE", url, body), []);
 
-  return { data, apiError, loading, get, post, put, patch, remove };
+  return { data, ok, apiError, loading, get, post, put, patch, remove };
 
 }
