@@ -30,52 +30,103 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
-import { Item } from "../../services/itemService";
+import itemService, { Item } from "../../services/itemService";
+
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { Dayjs } from "dayjs";
 
 import { ApiRole, useFetch } from "../../hooks/useFetch";
 
-//import { Link } from "react-router-dom";
-//import Helmet from "../../images/helmet.jpeg";
-
 interface ItemListProps {
-  onEdit: (item: Item) => void;
   categories?: { id: number; name: string }[];
 }
 
-const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
+const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // changed from sm to md (and) add px: { xs: 1, sm: 2 } to mobile view
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const navigate = useNavigate();
 
-  const [modeDisplay, setModeDisplay] = useState("table"); // for table and grid view
-
-  // fetching items from the backend
-  const [isModalOpen, setIsModalOpen] = useState(false); //modal view for single product
+  const [modeDisplay, setModeDisplay] = useState("table");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Item | null>(null);
-  const [searchInput, setSearchInput] = useState<string>(""); // for search bar
-
+  const [searchInput, setSearchInput] = useState<string>("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
-
   const [page, setPage] = useState(1);
-
-  const navigate = useNavigate();
+  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
   const {
     data: items,
     loading: isLoading,
-    apiError,
+    //apiError,
     get,
   } = useFetch<Item[]>(ApiRole.PUBLIC);
 
+  // Fetch items on component mount
   useEffect(() => {
     get("items");
   }, [get]);
 
+  // Update filtered items when items change
   useEffect(() => {
     if (items) {
       setFilteredItems([...items]);
     }
   }, [items]);
+
+  // Handle category filtering
+  useEffect(() => {
+    if (!items) return;
+
+    const newFilteredItems =
+      categoryFilter === "all"
+        ? [...items]
+        : items.filter((item) => item.categoryId === parseInt(categoryFilter));
+
+    setFilteredItems(newFilteredItems);
+  }, [categoryFilter, items]);
+
+  // Search availability based on dates
+  const searchAvailability = async () => {
+    if (startDate && endDate) {
+      try {
+        const availableItems = await itemService.searchAvailability(
+          startDate.toISOString(),
+          endDate.toISOString()
+        );
+        setFilteredItems(availableItems);
+        setPage(1);
+      } catch (error) {
+        console.error("Error searching availability:", error);
+      }
+    }
+  };
+
+  // Handle search input
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = event.target.value.trim().toLowerCase();
+    setSearchInput(searchTerm);
+
+    if (!items) return;
+
+    if (searchTerm === "") {
+      setFilteredItems([...items]);
+      return;
+    }
+
+    const newFilteredItems = items.filter((item) => {
+      const itemName = (item.name || "").toLowerCase();
+      const itemDescription = (item.description || "").toLowerCase();
+      return (
+        itemName.includes(searchTerm) || itemDescription.includes(searchTerm)
+      );
+    });
+
+    setFilteredItems(newFilteredItems);
+  };
 
   const toggleDisplayMode = () => {
     setModeDisplay((prevMode) => (prevMode === "table" ? "grid" : "table"));
@@ -91,18 +142,6 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     setIsModalOpen(false);
   };
 
-  //FILTER ITEMS BY CATEGORY
-  useEffect(() => {
-    if (!items) return;
-
-    const newFilteredItems =
-      categoryFilter === "all"
-        ? [...items]
-        : items.filter((item) => item.categoryId === parseInt(categoryFilter));
-
-    setFilteredItems(newFilteredItems);
-  }, [categoryFilter, items]);
-
   // Log when categories change to help debugging
   useEffect(() => {
     console.log("Categories in ItemList:", categories);
@@ -117,7 +156,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   //HANDLE TABLE VIEW
   const handleListView = () => {
     if (isMobile) {
-      // 📱 Stacked layout for mobile
+      // Mobile view for smaller screens
       return (
         <Box sx={{ mt: 2, px: { xs: 1, sm: 2 } }}>
           {currentItems.map((item) => {
@@ -186,6 +225,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
       );
     }
 
+    //regular table view for larger screens
     return (
       <Box
         sx={{
@@ -438,96 +478,72 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
             padding: 2,
           }}
         >
-          {currentItems.map((item) => {
-            const category = categories.find((c) => c.id === item.categoryId);
-            return (
-              <Card
-                key={item.id}
-                sx={{
-                  height: 400,
-                  width: 250,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  boxShadow: 3,
-                  borderRadius: 2,
-                  overflow: "hidden",
-                }}
-              >
-                <CardMedia
-                  sx={{ height: 200, width: "100%", objectFit: "cover" }}
-                  image={item.imageUrl || camera}
-                  title={item.description}
-                />
-                <CardContent
-                  sx={{ textAlign: "center", cursor: "pointer" }}
-                  onClick={() => openModal(item)}
+          {currentItems.length > 0 ? (
+            currentItems.map((item) => {
+              const category = categories.find((c) => c.id === item.categoryId);
+              return (
+                <Card
+                  key={item.id}
+                  sx={{
+                    height: 400,
+                    width: 250,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    boxShadow: 3,
+                    borderRadius: 2,
+                    overflow: "hidden",
+                  }}
                 >
-                  <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
-                  <p style={{ margin: 0 }}>{item.description}</p>
-                  <p style={{ margin: 0, color: "gray" }}>
-                    Category:{" "}
-                    {category
-                      ? category.name
-                      : item.categoryId
-                      ? `Category ${item.categoryId}`
-                      : "N/A"}
-                  </p>
-                </CardContent>
-                <CardActions>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={(event) => {
-                      event.stopPropagation(); // Prevent row click when clicking the button
-                      navigate(`/product/${item.id}`);
-                    }}
+                  <CardMedia
+                    sx={{ height: 200, width: "100%", objectFit: "cover" }}
+                    image={item.imageUrl || camera}
+                    title={item.description}
+                  />
+                  <CardContent
+                    sx={{ textAlign: "center", cursor: "pointer" }}
+                    onClick={() => openModal(item)}
                   >
-                    Book
-                  </Button>
-                </CardActions>
-              </Card>
-            );
-          })}
+                    <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
+                    <p style={{ margin: 0 }}>{item.description}</p>
+                    <p style={{ margin: 0, color: "gray" }}>
+                      Category:{" "}
+                      {category
+                        ? category.name
+                        : item.categoryId
+                        ? `Category ${item.categoryId}`
+                        : "N/A"}
+                    </p>
+                  </CardContent>
+                  <CardActions>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={(event) => {
+                        event.stopPropagation(); // Prevent row click when clicking the button
+                        navigate(`/product/${item.id}`);
+                      }}
+                    >
+                      Add to Cart
+                    </Button>
+                  </CardActions>
+                </Card>
+              );
+            })
+          ) : (
+            <Box sx={{ width: "100%", textAlign: "center", py: 4 }}>
+              No available items found for the selected dates
+            </Box>
+          )}
         </Paper>
       </div>
     );
   };
 
-  //in case you want to move to a new page
-  /*  const handleSingleProduct = () => {
-    console.log("single product");
-    navigate(<UserProducts/>); // wrong way. only strings are accecpted with navigate
-  }; */
-
-  /* const handleBooking = () => {
-    console.log("Booking");
-     navigate("/product/:id");
-  }; */
-
   //HANDLE CATEGORY FILTER
   const handleByCategory = (event: SelectChangeEvent) => {
     setCategoryFilter(event.target.value);
-  };
-
-  // SEARCH MANUALLY TYPED ITEMS
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("searching");
-    event.preventDefault();
-
-    const searchInput = event.target.value;
-    setSearchInput(searchInput);
-    console.log("searchInput", searchInput);
-
-    if (searchInput === "") {
-      setFilteredItems(items);
-    } else {
-      const filteredItems = items.filter((item) =>
-        item.description.toLowerCase().includes(searchInput.toLowerCase())
-      );
-      setFilteredItems(filteredItems);
-    }
   };
 
   return (
@@ -570,30 +586,65 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
         </Box>
       </Box>
 
-      {/* filter by category */}
-      <Box sx={{ marginBottom: "20px" }}>
-        <FormControl sx={{ width: 200 }}>
-          <InputLabel id="category-filter-label">Filter by Category</InputLabel>
-          <Select
-            labelId="category-filter-label"
-            value={categoryFilter}
-            label="Filter by Category"
-            onChange={handleByCategory}
-          >
-            <MenuItem value="all">All Categories</MenuItem>
-            {categories && categories.length > 0 ? (
-              categories.map((category) => (
-                <MenuItem key={category.id} value={category.id.toString()}>
-                  {category.name}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
+        {/* filter by category */}
+        <Box>
+          <FormControl sx={{ width: 200 }}>
+            <InputLabel id="category-filter-label">
+              Filter by Category
+            </InputLabel>
+            <Select
+              labelId="category-filter-label"
+              value={categoryFilter}
+              label="Filter by Category"
+              onChange={handleByCategory}
+            >
+              <MenuItem value="all">All Categories</MenuItem>
+              {categories && categories.length > 0 ? (
+                categories.map((category) => (
+                  <MenuItem key={category.id} value={category.id.toString()}>
+                    {category.name}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled value="">
+                  No categories available
                 </MenuItem>
-              ))
-            ) : (
-              <MenuItem disabled value="">
-                No categories available
-              </MenuItem>
-            )}
-          </Select>
-        </FormControl>
+              )}
+            </Select>
+          </FormControl>
+        </Box>
+
+        {/* Date Range Pickers */}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <DatePicker
+              label="Start Date"
+              value={startDate}
+              onChange={(newValue) => setStartDate(newValue)}
+              sx={{ width: 200 }}
+            />
+            <DatePicker
+              label="End Date"
+              value={endDate}
+              onChange={(newValue) => setEndDate(newValue)}
+              sx={{ width: 200 }}
+            />
+            <Button
+              onClick={searchAvailability}
+              disabled={!startDate || !endDate || isLoading}
+            >
+              {isLoading ? "Searching..." : "Search"}
+            </Button>
+          </Box>
+        </LocalizationProvider>
       </Box>
 
       {modeDisplay === "table" ? handleListView() : handleGridView()}

@@ -755,19 +755,25 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   // SEARCH MANUALLY TYPED ITEMS
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.preventDefault();
+    const searchTerm = event.target.value.trim().toLowerCase();
+    setSearchInput(searchTerm);
 
-    const searchInput = event.target.value;
-    setSearchInput(searchInput);
-
-    if (searchInput === "") {
+    if (searchTerm === "") {
       setFilteredItems(items);
-    } else {
-      const filteredItems = items.filter((item) =>
-        item.description.toLowerCase().includes(searchInput.toLowerCase())
-      );
-      setFilteredItems(filteredItems);
+      return;
     }
+
+    const filteredItems = items.filter((item) => {
+      const itemName = (item.name || "").toLowerCase();
+      const itemDescription = (item.description || "").toLowerCase();
+
+      // Search in both name and description
+      return (
+        itemName.includes(searchTerm) || itemDescription.includes(searchTerm)
+      );
+    });
+
+    setFilteredItems(filteredItems);
   };
 
   return (
