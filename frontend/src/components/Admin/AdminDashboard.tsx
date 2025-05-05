@@ -43,9 +43,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        console.log("Fetching categories...");
         const categoriesData = await categoryService.getAll();
-        console.log("Fetched categories:", categoriesData);
         setCategories(categoriesData);
 
         // Set default component with categories

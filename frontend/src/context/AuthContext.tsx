@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { User, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
 import { auth, provider } from "../config/firebase";
 import { ApplicationUser, UserRole } from "../types/applicationUser";
+import { ApiErrorType, ApiRole, useFetch } from "../hooks/useFetch";
 
 interface AuthProviderProp {
   children: React.ReactNode;
@@ -13,9 +14,9 @@ export enum AuthErrorType {
 }
 
 interface AuthContextType {
-    applicationUser?: ApplicationUser;
+    applicationUser: ApplicationUser | null;
     loading: boolean;
-    error?: AuthErrorType;
+    authError?: AuthErrorType;
     login: () => void;
     logout: () => void;
     isLoggedIn: boolean;
@@ -26,6 +27,7 @@ interface AuthContextType {
 }
 
 const authContextInitialValue = {
+    applicationUser: null,
     loading: false,
     login: () => {},
     logout: () => {},
@@ -35,52 +37,29 @@ const authContextInitialValue = {
     signUp: () => {},
 }
 
-const BACKEND_BASE_PATH = import.meta.env.VITE_BACKEND_ORIGIN + "/api";
-
 const AuthContext = createContext<AuthContextType>(authContextInitialValue);
 
 export const AuthProvider = ({ children }: AuthProviderProp) => {
-  const [applicationUser, setApplicationUser] = useState<ApplicationUser>();
+    const { data: applicationUser, apiError, loading, post } = useFetch<ApplicationUser>(ApiRole.PUBLIC);
+
   const [signUpUser, setSignUpUser] = useState<User>();
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<AuthErrorType>();
+  const [authError, setAuthError] = useState<AuthErrorType>();
 
     const fetchApplicationUserAndSetState = async (firebaseUser: User) => {
-        try {
-            setLoading(true);
-            const token = await firebaseUser.getIdToken();
-            const response = await fetch(`${BACKEND_BASE_PATH}/auth/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token }),
-                credentials: 'include',
-              });
-            
-            if (response.ok){
-                const user = await response.json() as ApplicationUser;
-                setApplicationUser(user);
-            } else if(response.status === 404) {
-                setError(AuthErrorType.USER_NOT_FOUND);
-                setSignUpUser(firebaseUser);
-            }
-
-        } catch (error) {
-            setError(AuthErrorType.LOGIN_FAILED)
-        } finally {
-            setLoading(false)  
+        const token = await firebaseUser.getIdToken();
+        await post('/auth/login', { token })
+        if (apiError === ApiErrorType.NOT_FOUND) {
+            setAuthError(AuthErrorType.USER_NOT_FOUND);
+            setSignUpUser(firebaseUser);
+        } else if (apiError === ApiErrorType.SOMETHING_WENT_WRONG) {
+            setAuthError(AuthErrorType.LOGIN_FAILED);
         }
     };
 
     const logoutUser = async () => {
-        const response = await fetch(`${BACKEND_BASE_PATH}/auth/logout`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: 'include',
-        });
-        if (response.ok){
-            setApplicationUser(undefined);
-        } else {
-            setError(AuthErrorType.LOGOUT_FAILED);
+        await post('/auth/logout', null);
+        if (apiError === ApiErrorType.SOMETHING_WENT_WRONG) {
+            setAuthError(AuthErrorType.LOGOUT_FAILED);
         }
     }
 
@@ -90,7 +69,6 @@ export const AuthProvider = ({ children }: AuthProviderProp) => {
                 fetchApplicationUserAndSetState(firebaseUser);
             } else {
                 if (applicationUser) {
-                    setApplicationUser(undefined);
                     logoutUser();
                 }
             }
@@ -106,8 +84,7 @@ export const AuthProvider = ({ children }: AuthProviderProp) => {
             }
         } catch (error) {
             console.error("Login error:", error);
-            setError(AuthErrorType.LOGIN_FAILED);
-            setLoading(false);
+            setAuthError(AuthErrorType.LOGIN_FAILED);
         }
     };
 
@@ -119,8 +96,7 @@ export const AuthProvider = ({ children }: AuthProviderProp) => {
             }
         } catch (error) {
             console.error("Login error:", error);
-            setError(AuthErrorType.LOGIN_FAILED);
-            setLoading(false);
+            setAuthError(AuthErrorType.LOGIN_FAILED);
         }
     };
 
@@ -132,7 +108,7 @@ export const AuthProvider = ({ children }: AuthProviderProp) => {
     const context = {
         applicationUser: applicationUser,
         loading: loading,
-        error: error,
+        authError: authError,
         login: login,
         logout: logout,
         isLoggedIn: !!applicationUser && applicationUser.isApproved,

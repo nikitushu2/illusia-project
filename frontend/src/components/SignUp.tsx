@@ -9,12 +9,19 @@ import {
   Alert
 } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
-import { UserRole } from "../types/applicationUser";
+import { ApplicationUser, UserRole } from "../types/applicationUser";
+import { ApiErrorType, ApiRole, useFetch } from "../hooks/useFetch";
 
-const BACKEND_BASE_PATH = import.meta.env.VITE_BACKEND_ORIGIN + '/api'
+interface SignUpResponse {
+  message: string;
+  user?: ApplicationUser;
+}
 
 const GoogleSignupForm = () => {
   const { signUpUser } = useAuth();
+
+   const { data: signUpResponse, apiError, loading, post } = useFetch<SignUpResponse>(ApiRole.PUBLIC);
+
   const [submitted, setSubmitted] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<"success" | "error" | null>(null);
@@ -33,30 +40,31 @@ const GoogleSignupForm = () => {
       });
     }
   }, [signUpUser]);
+
+  useEffect(() => {
+    if (signUpResponse && signUpResponse.user) {
+      setMessageType("success");
+      setMessage(signUpResponse.message || "Signup successful!");
+      setSubmitted(true);
+    } else if (apiError) {
+      setMessageType("error");
+      if (apiError === ApiErrorType.CONFLICT) {
+        setMessage("User already exists!");
+      } else {
+        setMessage(ApiErrorType.SOMETHING_WENT_WRONG);
+      }
+    }
+  }, [signUpResponse, apiError]);
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const token = await signUpUser?.getIdToken();
 
-    try {
-      const res = await fetch(`${BACKEND_BASE_PATH}/auth/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ ...formData, token: token }),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setMessageType("success");
-        setMessage(data.message || "Signup successful!");
-        setSubmitted(true);
-      } else {
-        setMessageType("error");
-        setMessage(data.message || "Something went wrong!");
-      }
-    } catch (error) {
-      console.error("Signup error:", error);
-    }
+    await post("/auth/signup", {
+      ...formData,
+      token: token,
+    });
+  
   };
 
   return (
@@ -98,8 +106,14 @@ const GoogleSignupForm = () => {
               <MenuItem value={UserRole.USER}>User</MenuItem>
               <MenuItem value={UserRole.ADMIN}>Admin</MenuItem>
             </TextField>
-            <Button disabled={submitted} type="submit" variant="contained" fullWidth sx={{ py: { xs: 1.5, sm: 1 }, mt: 2 }}>
-              Submit
+            <Button 
+              disabled={submitted || loading} 
+              type="submit" 
+              variant="contained" 
+              fullWidth 
+              sx={{ py: { xs: 1.5, sm: 1 }, mt: 2 }}
+            >
+              {loading ? 'Loading...' : 'Submit'}
             </Button>
           </Box>
       </Box>
