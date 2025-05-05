@@ -52,6 +52,8 @@ import UserSingleProduct from "../User/UserSingleProduct";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
+import { ApiRole, useFetch } from "../../hooks/useFetch";
+
 interface ItemListProps {
   onEdit?: (item: Item) => void;
   categories?: { id: number; name: string }[];
@@ -73,8 +75,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | undefined>(undefined);
-
-  //const [refreshKey, setRefreshKey] = useState(0); // Used to force ItemList to refresh
 
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
   const [searchInput, setSearchInput] = useState<string>(""); // for search bar
@@ -102,6 +102,49 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     message: "",
     severity: "success",
   });
+
+  //  FETCHING DATA USING CUSTOM HOOK 
+  const {
+    data: fetchedItems,
+    loading: fetchLoading,
+    apiError,
+    get,
+  } = useFetch<Item[]>(ApiRole.PUBLIC);
+
+  useEffect(() => {
+    get("items");
+  }, [get]);
+
+  // Update items when fetched data changes
+  useEffect(() => {
+    if (fetchedItems) {
+      setItems(fetchedItems);
+      setFilteredItems(fetchedItems);
+
+      const initialVisibility: { [itemId: number]: boolean } = {};
+      fetchedItems.forEach((item) => {
+        initialVisibility[item.id] = true;
+      });
+      setItemVisibility(initialVisibility);
+    }
+  }, [fetchedItems]);
+
+  // Handle API errors
+  useEffect(() => {
+    if (apiError) {
+      console.error("Error fetching items:", apiError);
+      setSnackbar({
+        open: true,
+        message: "Failed to fetch items",
+        severity: "error",
+      });
+    }
+  }, [apiError]);
+
+  // Update loading state based on fetchLoading
+  useEffect(() => {
+    setLoading(fetchLoading);
+  }, [fetchLoading]);
 
   const toggleDisplayMode = () => {
     setModeDisplay((prevMode) => (prevMode === "table" ? "grid" : "table"));
@@ -148,7 +191,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         message: "Item deleted successfully",
         severity: "success",
       });
-      fetchItems();
+      fetchedItems();
     } catch (error) {
       console.error("Error deleting item:", error);
       setSnackbar({
@@ -247,7 +290,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
       // Close modal and refresh items list
       setIsModalOpen(false);
       setSelectedItem(undefined);
-      fetchItems(); // Refresh the items list
+      fetchedItems(); // Refresh the items list
     } catch (error) {
       console.error("Error submitting item:", error);
       setSnackbar({
@@ -262,7 +305,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   //visibility toggle function
   const visibilityToggle = (item: Item) => {
-
     setItemVisibility((prevVisibility) => ({
       ...prevVisibility,
       [item.id]: !prevVisibility[item.id],
@@ -669,34 +711,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     );
   };
 
-  //FETCH ALL ITEMS
-  const fetchItems = async () => {
-    try {
-      setLoading(true);
-      const data = await itemService.getAll();
-      setItems(data);
-      setFilteredItems(data);
-
-      const initialVisibility: { [itemId: number]: boolean } = {};
-      data.forEach((item) => {
-        initialVisibility[item.id] = true;
-      });
-      setItemVisibility(initialVisibility);
-    } catch (error) {
-      console.error("Error fetching items:", error);
-      // message.error("Failed to fetch items");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
-  useEffect(() => {
-  }, [categories]);
-
   // Filter items by category
   useEffect(() => {
     if (categoryFilter === "all") {
@@ -713,22 +727,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const handleByCategory = (event: SelectChangeEvent) => {
     setCategoryFilter(event.target.value);
   };
-
-  // const toggleDisplayMode = () => {
-  //   setModeDisplay(prevMode => (prevMode === "table" ? "grid" : "table"));
-  // };
-
-  // grid view
-  //  const handleGridView = () => {
-  //   console.log("grid");
-  //   setGrid(!grid);
-  // };
-
-  // list view
-  // const handleListView = () => {
-  //   console.log("list");
-  //   setList(!list);
-  // };
 
   // handle add new item
   const handleCreate = () => {
