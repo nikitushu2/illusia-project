@@ -23,6 +23,7 @@ import {
   useTheme,
   useMediaQuery,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
@@ -30,7 +31,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
-import itemService from "../../services/itemService";
+import useItems from "../../services/itemService";
 import { Item } from "../../services/itemService";
 
 //import { Link } from "react-router-dom";
@@ -44,12 +45,10 @@ interface ItemListProps {
 const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md")); // changed from sm to md (and) add px: { xs: 1, sm: 2 } to mobile view
-  
-  const [modeDisplay, setModeDisplay] = React.useState("table"); // for table and grid view
 
-  // fetching items from the backend
-  const [items, setItems] = React.useState<Item[]>([]);
-  const [loading, setLoading] = React.useState(false);
+  const itemsService = useItems();
+
+  const [modeDisplay, setModeDisplay] = React.useState("table"); // for table and grid view
 
   const [isModalOpen, setIsModalOpen] = React.useState(false); //modal view for single product
   const [selectedProduct, setSelectedProduct] = React.useState<Item | null>(
@@ -78,39 +77,20 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     setIsModalOpen(false);
   };
 
-  //FETCH ALL ITEMS
-  const fetchItems = async () => {
-    try {
-      setLoading(true);
-      console.log("Fetching items...");
-      const data = await itemService.getAll();
-      console.log("Fetched items:", data);
-      setItems(data);
-    } catch (error) {
-      console.error("Error fetching items:", error);
-      // message.error("Failed to fetch items");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
   //FILTER ITEMS BY CATEGORY
   useEffect(() => {
     if (categoryFilter === "all") {
-      setFilteredItems(items);
+      setFilteredItems(itemsService.items);
     } else {
       setFilteredItems(
-        items.filter((item) => item.categoryId === parseInt(categoryFilter))
+        itemsService.items.filter(
+          (item) => item.categoryId === parseInt(categoryFilter)
+        )
       );
     }
-
     //Reset to first page when filter changes
-    //setPage(0);
-  }, [categoryFilter, items]);
+    setPage(1);
+  }, [categoryFilter, itemsService.items]);
 
   // Log when categories change to help debugging
   useEffect(() => {
@@ -123,13 +103,21 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
+  // If loading is true, show a loading indicator
+  if (itemsService.loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   //HANDLE TABLE VIEW
   const handleListView = () => {
-
     if (isMobile) {
       // 📱 Stacked layout for mobile
       return (
-        <Box sx={{ mt: 2, px: { xs: 1, sm: 2 }}}>
+        <Box sx={{ mt: 2, px: { xs: 1, sm: 2 } }}>
           {currentItems.map((item) => {
             const category = categories.find((c) => c.id === item.categoryId);
             return (
@@ -149,16 +137,28 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                     <img
                       src={item.imageUrl || camera}
                       alt={item.description || "No Image"}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
                     />
                   </Box>
                   <Box>
-                    <Typography variant="subtitle2"><strong>Name:</strong> {item.name}</Typography>
-                    <Typography variant="body2"><strong>Description:</strong> {item.description}</Typography>
+                    <Typography variant="subtitle2">
+                      <strong>Name:</strong> {item.name}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Description:</strong> {item.description}
+                    </Typography>
                     {/* <Typography variant="body2"><strong>Size:</strong> {item.size}</Typography>
                     <Typography variant="body2"><strong>Color:</strong> {item.color}</Typography> */}
-                    <Typography variant="body2"><strong>Quantity:</strong> {item.quantity}</Typography>
-                    <Typography variant="body2"><strong>Location:</strong> {item.itemLocation}</Typography>
+                    <Typography variant="body2">
+                      <strong>Quantity:</strong> {item.quantity}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Location:</strong> {item.itemLocation}
+                    </Typography>
                     <Typography variant="body2">
                       <strong>Category:</strong>{" "}
                       {category ? category.name : `Category ${item.categoryId}`}
@@ -184,7 +184,6 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
       );
     }
 
-    
     return (
       <Box
         sx={{
@@ -520,9 +519,9 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     console.log("searchInput", searchInput);
 
     if (searchInput === "") {
-      setFilteredItems(items);
+      setFilteredItems(itemsService.items);
     } else {
-      const filteredItems = items.filter((item) =>
+      const filteredItems = itemsService.items.filter((item) =>
         item.description.toLowerCase().includes(searchInput.toLowerCase())
       );
       setFilteredItems(filteredItems);
