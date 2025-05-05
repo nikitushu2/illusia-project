@@ -17,11 +17,14 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import logo from "../images/logo-transparent.png";
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ThemeContext } from "../themes/themeContext";
 import { useContext, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useBookingCart } from "../context/BookingCartContext";
+import BookingCartDrawer from "./BookingCart/BookingCartDrawer";
+import ShoppingCartIconComponent from "./ShoppingCartIcon";
 
 export const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -29,6 +32,9 @@ export const Header = () => {
   const { logout, isLoggedIn, signUp, signUpUser, isAdmin, applicationUser } =
     useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isCartOpen, closeCart } = useBookingCart();
+  const isUserDashboard = location.pathname === "/userDashboard";
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -186,7 +192,12 @@ export const Header = () => {
               >
                 <Typography variant="body1">EVENTS</Typography>
               </Button>
-              <Button color="inherit" variant="text" component={Link} to="/info">
+              <Button
+                color="inherit"
+                variant="text"
+                component={Link}
+                to="/info"
+              >
                 <Typography variant="body1">INFO</Typography>
               </Button>
             </Box>
@@ -195,16 +206,18 @@ export const Header = () => {
               sx={{
                 display: "flex",
                 alignItems: "center",
-                gap: "30px",
+                gap: "20px",
               }}
             >
               {isLoggedIn ? (
                 <>
+                  {isUserDashboard && !isAdmin && <ShoppingCartIconComponent />}
+
                   <Box
                     sx={{
                       display: { xs: "none", md: "flex" },
                       alignItems: "center",
-                      gap: "30px",
+                      gap: "20px",
                     }}
                   >
                     <Chip
@@ -294,6 +307,9 @@ export const Header = () => {
       >
         {drawer}
       </Drawer>
+
+      {/* Cart Drawer */}
+      <BookingCartDrawer open={isCartOpen} onClose={closeCart} />
     </>
   );
 };

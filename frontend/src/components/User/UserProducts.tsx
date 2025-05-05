@@ -33,6 +33,7 @@ import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
 import useItems from "../../services/itemService";
 import { Item } from "../../services/itemService";
+import { useBookingCart } from "../../context/BookingCartContext";
 
 //import { Link } from "react-router-dom";
 //import Helmet from "../../images/helmet.jpeg";
@@ -47,6 +48,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md")); // changed from sm to md (and) add px: { xs: 1, sm: 2 } to mobile view
 
   const itemsService = useItems();
+  const { addItem } = useBookingCart();
 
   const [modeDisplay, setModeDisplay] = React.useState("table"); // for table and grid view
 
@@ -166,13 +168,20 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                     <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
                       <Button
                         variant="contained"
-                        color="primary"
                         onClick={(event) => {
                           event.stopPropagation();
-                          navigate(`/product/${item.id}`);
+                          console.log(
+                            "Adding item to cart from mobile view:",
+                            item
+                          );
+                          addItem(item);
+                        }}
+                        sx={{
+                          backgroundColor: "#3ec3ba",
+                          "&:hover": { backgroundColor: "#2ba19a" },
                         }}
                       >
-                        Book
+                        Add to Cart
                       </Button>
                     </Box>
                   </Box>
@@ -403,14 +412,18 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                       <Button
                         onClick={(event) => {
                           event.stopPropagation();
-                          navigate(`/product/${item.id}`);
+                          console.log(
+                            "Adding item to cart from table view:",
+                            item
+                          );
+                          addItem(item);
                         }}
                         sx={{
-                          fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                          padding: { xs: "4px 8px", sm: "6px 16px" },
+                          backgroundColor: "#3ec3ba",
+                          "&:hover": { backgroundColor: "#2ba19a" },
                         }}
                       >
-                        Book
+                        Add to Cart
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -476,13 +489,17 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                 <CardActions>
                   <Button
                     variant="contained"
-                    color="primary"
                     onClick={(event) => {
-                      event.stopPropagation(); // Prevent row click when clicking the button
-                      navigate(`/product/${item.id}`);
+                      event.stopPropagation();
+                      console.log("Adding item to cart from grid view:", item);
+                      addItem(item);
+                    }}
+                    sx={{
+                      backgroundColor: "#3ec3ba",
+                      "&:hover": { backgroundColor: "#2ba19a" },
                     }}
                   >
-                    Book
+                    Add to Cart
                   </Button>
                 </CardActions>
               </Card>
