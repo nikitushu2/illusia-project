@@ -31,28 +31,23 @@ import {
   Stack,
   useTheme,
   useMediaQuery,
-  Typography,
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
-//import { useState } from "react";
 import React, { useEffect, useState } from "react";
-// import box from "../images/box.png";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import itemService, {
+import useItems, {
   UpdateItemData,
   CreateItemData,
+  Item,
 } from "../../services/itemService";
-import { Item } from "../../services/itemService";
 import camera from "../../images/camera.png";
 import ItemForm from "../Items/ItemForm";
 import { useAuth } from "../../context/AuthContext";
 import UserSingleProduct from "../User/UserSingleProduct";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-
-import { ApiRole, useFetch } from "../../hooks/useFetch";
 
 interface ItemListProps {
   onEdit?: (item: Item) => void;
@@ -62,6 +57,15 @@ interface ItemListProps {
 const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const {
+    items,
+    loading,
+    error,
+    create,
+    update,
+    delete: deleteItem,
+    refresh,
+  } = useItems();
 
   // Add debug logging
   console.log("isMobile:", isMobile);
@@ -70,18 +74,15 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const { isLoggedIn, isAdmin } = useAuth();
   const [modeDisplay, setModeDisplay] = React.useState("table");
 
-  const [items, setItems] = React.useState<Item[]>([]);
-  const [loading, setLoading] = React.useState(false);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | undefined>(undefined);
 
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
-  const [searchInput, setSearchInput] = useState<string>(""); // for search bar
+  const [searchInput, setSearchInput] = useState<string>("");
 
   const [itemVisibility, setItemVisibility] = useState<{
     [itemId: number]: boolean;
-  }>({}); // State to track visibility per item
+  }>({});
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
@@ -103,48 +104,41 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     severity: "success",
   });
 
-  //  FETCHING DATA USING CUSTOM HOOK 
-  const {
-    data: fetchedItems,
-    loading: fetchLoading,
-    apiError,
-    get,
-  } = useFetch<Item[]>(ApiRole.PUBLIC);
-
+  // Initialize the visibility state when items are loaded
   useEffect(() => {
-    get("items");
-  }, [get]);
-
-  // Update items when fetched data changes
-  useEffect(() => {
-    if (fetchedItems) {
-      setItems(fetchedItems);
-      setFilteredItems(fetchedItems);
-
+    if (items && items.length > 0) {
       const initialVisibility: { [itemId: number]: boolean } = {};
-      fetchedItems.forEach((item) => {
+      items.forEach((item) => {
         initialVisibility[item.id] = true;
       });
       setItemVisibility(initialVisibility);
     }
-  }, [fetchedItems]);
+  }, [items]);
+
+  // Filter items by category
+  useEffect(() => {
+    if (categoryFilter === "all") {
+      setFilteredItems(items);
+    } else {
+      setFilteredItems(
+        items.filter((item) => item.categoryId === parseInt(categoryFilter))
+      );
+    }
+    // Reset pagination when filter changes
+    setPage(1);
+  }, [categoryFilter, items]);
 
   // Handle API errors
   useEffect(() => {
-    if (apiError) {
-      console.error("Error fetching items:", apiError);
+    if (error) {
+      console.error("Error fetching items:", error);
       setSnackbar({
         open: true,
         message: "Failed to fetch items",
         severity: "error",
       });
     }
-  }, [apiError]);
-
-  // Update loading state based on fetchLoading
-  useEffect(() => {
-    setLoading(fetchLoading);
-  }, [fetchLoading]);
+  }, [error]);
 
   const toggleDisplayMode = () => {
     setModeDisplay((prevMode) => (prevMode === "table" ? "grid" : "table"));
@@ -185,13 +179,13 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     if (itemToDelete === null) return;
 
     try {
-      await itemService.delete(itemToDelete);
+      await deleteItem(itemToDelete);
       setSnackbar({
         open: true,
         message: "Item deleted successfully",
         severity: "success",
       });
-      fetchedItems();
+      refresh();
     } catch (error) {
       console.error("Error deleting item:", error);
       setSnackbar({
@@ -271,7 +265,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
       if (selectedItem) {
         // Update existing item
-        await itemService.update(selectedItem.id, values as UpdateItemData);
+        await update(selectedItem.id, values as UpdateItemData);
         setSnackbar({
           open: true,
           message: "Item updated successfully",
@@ -279,7 +273,8 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         });
       } else {
         // Create new item
-        await itemService.create(values as CreateItemData);
+        const result = await create(values as CreateItemData);
+        console.log("Created new item:", result);
         setSnackbar({
           open: true,
           message: "Item created successfully",
@@ -287,10 +282,10 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         });
       }
 
-      // Close modal and refresh items list
+      // Close modal
       setIsModalOpen(false);
       setSelectedItem(undefined);
-      fetchedItems(); // Refresh the items list
+      refresh(); // Refresh the items list
     } catch (error) {
       console.error("Error submitting item:", error);
       setSnackbar({
@@ -316,412 +311,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const indexOfLastItem = page * ITEMS_PER_PAGE;
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
-
-  //HANDLE TABLE VIEW
-  const handleListView = () => {
-    if (isMobile) {
-      // 📱 Stacked layout for mobile
-      return (
-        <Box sx={{ mt: 2 }}>
-          {currentItems.map((item) => {
-            const category = categories.find((c) => c.id === item.categoryId);
-            return (
-              <Paper key={item.id} sx={{ p: 2, mb: 2 }}>
-                <Box sx={{ display: "flex", gap: 2 }}>
-                  <Box
-                    sx={{
-                      minWidth: 80,
-                      height: 80,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 1,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <img
-                      src={item.imageUrl || camera}
-                      alt={item.description || "No Image"}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </Box>
-                  <Box>
-                    <Typography variant="subtitle2">
-                      <strong>Name:</strong> {item.name}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Description:</strong> {item.description}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Size:</strong> {item.size}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Color:</strong> {item.color}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Quantity:</strong> {item.quantity}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Location:</strong> {item.itemLocation}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Category:</strong>{" "}
-                      {category ? category.name : `Category ${item.categoryId}`}
-                    </Typography>
-                    <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
-                      <IconButton
-                        color="primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEdit(item);
-                        }}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        color="primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          confirmDelete(item.id);
-                        }}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        color="primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          visibilityToggle(item);
-                        }}
-                      >
-                        {itemVisibility[item.id] ? (
-                          <VisibilityIcon fontSize="small" />
-                        ) : (
-                          <VisibilityOffIcon fontSize="small" />
-                        )}
-                      </IconButton>
-                    </Box>
-                  </Box>
-                </Box>
-              </Paper>
-            );
-          })}
-        </Box>
-      );
-    }
-
-    return (
-      <Box
-        sx={{
-          width: "100%",
-          overflowX: "auto",
-          marginTop: { xs: 2, sm: 4 },
-          padding: { xs: 1, sm: 2 },
-          "& .MuiTableCell-root": {
-            whiteSpace: "nowrap",
-            maxWidth: "200px",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            padding: { xs: "8px 4px", sm: "16px" },
-            fontSize: { xs: "0.75rem", sm: "0.875rem" },
-          },
-          "& .MuiTableHead-root": {
-            "& .MuiTableCell-root": {
-              fontSize: { xs: "0.75rem", sm: "0.875rem" },
-              fontWeight: "bold",
-              backgroundColor: "primary.main",
-              color: "white",
-              padding: { xs: "8px 4px", sm: "16px" },
-            },
-          },
-          "& .MuiTableRow-root": {
-            "&:hover": {
-              backgroundColor: "action.hover",
-            },
-            "&:last-child td": {
-              borderBottom: 0,
-            },
-          },
-        }}
-      >
-        <TableContainer
-          sx={{
-            maxHeight: 800,
-            borderRadius: 2,
-            boxShadow: 2,
-            "&::-webkit-scrollbar": {
-              width: "8px",
-              height: "8px",
-            },
-            "&::-webkit-scrollbar-track": {
-              background: "#f1f1f1",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              background: "#888",
-              borderRadius: "4px",
-            },
-            "&::-webkit-scrollbar-thumb:hover": {
-              background: "#555",
-            },
-          }}
-        >
-          <Table stickyHeader>
-            <TableHead>
-              <TableRow>
-                <TableCell
-                  sx={{
-                    minWidth: { xs: "80px", sm: "100px" },
-                  }}
-                >
-                  Image
-                </TableCell>
-                <TableCell
-                  sx={{
-                    minWidth: { xs: "120px", sm: "150px" },
-                  }}
-                >
-                  Name
-                </TableCell>
-                <TableCell
-                  sx={{
-                    minWidth: { xs: "150px", sm: "200px" },
-                  }}
-                >
-                  Description
-                </TableCell>
-                <TableCell
-                  sx={{
-                    minWidth: { xs: "60px", sm: "80px" },
-                  }}
-                >
-                  Size
-                </TableCell>
-                <TableCell
-                  sx={{
-                    minWidth: { xs: "60px", sm: "80px" },
-                  }}
-                >
-                  Color
-                </TableCell>
-                <TableCell
-                  sx={{
-                    minWidth: { xs: "60px", sm: "80px" },
-                  }}
-                >
-                  Quantity
-                </TableCell>
-                <TableCell
-                  sx={{
-                    minWidth: { xs: "100px", sm: "120px" },
-                  }}
-                >
-                  Item Location
-                </TableCell>
-                <TableCell
-                  sx={{
-                    minWidth: { xs: "80px", sm: "100px" },
-                  }}
-                >
-                  Category
-                </TableCell>
-                <TableCell
-                  sx={{
-                    minWidth: { xs: "100px", sm: "120px" },
-                  }}
-                >
-                  Action
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {currentItems.map((item) => {
-                const category = categories.find(
-                  (c) => c.id === item.categoryId
-                );
-                return (
-                  <TableRow
-                    key={item.id}
-                    onClick={() => openModal(item)}
-                    sx={{
-                      cursor: "pointer",
-                      "&:hover": {
-                        backgroundColor: "action.hover",
-                      },
-                    }}
-                  >
-                    <TableCell>
-                      <Box
-                        sx={{
-                          width: { xs: 50, sm: 100 },
-                          height: { xs: 50, sm: 100 },
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <img
-                          src={item.imageUrl || camera}
-                          alt={item.description || "No Image Available"}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            borderRadius: "4px",
-                          }}
-                        />
-                      </Box>
-                    </TableCell>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.description}</TableCell>
-                    <TableCell>{item.size}</TableCell>
-                    <TableCell>{item.color}</TableCell>
-                    <TableCell>{item.quantity}</TableCell>
-                    <TableCell>{item.itemLocation}</TableCell>
-                    <TableCell>
-                      {category
-                        ? category.name
-                        : item.categoryId
-                        ? `Category ${item.categoryId}`
-                        : "N/A"}
-                    </TableCell>
-                    <TableCell>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          gap: { xs: 0.5, sm: 1 },
-                          "& .MuiIconButton-root": {
-                            padding: { xs: "4px", sm: "8px" },
-                          },
-                        }}
-                      >
-                        <IconButton
-                          color="primary"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleEdit(item);
-                          }}
-                          size="small"
-                        >
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton
-                          color="primary"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            confirmDelete(item.id);
-                          }}
-                          size="small"
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                        <IconButton
-                          color="primary"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            visibilityToggle(item);
-                          }}
-                          size="small"
-                        >
-                          {itemVisibility[item.id] ? (
-                            <VisibilityIcon />
-                          ) : (
-                            <VisibilityOffIcon />
-                          )}
-                        </IconButton>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-    );
-  };
-
-  //HANDLE GRID VIEW
-  const handleGridView = () => {
-    return (
-      <div>
-        <Paper
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: 4,
-            padding: 2,
-          }}
-        >
-          {currentItems.map((item) => {
-            const category = categories.find((c) => c.id === item.categoryId);
-            return (
-              <Card
-                key={item.id}
-                sx={{
-                  height: 400,
-                  width: 250,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  boxShadow: 3,
-                  borderRadius: 2,
-                  overflow: "hidden",
-                }}
-                style={{ opacity: itemVisibility[item.id] ? 1 : 0.5 }}
-              >
-                <CardMedia
-                  sx={{ height: 200, width: "100%", objectFit: "cover" }}
-                  image={item.imageUrl || camera}
-                  title={item.description}
-                />
-                <CardContent
-                  sx={{ textAlign: "center", cursor: "pointer" }}
-                  onClick={() => openModal(item)}
-                >
-                  <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
-                  <p style={{ margin: 0 }}>{item.description}</p>
-                  <p style={{ margin: 0 }}>ID: {item.id}</p>
-                  <p style={{ margin: 0, color: "gray" }}>
-                    Category:{" "}
-                    {category
-                      ? category.name
-                      : item.categoryId
-                      ? `Category ${item.categoryId}`
-                      : "N/A"}
-                  </p>
-                </CardContent>
-                <CardActions>
-                  <Button onClick={() => handleEdit(item)}>Edit</Button>
-                  <Button onClick={() => confirmDelete(item.id)}>Delete</Button>
-                  <Button onClick={() => visibilityToggle(item)} size="medium">
-                    {itemVisibility[item.id] ? "Hide" : "Show"}
-                  </Button>
-                </CardActions>
-              </Card>
-            );
-          })}
-        </Paper>
-      </div>
-    );
-  };
-
-  // Filter items by category
-  useEffect(() => {
-    if (categoryFilter === "all") {
-      setFilteredItems(items);
-    } else {
-      setFilteredItems(
-        items.filter((item) => item.categoryId === parseInt(categoryFilter))
-      );
-    }
-    // Reset any pagination if implemented later
-  }, [categoryFilter, items]);
 
   //HANDLE CATEGORY FILTER
   const handleByCategory = (event: SelectChangeEvent) => {
@@ -755,26 +344,29 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   // SEARCH MANUALLY TYPED ITEMS
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = event.target.value.trim().toLowerCase();
-    setSearchInput(searchTerm);
+    event.preventDefault();
 
-    if (searchTerm === "") {
+    const searchInput = event.target.value;
+    setSearchInput(searchInput);
+
+    if (searchInput === "") {
       setFilteredItems(items);
-      return;
-    }
-
-    const filteredItems = items.filter((item) => {
-      const itemName = (item.name || "").toLowerCase();
-      const itemDescription = (item.description || "").toLowerCase();
-
-      // Search in both name and description
-      return (
-        itemName.includes(searchTerm) || itemDescription.includes(searchTerm)
+    } else {
+      const filteredItems = items.filter((item) =>
+        item.description.toLowerCase().includes(searchInput.toLowerCase())
       );
-    });
-
-    setFilteredItems(filteredItems);
+      setFilteredItems(filteredItems);
+    }
   };
+
+  // If loading is true, show a loading indicator
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <div>
@@ -918,14 +510,300 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         </Box>
       </Box>
 
-      {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-          <CircularProgress size={60} />
+      {modeDisplay === "table" ? (
+        <Box
+          sx={{
+            width: "100%",
+            overflowX: "auto",
+            marginTop: { xs: 2, sm: 4 },
+            padding: { xs: 1, sm: 2 },
+            "& .MuiTableCell-root": {
+              whiteSpace: "nowrap",
+              maxWidth: "200px",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              padding: { xs: "8px 4px", sm: "16px" },
+              fontSize: { xs: "0.75rem", sm: "0.875rem" },
+            },
+            "& .MuiTableHead-root": {
+              "& .MuiTableCell-root": {
+                fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                fontWeight: "bold",
+                backgroundColor: "primary.main",
+                color: "white",
+                padding: { xs: "8px 4px", sm: "16px" },
+              },
+            },
+            "& .MuiTableRow-root": {
+              "&:hover": {
+                backgroundColor: "action.hover",
+              },
+              "&:last-child td": {
+                borderBottom: 0,
+              },
+            },
+          }}
+        >
+          <TableContainer
+            sx={{
+              maxHeight: 800,
+              borderRadius: 2,
+              boxShadow: 2,
+              "&::-webkit-scrollbar": {
+                width: "8px",
+                height: "8px",
+              },
+              "&::-webkit-scrollbar-track": {
+                background: "#f1f1f1",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                background: "#888",
+                borderRadius: "4px",
+              },
+              "&::-webkit-scrollbar-thumb:hover": {
+                background: "#555",
+              },
+            }}
+          >
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "80px", sm: "100px" },
+                    }}
+                  >
+                    Image
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "120px", sm: "150px" },
+                    }}
+                  >
+                    Name
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "150px", sm: "200px" },
+                    }}
+                  >
+                    Description
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "60px", sm: "80px" },
+                    }}
+                  >
+                    Size
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "60px", sm: "80px" },
+                    }}
+                  >
+                    Color
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "60px", sm: "80px" },
+                    }}
+                  >
+                    Quantity
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "100px", sm: "120px" },
+                    }}
+                  >
+                    Item Location
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "80px", sm: "100px" },
+                    }}
+                  >
+                    Category
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "100px", sm: "120px" },
+                    }}
+                  >
+                    Action
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {currentItems.map((item) => {
+                  const category = categories.find(
+                    (c) => c.id === item.categoryId
+                  );
+                  return (
+                    <TableRow
+                      key={item.id}
+                      onClick={() => openModal(item)}
+                      sx={{
+                        cursor: "pointer",
+                        "&:hover": {
+                          backgroundColor: "action.hover",
+                        },
+                      }}
+                    >
+                      <TableCell>
+                        <Box
+                          sx={{
+                            width: { xs: 50, sm: 100 },
+                            height: { xs: 50, sm: 100 },
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <img
+                            src={item.imageUrl || camera}
+                            alt={item.description || "No Image Available"}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              borderRadius: "4px",
+                            }}
+                          />
+                        </Box>
+                      </TableCell>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>{item.description}</TableCell>
+                      <TableCell>{item.size}</TableCell>
+                      <TableCell>{item.color}</TableCell>
+                      <TableCell>{item.quantity}</TableCell>
+                      <TableCell>{item.itemLocation}</TableCell>
+                      <TableCell>
+                        {category
+                          ? category.name
+                          : item.categoryId
+                          ? `Category ${item.categoryId}`
+                          : "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            gap: { xs: 0.5, sm: 1 },
+                            "& .MuiIconButton-root": {
+                              padding: { xs: "4px", sm: "8px" },
+                            },
+                          }}
+                        >
+                          <IconButton
+                            color="primary"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleEdit(item);
+                            }}
+                            size="small"
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            color="primary"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              confirmDelete(item.id);
+                            }}
+                            size="small"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                          <IconButton
+                            color="primary"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              visibilityToggle(item);
+                            }}
+                            size="small"
+                          >
+                            {itemVisibility[item.id] ? (
+                              <VisibilityIcon />
+                            ) : (
+                              <VisibilityOffIcon />
+                            )}
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
-      ) : modeDisplay === "table" ? (
-        handleListView()
       ) : (
-        handleGridView()
+        <div>
+          <Paper
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: 4,
+              padding: 2,
+            }}
+          >
+            {currentItems.map((item) => {
+              const category = categories.find((c) => c.id === item.categoryId);
+              return (
+                <Card
+                  key={item.id}
+                  sx={{
+                    height: 400,
+                    width: 250,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    boxShadow: 3,
+                    borderRadius: 2,
+                    overflow: "hidden",
+                  }}
+                  style={{ opacity: itemVisibility[item.id] ? 1 : 0.5 }}
+                >
+                  <CardMedia
+                    sx={{ height: 200, width: "100%", objectFit: "cover" }}
+                    image={item.imageUrl || camera}
+                    title={item.description}
+                  />
+                  <CardContent
+                    sx={{ textAlign: "center", cursor: "pointer" }}
+                    onClick={() => openModal(item)}
+                  >
+                    <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
+                    <p style={{ margin: 0 }}>{item.description}</p>
+                    <p style={{ margin: 0 }}>ID: {item.id}</p>
+                    <p style={{ margin: 0, color: "gray" }}>
+                      Category:{" "}
+                      {category
+                        ? category.name
+                        : item.categoryId
+                        ? `Category ${item.categoryId}`
+                        : "N/A"}
+                    </p>
+                  </CardContent>
+                  <CardActions>
+                    <Button onClick={() => handleEdit(item)}>Edit</Button>
+                    <Button onClick={() => confirmDelete(item.id)}>
+                      Delete
+                    </Button>
+                    <Button
+                      onClick={() => visibilityToggle(item)}
+                      size="medium"
+                    >
+                      {itemVisibility[item.id] ? "Hide" : "Show"}
+                    </Button>
+                  </CardActions>
+                </Card>
+              );
+            })}
+          </Paper>
+        </div>
       )}
 
       {/* open a modal to edit/create an item */}

@@ -23,6 +23,7 @@ import {
   useTheme,
   useMediaQuery,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
@@ -30,7 +31,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
-import itemService, { Item } from "../../services/itemService";
+import { Item } from "../../services/itemService";
 
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -61,7 +62,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const {
     data: items,
     loading: isLoading,
-    //apiError,
+    apiError,
     get,
   } = useFetch<Item[]>(ApiRole.PUBLIC);
 
@@ -90,20 +91,21 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   }, [categoryFilter, items]);
 
   // Search availability based on dates
-  const searchAvailability = async () => {
+   const searchAvailability = async () => {
     if (startDate && endDate) {
       try {
-        const availableItems = await itemService.searchAvailability(
-          startDate.toISOString(),
-          endDate.toISOString()
+        const response = await get(
+          `items/availability?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
         );
-        setFilteredItems(availableItems);
-        setPage(1);
+        if (response) {
+          setFilteredItems(response);
+          setPage(1);
+        }
       } catch (error) {
         console.error("Error searching availability:", error);
       }
     }
-  };
+  }; 
 
   // Handle search input
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,6 +154,26 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const indexOfLastItem = page * ITEMS_PER_PAGE;
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // Show error state
+  if (apiError) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <Typography color="error">
+          Error loading items. Please try again later.
+        </Typography>
+      </Box>
+    );
+  }
 
   //HANDLE TABLE VIEW
   const handleListView = () => {
