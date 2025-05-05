@@ -12,6 +12,7 @@ import {
   Collapse,
   Typography,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import { JSX, useState, useEffect } from "react";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
@@ -25,45 +26,30 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 import AdminBookings from "./AdminBookings";
 import AdminProducts from "./AdminProducts";
-import categoryService from "../../services/categoryService";
+import useCategories from "../../services/categoryService";
 import { UserManagement } from "../userManagement/UserManagement";
 
 const AdminDashboard = () => {
   const [sideLink, setsideLink] = useState<string | null>(null);
-  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
-    []
-  );
   const [productsOpen, setProductsOpen] = useState(false);
   const [bookingsOpen, setBookingsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  //const[component, setComponent] = useState<JSX.Element | null>(<AdminProducts/>);
   const [component, setComponent] = useState<React.ReactElement | null>(null);
 
-  // Fetch categories when component mounts
+  const categoriesService = useCategories();
+
+  // Initialize the component with admin products
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const categoriesData = await categoryService.getAll();
-        setCategories(categoriesData);
-
-        // Set default component with categories
-        setComponent(
-          <AdminProducts
-            onEdit={(item) => console.log("Edit item", item)}
-            categories={categoriesData}
-          />
-        );
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        // Set default component without categories
-        setComponent(
-          <AdminProducts onEdit={(item) => console.log("Edit item", item)} />
-        );
-      }
-    };
-
-    fetchCategories();
-  }, []);
+    // Set default component with categories when they're loaded
+    if (!categoriesService.loading && categoriesService.categories) {
+      setComponent(
+        <AdminProducts
+          onEdit={(item) => console.log("Edit item", item)}
+          categories={categoriesService.categories}
+        />
+      );
+    }
+  }, [categoriesService.categories, categoriesService.loading]);
 
   const handleSideBar = (content: JSX.Element | string) => {
     if (typeof content === "string") {
@@ -87,6 +73,16 @@ const AdminDashboard = () => {
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
+  };
+
+  // Function to handle Products menu item click
+  const handleProductsMenuClick = () => {
+    handleSideBar(
+      <AdminProducts
+        onEdit={(item) => console.log("Edit item", item)}
+        categories={categoriesService.categories}
+      />
+    );
   };
 
   return (
@@ -167,18 +163,13 @@ const AdminDashboard = () => {
                           slotProps={{
                             primary: { style: { color: "white" } },
                           }}
-                          onClick={() =>
-                            handleSideBar(
-                              <AdminProducts
-                                onEdit={(item) =>
-                                  console.log("Edit item", item)
-                                }
-                                categories={categories}
-                              />
-                            )
-                          }
+                          onClick={handleProductsMenuClick}
                         />
-                        {productsOpen ? <ExpandLess  style={{color:"white"}}/> : <ExpandMore style={{color:"white"}} />}
+                        {productsOpen ? (
+                          <ExpandLess style={{ color: "white" }} />
+                        ) : (
+                          <ExpandMore style={{ color: "white" }} />
+                        )}
                       </>
                     )}
                   </ListItemButton>
@@ -240,7 +231,11 @@ const AdminDashboard = () => {
                           }}
                         />
 
-                        {bookingsOpen ? <ExpandLess style={{color:"white"}}/> : <ExpandMore style={{color:"white"}}/>}
+                        {bookingsOpen ? (
+                          <ExpandLess style={{ color: "white" }} />
+                        ) : (
+                          <ExpandMore style={{ color: "white" }} />
+                        )}
                       </>
                     )}
                   </ListItemButton>
@@ -285,7 +280,7 @@ const AdminDashboard = () => {
                     </List>
                   </ListItem>
                 </Collapse>
-                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }}/>
+                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} />
 
                 <ListItem disablePadding>
                   <ListItemButton>
@@ -317,7 +312,13 @@ const AdminDashboard = () => {
           >
             {/* data here */}
             <Box sx={{ marginTop: "50px", marginRight: "50px" }}>
-              {component || sideLink}
+              {categoriesService.loading ? (
+                <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+                  <CircularProgress />
+                </Box>
+              ) : (
+                component || sideLink
+              )}
             </Box>
           </Box>
         </Box>
