@@ -41,7 +41,22 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 
 import { ApiRole, useFetch } from "../../hooks/useFetch";
-// import { BookingStatus } from "../../types/booking";
+import { BookingStatus } from "../../types/booking";
+
+// Add these interfaces
+interface BookingItem {
+  id: number;
+  itemId: number;
+  quantity: number;
+}
+
+interface Booking {
+  id: number;
+  startDate: string;
+  endDate: string;
+  status: BookingStatus;
+  items: BookingItem[];
+}
 
 interface ItemListProps {
   categories?: { id: number; name: string }[];
@@ -73,16 +88,45 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     data: bookings,
     loading: bookingsLoading,
     get: getBookings,
-  } = useFetch<any[]>(ApiRole.PUBLIC);
+  } = useFetch<Booking[]>(ApiRole.PRIVATE);
 
   // Fetch items and bookings on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await get("items");
-        await getBookings("bookings");
+        console.log("Starting initial data fetch...");
+        const itemsData = await get("items");
+        console.log("Initial items response:", itemsData);
+
+        if (!itemsData) {
+          console.error("Items data is null after fetch");
+          setSnackbar({
+            open: true,
+            message: "Failed to load items. Please refresh the page.",
+            severity: "error",
+          });
+          return;
+        }
+
+        const bookingsData = await getBookings("bookings/my-bookings");
+        console.log("Initial bookings response:", bookingsData);
+
+        if (!bookingsData) {
+          console.error("Bookings data is null after fetch");
+          setSnackbar({
+            open: true,
+            message: "Failed to load bookings. Please refresh the page.",
+            severity: "error",
+          });
+          return;
+        }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error in initial data fetch:", error);
+        setSnackbar({
+          open: true,
+          message: "Error loading initial data. Please refresh the page.",
+          severity: "error",
+        });
       }
     };
     fetchData();
@@ -90,7 +134,9 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   // Update filtered items when items change
   useEffect(() => {
-    if (items) {
+    console.log("Items updated:", items);
+    if (items && items.length > 0) {
+      console.log("Setting filtered items:", items);
       setFilteredItems([...items]);
     }
   }, [items]);
@@ -98,6 +144,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   // SEARCH AVAILABILITY BASED ON DATES
   const searchAvailability = async () => {
     try {
+      // First validate dates
       if (!startDate || !endDate) {
         setSnackbar({
           open: true,
@@ -107,58 +154,181 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         return;
       }
 
-      if (!items || !bookings) {
+      if (startDate.isAfter(endDate)) {
         setSnackbar({
           open: true,
-          message: "Loading data, please try again in a moment",
-          severity: "info",
+          message: "Start date must be before end date",
+          severity: "error",
         });
         return;
       }
 
-      // Step 1: Find relevant bookings (pending or approved) overlapping the selected dates
-      const activeBookings = bookings.filter(
-        (booking) =>
-          (booking.status === "pending" || booking.status === "approved") &&
-          dayjs(booking.startDate).isBefore(endDate) &&
-          dayjs(booking.endDate).isAfter(startDate)
-      );
+      // Check if we have the necessary data
+      if (!items || !bookings) {
+        console.log("Data missing, attempting to fetch...");
+        try {
+          const itemsData = await get("items");
+          console.log("Items fetch response:", itemsData);
 
-      console.log("Active bookings:", activeBookings); // Debug log
+          const bookingsData = await getBookings("bookings/my-bookings");
+          console.log("Bookings fetch response:", bookingsData);
 
-      // Step 2: Get all booking items linked to these bookings
-      const activeBookingItems = activeBookings.flatMap((booking) =>
-        booking.items.map((item: any) => ({
-          item_id: item.id,
-          quantity: item.quantity,
+          // If still no data after fetch, show error
+          if (!itemsData || !bookingsData) {
+            console.error("Data still missing after fetch attempt");
+            setSnackbar({
+              open: true,
+              message:
+                "Unable to load data. Please refresh the page and try again.",
+              severity: "error",
+            });
+            return;
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setSnackbar({
+            open: true,
+            message:
+              "Error loading data. Please refresh the page and try again.",
+            severity: "error",
+          });
+          return;
+        }
+      }
+
+      // Ensure we have the data before proceeding
+      if (!items || !bookings) {
+        console.error("Data not available for processing");
+        setSnackbar({
+          open: true,
+          message: "Data not available. Please refresh the page and try again.",
+          severity: "error",
+        });
+        return;
+      }
+
+      console.log("Processing availability with:", {
+        itemsCount: items.length,
+        bookingsCount: bookings.length,
+        startDate: startDate.format(),
+        endDate: endDate.format(),
+      });
+
+      // Log all bookings with their details
+      console.log(
+        "All bookings:",
+        bookings.map((b) => ({
+          id: b.id,
+          status: b.status,
+          startDate: b.startDate,
+          endDate: b.endDate,
+          items: b.items.map((item) => ({
+            id: item.id,
+            itemId: item.itemId,
+            quantity: item.quantity,
+            item: item, // Log the entire item object
+          })),
         }))
       );
 
-      console.log("Active booking items:", activeBookingItems); // Debug log
+      // Process the availability
+      const activeBookings = bookings.filter((booking) => {
+        const isActive =
+          (booking.status === BookingStatus.PENDING_APPROVAL ||
+            booking.status === BookingStatus.IN_PROGRESS ||
+            booking.status === BookingStatus.RESERVED ||
+            booking.status === BookingStatus.IN_QUEUE) &&
+          dayjs(booking.startDate).isBefore(endDate) &&
+          dayjs(booking.endDate).isAfter(startDate);
 
-      // Step 3: Aggregate booked quantities per item ID
+        console.log("Booking check:", {
+          id: booking.id,
+          status: booking.status,
+          startDate: booking.startDate,
+          endDate: booking.endDate,
+          isActive,
+          items: booking.items.map((item) => ({
+            id: item.id,
+            itemId: item.itemId,
+            quantity: item.quantity,
+            item: item, // Log the entire item object
+          })),
+        });
+
+        return isActive;
+      });
+
+      console.log("Active bookings:", activeBookings);
+
+      const activeBookingItems = activeBookings.flatMap((booking) =>
+        booking.items.map((item) => {
+          console.log("Processing booking item:", {
+            id: item.id,
+            itemId: item.itemId,
+            quantity: item.quantity,
+            item: item, // Log the entire item object
+          });
+          return {
+            item_id: item.itemId || item.id,
+            quantity: item.quantity,
+          };
+        })
+      );
+
+      console.log("Active booking items:", activeBookingItems);
+
       const bookedQuantities: Record<number, number> = {};
       activeBookingItems.forEach((bi) => {
+        console.log("Adding to booked quantities:", {
+          item_id: bi.item_id,
+          quantity: bi.quantity,
+          current_total: bookedQuantities[bi.item_id] || 0,
+        });
         if (!bookedQuantities[bi.item_id]) {
           bookedQuantities[bi.item_id] = 0;
         }
         bookedQuantities[bi.item_id] += bi.quantity;
       });
 
-      console.log("Booked quantities:", bookedQuantities); // Debug log
+      console.log("Booked quantities:", bookedQuantities);
 
-      // Step 4: Calculate remaining quantity and filter out fully booked items
+      // Log all items and their booked status
+      console.log(
+        "All items:",
+        items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          isBooked: bookedQuantities[item.id] > 0,
+          bookedQuantity: bookedQuantities[item.id] || 0,
+        }))
+      );
+
+      // Show only non-reserved items and partially reserved items with remaining quantity
       const availableItems: Item[] = items
         .map((item) => {
           const booked = bookedQuantities[item.id] || 0;
-          const availableQty = item.quantity - booked;
-          return availableQty > 0 ? { ...item, quantity: availableQty } : null;
+          const remainingQuantity = item.quantity - booked;
+          console.log(
+            `Item ${item.id} (${item.name}): total=${item.quantity}, booked=${booked}, remaining=${remainingQuantity}`
+          );
+          return {
+            ...item,
+            quantity: remainingQuantity > 0 ? remainingQuantity : 0, // Ensure we don't show negative quantities
+          };
         })
-        .filter((item): item is Item => item !== null);
+        .filter((item) => {
+          const booked = bookedQuantities[item.id] || 0;
+          const remainingQuantity = item.quantity - booked;
+          const shouldShow = remainingQuantity > 0;
+          console.log(
+            `Filtering item ${item.id} (${item.name}): total=${item.quantity}, booked=${booked}, remaining=${remainingQuantity}, showing=${shouldShow}`
+          );
+          return shouldShow;
+        });
 
-      console.log("Available items:", availableItems); // Debug log
+      console.log("Available items:", availableItems);
 
-      // Step 5: Update the UI
       setFilteredItems(availableItems);
       setPage(1);
 
@@ -167,6 +337,12 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           open: true,
           message: "No items available for the selected dates",
           severity: "info",
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: `Found ${availableItems.length} available items for your selected dates`,
+          severity: "success",
         });
       }
     } catch (error) {
@@ -254,8 +430,8 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Show loading state
-  if (isLoading) {
+  // Show loading state only when items are loading
+  if (isLoading || bookingsLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
         <CircularProgress />
@@ -268,8 +444,17 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
         <Typography color="error">
-          Error loading items. Please try again later.
+          Error loading items: {apiError}. Please try again later.
         </Typography>
+      </Box>
+    );
+  }
+
+  // If no items are available, show a message
+  if (!items || items.length === 0) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <Typography>No items available at the moment.</Typography>
       </Box>
     );
   }
@@ -764,9 +949,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               variant="contained"
               color="primary"
             >
-              {isLoading || bookingsLoading
-                ? "Loading..."
-                : "Search Availability"}
+              {isLoading || bookingsLoading ? "Loading..." : "Search"}
             </Button>
           </Box>
         </LocalizationProvider>

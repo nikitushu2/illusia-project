@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 
 export enum ApiErrorType {
@@ -21,11 +20,11 @@ interface FetchState<T> {
   ok: boolean;
   apiError: ApiErrorType | null;
   loading: boolean;
-  get: (url: string) => Promise<void>;
-  post: (url: string, body: any) => Promise<void>;
-  put: (url: string, body: any) => Promise<void>;
-  patch: (url: string, body: any) => Promise<void>;
-  remove: (url: string, body: any) => Promise<void>;
+  get: (url: string) => Promise<T | null>;
+  post: (url: string, body: any) => Promise<T | null>;
+  put: (url: string, body: any) => Promise<T | null>;
+  patch: (url: string, body: any) => Promise<T | null>;
+  remove: (url: string, body: any) => Promise<T | null>;
 }
 
 const BACKEND_BASE_PATH = import.meta.env.VITE_BACKEND_ORIGIN + "/api";
@@ -36,10 +35,11 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
   const [loading, setLoading] = useState(false);
   const [ok, setOk] = useState(false);
 
-  const fetchData = async (method: string, url: string, body: any) => {
+  const fetchData = async (method: string, url: string, body: any): Promise<T | null> => {
     setLoading(true);
     setApiError(null);
     try {
+      console.log(`Fetching ${method} ${BACKEND_BASE_PATH}${role}/${url}`);
       const options: RequestInit = {
         method: method,
         headers: { "Content-Type": "application/json" },
@@ -47,10 +47,14 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
         credentials: 'include',
       };
       const response = await fetch(`${BACKEND_BASE_PATH}${role}/${url}`, options);
+      console.log(`Response status: ${response.status}`);
+      
       if (response.ok) {
         setOk(true);
-        const data = await response.json() as T;
-        setData(data);
+        const responseData = await response.json() as T;
+        console.log(`Response data:`, responseData);
+        setData(responseData);
+        return responseData;
       } else {
         let errorMessage: ApiErrorType;
         switch (response.status) {
@@ -72,11 +76,14 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
           default:
             errorMessage = ApiErrorType.SOMETHING_WENT_WRONG;
         }
+        console.error(`API Error: ${errorMessage} for ${url}`);
         setApiError(errorMessage);
+        return null;
       }
     } catch (error) {
-      setApiError(ApiErrorType.SOMETHING_WENT_WRONG);
       console.error("Fetch error:", error);
+      setApiError(ApiErrorType.SOMETHING_WENT_WRONG);
+      return null;
     } finally {
       setLoading(false);
     }
@@ -89,5 +96,4 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
   const remove = useCallback((url: string, body: any) => fetchData("DELETE", url, body), []);
 
   return { data, ok, apiError, loading, get, post, put, patch, remove };
-
 }
