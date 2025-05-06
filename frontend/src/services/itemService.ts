@@ -1,11 +1,5 @@
-import axios from 'axios';
-import { API_URL } from '../config';
-
-// Create an authenticated axios instance that includes credentials
-const authAxios = axios.create({
-  baseURL: API_URL,
-  withCredentials: true
-});
+import { ApiRole, useFetch } from '../hooks/useFetch';
+import { useEffect, useState, useCallback } from 'react';
 
 export interface Item {
   id: number;
@@ -47,39 +41,84 @@ export interface UpdateItemData {
   quantity?: number;
   categoryId?: number;
 
-  size: string;
-  color: string;
-  itemLocation: string;
-  storageLocation: string;
+  size?: string;
+  color?: string;
+  itemLocation?: string;
+  storageLocation?: string;
 }
 
-const itemService = {
-  getAll: async (): Promise<Item[]> => {
-    const response = await axios.get(`${API_URL}/items`);
-    return response.data;
-  },
+const useItems = () => {
+  const { data, loading, apiError, get } = useFetch<Item[]>(ApiRole.PUBLIC);
+  const { data: singleItem, get: getSingle } = useFetch<Item>(ApiRole.PUBLIC);
+  const { post } = useFetch<Item>(ApiRole.PRIVATE);
+  const { put } = useFetch<Item>(ApiRole.PRIVATE);
+  const { remove } = useFetch<void>(ApiRole.ADMIN);
+  
+  // Local state to manage items
+  const [items, setItems] = useState<Item[]>([]);
+  const [refreshFlag, setRefreshFlag] = useState(0);
 
-  getById: async (id: number): Promise<Item> => {
-    const response = await axios.get(`${API_URL}/items/${id}`);
-    return response.data;
-  },
+  // Function to force refresh
+  const refreshItems = useCallback(() => {
+    setRefreshFlag(prev => prev + 1);
+  }, []);
 
-  create: async (data: CreateItemData): Promise<Item> => {
-    // Use authenticated axios for protected routes
-    const response = await authAxios.post(`/private/items`, data);
-    return response.data;
-  },
+  // Load items on mount or when refreshFlag changes
+  useEffect(() => {
+    const loadItems = async () => {
+      await get('items');
+    };
+    loadItems();
+  }, [get, refreshFlag]);
 
-  update: async (id: number, data: UpdateItemData): Promise<Item> => {
-    // Use authenticated axios for protected routes
-    const response = await authAxios.put(`/private/admin/items/${id}`, data);
-    return response.data;
-  },
+  // Update local items state whenever data changes
+  useEffect(() => {
+    if (data) {
+      setItems(data);
+    }
+  }, [data]);
 
-  delete: async (id: number): Promise<void> => {
-    // Use authenticated axios for protected routes
-    await authAxios.delete(`/private/admin/items/${id}`);
-  }
+  const getAll = async (): Promise<Item[]> => {
+    await get('items');
+    return items || [];
+  };
+
+  const getById = async (id: number): Promise<Item | null> => {
+    await getSingle(`items/${id}`);
+    return singleItem || null;
+  };
+
+  const create = async (data: CreateItemData): Promise<Item | null> => {
+    await post('items', data);
+    // Refresh items list after creating
+    refreshItems();
+    return singleItem;
+  };
+
+  const update = async (id: number, data: UpdateItemData): Promise<Item | null> => {
+    await put(`items/${id}`, data);
+    // Refresh items list after updating
+    refreshItems();
+    return singleItem;
+  };
+
+  const deleteItem = async (id: number): Promise<void> => {
+    await remove(`items/${id}`, null);
+    // Refresh items list after deleting
+    refreshItems();
+  };
+
+  return {
+    getAll,
+    getById,
+    create,
+    update,
+    delete: deleteItem,
+    items: items || [],
+    loading,
+    error: apiError,
+    refresh: refreshItems
+  };
 };
 
-export default itemService; 
+export default useItems; 
