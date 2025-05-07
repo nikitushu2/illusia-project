@@ -1,5 +1,6 @@
-import mailchimp from "../config/mailchimp";
+import transporter from "../config/nodemailer";
 import { BookingStatus } from "../types/booking";
+require("dotenv").config();
 
 interface EmailOptions {
   to: string;
@@ -65,16 +66,14 @@ const generateStatusChangeEmailContent = (
 
 export const sendEmail = async (options: EmailOptions): Promise<void> => {
   try {
-    const response = await mailchimp.messages.send({
-      message: {
-        from_email: "test@mandrillapp.com",
-        subject: options.subject,
-        html: options.html,
-        to: [{ email: options.to }],
-      },
+    const response = await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
     });
 
-    console.log("Email sent successfully:", response);
+    console.log("Email sent:", response.messageId);
   } catch (error) {
     console.error("Error sending email:", error);
     throw error;
