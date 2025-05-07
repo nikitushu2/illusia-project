@@ -41,22 +41,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 
 import { ApiRole, useFetch } from "../../hooks/useFetch";
-import { BookingStatus } from "../../types/booking";
-
-// Add these interfaces
-interface BookingItem {
-  id: number;
-  itemId: number;
-  quantity: number;
-}
-
-interface Booking {
-  id: number;
-  startDate: string;
-  endDate: string;
-  status: BookingStatus;
-  items: BookingItem[];
-}
+import { BookingStatus, BookingWithDetails } from "../../types/booking";
 
 interface ItemListProps {
   categories?: { id: number; name: string }[];
@@ -88,7 +73,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     data: bookings,
     loading: bookingsLoading,
     get: getBookings,
-  } = useFetch<Booking[]>(ApiRole.PRIVATE);
+  } = useFetch<BookingWithDetails[]>(ApiRole.PRIVATE);
 
   // Fetch items and bookings on component mount
   useEffect(() => {
@@ -226,7 +211,6 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
             id: item.id,
             itemId: item.itemId,
             quantity: item.quantity,
-            item: item, // Log the entire item object
           })),
         }))
       );
@@ -251,7 +235,6 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
             id: item.id,
             itemId: item.itemId,
             quantity: item.quantity,
-            item: item, // Log the entire item object
           })),
         });
 
@@ -266,10 +249,9 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
             id: item.id,
             itemId: item.itemId,
             quantity: item.quantity,
-            item: item, // Log the entire item object
           });
           return {
-            item_id: item.itemId || item.id,
+            item_id: item.itemId,
             quantity: item.quantity,
           };
         })
@@ -314,7 +296,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           );
           return {
             ...item,
-            quantity: remainingQuantity > 0 ? remainingQuantity : 0, // Ensure we don't show negative quantities
+            quantity: remainingQuantity > 0 ? remainingQuantity : 0, // don't show negative quantities
           };
         })
         .filter((item) => {
