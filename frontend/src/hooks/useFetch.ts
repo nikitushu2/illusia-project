@@ -20,11 +20,11 @@ interface FetchState<T> {
   ok: boolean;
   apiError: ApiErrorType | null;
   loading: boolean;
-  get: (url: string) => Promise<T | null>;
-  post: (url: string, body: any) => Promise<T | null>;
-  put: (url: string, body: any) => Promise<T | null>;
-  patch: (url: string, body: any) => Promise<T | null>;
-  remove: (url: string, body: any) => Promise<T | null>;
+  get: (url: string) => Promise<void>;
+  post: (url: string, body: any) => Promise<void>;
+  put: (url: string, body: any) => Promise<void>;
+  patch: (url: string, body: any) => Promise<void>;
+  remove: (url: string, body: any) => Promise<void>;
 }
 
 const BACKEND_BASE_PATH = import.meta.env.VITE_BACKEND_ORIGIN + "/api";
