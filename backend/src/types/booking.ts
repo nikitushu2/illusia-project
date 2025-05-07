@@ -22,6 +22,7 @@ export interface BookingWithDetails {
       id: number;
       itemId: number;
       quantity: number;
+      item?: { id: number; name: string; price: number; imageUrl?: string };
     }>;
 }
 

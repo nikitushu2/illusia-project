@@ -19,6 +19,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useBookingCart, CartItem } from "../../context/BookingCartContext";
 import { useNavigate } from "react-router-dom";
 import bookingService from "../../services/bookingService";
+import { BookingStatus } from "../../types/booking";
 
 interface BookingCartDrawerProps {
   open: boolean;
@@ -67,7 +68,8 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
       const bookingData = {
         startDate: today.toISOString().split("T")[0], // Format as YYYY-MM-DD
         endDate: twoWeeksLater.toISOString().split("T")[0], // Format as YYYY-MM-DD
-        status: "PENDING",
+        status: BookingStatus.PENDING_APPROVAL, // Use the enum value
+
         items: items.map((item) => ({
           itemId: item.id,
           quantity: item.quantity,

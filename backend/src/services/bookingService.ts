@@ -2,7 +2,7 @@ import Booking from "../models/booking";
 import User from "../models/user";
 import BookingItem from "../models/bookingItem";
 import Item from "../models/item";
-import { InferCreationAttributes } from "sequelize";
+import { InferCreationAttributes, Op } from "sequelize";
 import { sequelize } from "../util/db";
 import { BookingStatus, BookingWithDetails, CreateBookingData, UpdateBookingData } from "../types/booking";
 
@@ -11,7 +11,7 @@ export type BookingCreationAttributes = Omit<
   "id" | "createdAt"
 >;
 
-
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return */
 export function mapBookingToDetails(booking: any): BookingWithDetails {
   const plain = booking.get ? booking.get({ plain: true }) : booking;
 
@@ -30,6 +30,14 @@ export function mapBookingToDetails(booking: any): BookingWithDetails {
       id: bi.id,
       itemId: bi.itemId,
       quantity: bi.quantity,
+      item: bi.item
+        ? {
+            id: bi.item.id,
+            name: bi.item.name,
+            price: bi.item.price,
+            imageUrl: bi.item.imageUrl,
+          }
+        : undefined,
     })),
   };
 }
@@ -112,7 +120,8 @@ export const updateStatus = async (id: number, status: BookingStatus): Promise<B
 
 export const remove = async (id: number): Promise<void> => {
   try {
-    const deletedCount = await BookingItem.destroy({ where: { id } });
+    // Delete the booking; booking items will cascade via DB foreign key
+    const deletedCount = await Booking.destroy({ where: { id } });
     if (deletedCount === 0) {
       throw new Error("Booking not found");
     }
@@ -160,8 +169,6 @@ export const createCompleteBooking = async (data: CreateBookingData): Promise<Bo
   }
 };
 
-
-
 export const updateCompleteBooking = async (exixtingBooking: UpdateBookingData) => {
   const transaction = await sequelize.transaction();
 
@@ -197,6 +204,25 @@ export const updateCompleteBooking = async (exixtingBooking: UpdateBookingData) 
             { transaction }
           );
         }
+      }
+      // Delete removed items not present in the update payload
+      const providedIds = exixtingBooking.items
+        .filter((item) => item.id != null)
+        .map((item) => item.id as number);
+      if (providedIds.length > 0) {
+        await BookingItem.destroy({
+          where: {
+            bookingId: exixtingBooking.id,
+            id: { [Op.notIn]: providedIds },
+          },
+          transaction,
+        });
+      } else {
+        // No items provided: delete all items for this booking
+        await BookingItem.destroy({
+          where: { bookingId: exixtingBooking.id },
+          transaction,
+        });
       }
     }
 

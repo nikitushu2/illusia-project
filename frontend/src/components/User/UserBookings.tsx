@@ -18,15 +18,23 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  TextField,
+  IconButton,
 } from "@mui/material";
-import bookingService, { Booking } from "../../services/bookingService";
+import bookingService, {
+  Booking,
+  BookingItem,
+} from "../../services/bookingService";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const UserBookings: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editItems, setEditItems] = useState<BookingItem[]>([]);
 
   // Fetch real bookings from API
   useEffect(() => {
@@ -49,34 +57,38 @@ const UserBookings: React.FC = () => {
     fetchBookings();
   }, []);
 
-  const handleCancelBooking = (booking: Booking) => {
+  const handleDeleteBooking = (booking: Booking) => {
     setSelectedBooking(booking);
-    setCancelDialogOpen(true);
+    setDeleteDialogOpen(true);
   };
 
-  const confirmCancelBooking = async () => {
+  const confirmDeleteBooking = async () => {
     if (!selectedBooking) return;
-
     try {
       setLoading(true);
-      // Use the real cancel endpoint
-      await bookingService.cancel(selectedBooking.id);
-
-      // Update local state
-      setBookings((prevBookings) =>
-        prevBookings.map((booking) =>
-          booking.id === selectedBooking.id
-            ? { ...booking, status: "CANCELLED" }
-            : booking
-        )
-      );
-      setCancelDialogOpen(false);
+      await bookingService.delete(selectedBooking.id);
+      setBookings((prev) => prev.filter((b) => b.id !== selectedBooking.id));
+      setDeleteDialogOpen(false);
       setLoading(false);
     } catch (err) {
-      console.error("Error cancelling booking:", err);
-      setError("Failed to cancel booking. Please try again.");
+      console.error("Error deleting booking:", err);
+      setError("Failed to delete booking. Please try again.");
       setLoading(false);
     }
+  };
+
+  const handleEditBooking = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setEditItems(
+      booking.items?.map((i) => ({
+        id: i.id,
+        bookingId: booking.id,
+        itemId: i.itemId,
+        quantity: i.quantity,
+        item: i.item,
+      })) || []
+    );
+    setEditDialogOpen(true);
   };
 
   const getStatusColor = (status: string) => {
@@ -140,7 +152,10 @@ const UserBookings: React.FC = () => {
                 Status
               </TableCell>
               <TableCell sx={{ color: "white", fontWeight: "bold" }}>
-                Items
+                Item Name
+              </TableCell>
+              <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                Quantity
               </TableCell>
               <TableCell sx={{ color: "white", fontWeight: "bold" }}>
                 Actions
@@ -162,30 +177,45 @@ const UserBookings: React.FC = () => {
                   />
                 </TableCell>
                 <TableCell>
-                  {booking.items &&
-                    booking.items.map((item) => (
-                      <Box
-                        key={item.id}
-                        sx={{ display: "flex", alignItems: "center", mb: 1 }}
-                      >
-                        <Typography variant="body2">
-                          {item.quantity} x{" "}
-                          {item.item?.name || `Item #${item.itemId}`}
-                        </Typography>
-                      </Box>
-                    ))}
+                  {booking.items?.map((item) => (
+                    <Box
+                      key={item.id}
+                      sx={{ display: "flex", alignItems: "center", mb: 1 }}
+                    >
+                      <Typography variant="body2">
+                        {item.item?.name || "Unknown Item"}
+                      </Typography>
+                    </Box>
+                  ))}
                 </TableCell>
                 <TableCell>
-                  {booking.status === "PENDING" && (
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="small"
-                      onClick={() => handleCancelBooking(booking)}
+                  {booking.items?.map((item) => (
+                    <Box
+                      key={item.id}
+                      sx={{ display: "flex", alignItems: "center", mb: 1 }}
                     >
-                      Cancel
-                    </Button>
-                  )}
+                      <Typography variant="body2">{item.quantity}</Typography>
+                    </Box>
+                  ))}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    onClick={() => handleEditBooking(booking)}
+                    sx={{ mr: 1 }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    size="small"
+                    onClick={() => handleDeleteBooking(booking)}
+                  >
+                    Delete
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -193,24 +223,95 @@ const UserBookings: React.FC = () => {
         </Table>
       </TableContainer>
 
-      {/* Cancel Confirmation Dialog */}
+      {/* Delete Confirmation Dialog */}
       <Dialog
-        open={cancelDialogOpen}
-        onClose={() => setCancelDialogOpen(false)}
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
       >
-        <DialogTitle>Cancel Booking</DialogTitle>
+        <DialogTitle>Delete Booking</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to cancel this booking? This action cannot be
+            Are you sure you want to delete this booking? This action cannot be
             undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCancelDialogOpen(false)}>
-            No, Keep It
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={confirmDeleteBooking} color="error" autoFocus>
+            Delete
           </Button>
-          <Button onClick={confirmCancelBooking} color="error" autoFocus>
-            Yes, Cancel Booking
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Booking Dialog */}
+      <Dialog
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Edit Booking {selectedBooking?.id}</DialogTitle>
+        <DialogContent>
+          {editItems.map((item, idx) => (
+            <Box
+              key={item.id || item.itemId}
+              sx={{ display: "flex", alignItems: "center", mt: 2 }}
+            >
+              <Typography sx={{ flexGrow: 1 }}>
+                {selectedBooking?.items?.find((i) => i.id === item.id)?.item
+                  ?.name || `Item #${item.itemId}`}
+              </Typography>
+              <TextField
+                label="Quantity"
+                type="number"
+                size="small"
+                value={item.quantity}
+                onChange={(e) => {
+                  const q = parseInt(e.target.value) || 0;
+                  setEditItems((prev) => {
+                    const copy = [...prev];
+                    copy[idx] = { ...item, quantity: q };
+                    return copy;
+                  });
+                }}
+                sx={{ width: 80, mr: 1 }}
+              />
+              <IconButton
+                color="error"
+                onClick={() =>
+                  setEditItems((prev) => prev.filter((_, i) => i !== idx))
+                }
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+          <Button
+            variant="contained"
+            onClick={async () => {
+              if (!selectedBooking) return;
+              try {
+                setLoading(true);
+                const updated = await bookingService.update(
+                  selectedBooking.id,
+                  { items: editItems }
+                );
+                setBookings((prev) =>
+                  prev.map((b) => (b.id === updated.id ? updated : b))
+                );
+                setEditDialogOpen(false);
+              } catch (err) {
+                console.error("Error updating booking:", err);
+                setError("Failed to update booking. Please try again.");
+              } finally {
+                setLoading(false);
+              }
+            }}
+          >
+            Save
           </Button>
         </DialogActions>
       </Dialog>
