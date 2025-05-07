@@ -35,11 +35,10 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
   const [loading, setLoading] = useState(false);
   const [ok, setOk] = useState(false);
 
-  const fetchData = async (method: string, url: string, body: any): Promise<T | null> => {
+  const fetchData = async (method: string, url: string, body: any) => {
     setLoading(true);
     setApiError(null);
     try {
-      console.log(`Fetching ${method} ${BACKEND_BASE_PATH}${role}/${url}`);
       const options: RequestInit = {
         method: method,
         headers: { "Content-Type": "application/json" },
@@ -47,14 +46,11 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
         credentials: 'include',
       };
       const response = await fetch(`${BACKEND_BASE_PATH}${role}/${url}`, options);
-      console.log(`Response status: ${response.status}`);
       
       if (response.ok) {
         setOk(true);
-        const responseData = await response.json() as T;
-        console.log(`Response data:`, responseData);
-        setData(responseData);
-        return responseData;
+        const data = await response.json() as T;
+        setData(data);
       } else {
         let errorMessage: ApiErrorType;
         switch (response.status) {
@@ -76,14 +72,11 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
           default:
             errorMessage = ApiErrorType.SOMETHING_WENT_WRONG;
         }
-        console.error(`API Error: ${errorMessage} for ${url}`);
         setApiError(errorMessage);
-        return null;
       }
     } catch (error) {
-      console.error("Fetch error:", error);
       setApiError(ApiErrorType.SOMETHING_WENT_WRONG);
-      return null;
+      console.error("Fetch error:", error);
     } finally {
       setLoading(false);
     }
