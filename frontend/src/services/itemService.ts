@@ -49,14 +49,14 @@ export interface UpdateItemData {
 }
 
 const useItems = () => {
-  const { data, loading, apiError, get } = useFetch<Item[]>(ApiRole.PUBLIC);
+  const { data: items,loading, apiError, get } = useFetch<Item[]>(ApiRole.PUBLIC);
   const { data: singleItem, get: getSingle } = useFetch<Item>(ApiRole.PUBLIC);
   const { post } = useFetch<Item>(ApiRole.PRIVATE);
   const { put } = useFetch<Item>(ApiRole.PRIVATE);
   const { remove } = useFetch<void>(ApiRole.ADMIN);
   
   // Local state to manage items
-  const [items, setItems] = useState<Item[]>([]);
+
   const [refreshFlag, setRefreshFlag] = useState(0);
 
   // Function to force refresh
@@ -72,12 +72,7 @@ const useItems = () => {
     loadItems();
   }, [get, refreshFlag]);
 
-  // Update local items state whenever data changes
-  useEffect(() => {
-    if (data) {
-      setItems(data);
-    }
-  }, [data]);
+  
 
   const getAll = async (): Promise<Item[]> => {
     await get('items');

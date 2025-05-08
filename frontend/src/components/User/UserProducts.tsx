@@ -65,7 +65,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   const {
     data: items,
-    loading: isLoading,
+    loading: itemsLoading,
     apiError,
     get,
   } = useFetch<Item[]>(ApiRole.PUBLIC);
@@ -295,7 +295,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
   // Show loading state only when items are loading
-  if (isLoading || bookingsLoading) {
+  if (itemsLoading || bookingsLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
         <CircularProgress />
@@ -789,13 +789,13 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               <Button
                 onClick={searchAvailability}
                 disabled={
-                  !startDate || !endDate || isLoading || bookingsLoading
+                  !startDate || !endDate || itemsLoading || bookingsLoading
                 }
                 variant="contained"
                 color="primary"
                 sx={{ width: { xs: "100%", sm: "auto" } }}
               >
-                {isLoading || bookingsLoading ? "Loading..." : "Search"}
+                {itemsLoading || bookingsLoading ? "Loading..." : "Search"}
               </Button>
               {(startDate || endDate) && (
                 <Button
