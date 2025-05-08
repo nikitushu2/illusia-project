@@ -46,7 +46,6 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
         credentials: 'include',
       };
       const response = await fetch(`${BACKEND_BASE_PATH}${role}/${url}`, options);
-      
       if (response.ok) {
         setOk(true);
         const data = await response.json() as T;
