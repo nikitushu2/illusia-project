@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { API_URL } from '../config';
+import { ApiRole, useFetch } from '../hooks/useFetch';
+import { useEffect } from 'react';
 
 export interface Category {
   id: number;
@@ -14,16 +14,34 @@ export interface Category {
   // storageLocation: string;
 }
 
-const categoryService = {
-  getAll: async (): Promise<Category[]> => {
-    const response = await axios.get(`${API_URL}/categories`);
-    return response.data;
-  },
+const useCategories = () => {
+  const { data, loading, apiError, get } = useFetch<Category[]>(ApiRole.PUBLIC);
+  const { data: singleCategory, get: getSingle } = useFetch<Category>(ApiRole.PUBLIC);
 
-  getById: async (id: number): Promise<Category> => {
-    const response = await axios.get(`${API_URL}/categories/${id}`);
-    return response.data;
-  }
+  // Load categories on mount
+  useEffect(() => {
+    getAll();
+  }, []);
+
+  const getAll = async (): Promise<Category[]> => {
+    if (!loading && !data) {
+      await get('categories');
+    }
+    return data || [];
+  };
+
+  const getById = async (id: number): Promise<Category | null> => {
+    await getSingle(`categories/${id}`);
+    return singleCategory || null;
+  };
+
+  return {
+    getAll,
+    getById,
+    categories: data || [],
+    loading,
+    error: apiError
+  };
 };
 
-export default categoryService; 
+export default useCategories; 

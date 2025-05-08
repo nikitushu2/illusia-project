@@ -29,19 +29,19 @@ import {
   TextField,
   Pagination,
   Stack,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
-//import { useState } from "react";
 import React, { useEffect, useState } from "react";
-// import box from "../images/box.png";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import itemService, {
+import useItems, {
   UpdateItemData,
   CreateItemData,
+  Item,
 } from "../../services/itemService";
-import { Item } from "../../services/itemService";
 import camera from "../../images/camera.png";
 import ItemForm from "../Items/ItemForm";
 import { useAuth } from "../../context/AuthContext";
@@ -49,31 +49,40 @@ import UserSingleProduct from "../User/UserSingleProduct";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
-//import categoryService, { Category } from "../../services/categoryService";
-//import ItemList from "../Items/ItemList";
 interface ItemListProps {
   onEdit?: (item: Item) => void;
   categories?: { id: number; name: string }[];
 }
 
 const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const {
+    items,
+    loading,
+    error,
+    create,
+    update,
+    delete: deleteItem,
+    refresh,
+  } = useItems();
+
+  // Add debug logging
+  console.log("isMobile:", isMobile);
+  console.log("window.innerWidth:", window.innerWidth);
+
   const { isLoggedIn, isAdmin } = useAuth();
   const [modeDisplay, setModeDisplay] = React.useState("table");
-
-  const [items, setItems] = React.useState<Item[]>([]);
-  const [loading, setLoading] = React.useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | undefined>(undefined);
 
-  //const [refreshKey, setRefreshKey] = useState(0); // Used to force ItemList to refresh
-
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
-  const [searchInput, setSearchInput] = useState<string>(""); // for search bar
+  const [searchInput, setSearchInput] = useState<string>("");
 
   const [itemVisibility, setItemVisibility] = useState<{
     [itemId: number]: boolean;
-  }>({}); // State to track visibility per item
+  }>({});
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
@@ -94,6 +103,42 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     message: "",
     severity: "success",
   });
+
+  // Initialize the visibility state when items are loaded
+  useEffect(() => {
+    if (items && items.length > 0) {
+      const initialVisibility: { [itemId: number]: boolean } = {};
+      items.forEach((item) => {
+        initialVisibility[item.id] = true;
+      });
+      setItemVisibility(initialVisibility);
+    }
+  }, [items]);
+
+  // Filter items by category
+  useEffect(() => {
+    if (categoryFilter === "all") {
+      setFilteredItems(items);
+    } else {
+      setFilteredItems(
+        items.filter((item) => item.categoryId === parseInt(categoryFilter))
+      );
+    }
+    // Reset pagination when filter changes
+    setPage(1);
+  }, [categoryFilter, items]);
+
+  // Handle API errors
+  useEffect(() => {
+    if (error) {
+      console.error("Error fetching items:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to fetch items",
+        severity: "error",
+      });
+    }
+  }, [error]);
 
   const toggleDisplayMode = () => {
     setModeDisplay((prevMode) => (prevMode === "table" ? "grid" : "table"));
@@ -134,13 +179,13 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     if (itemToDelete === null) return;
 
     try {
-      await itemService.delete(itemToDelete);
+      await deleteItem(itemToDelete);
       setSnackbar({
         open: true,
         message: "Item deleted successfully",
         severity: "success",
       });
-      fetchItems();
+      refresh();
     } catch (error) {
       console.error("Error deleting item:", error);
       setSnackbar({
@@ -218,11 +263,9 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         severity: "success",
       });
 
-      console.log("Submitting form with values:", values);
       if (selectedItem) {
         // Update existing item
-        console.log("Updating item:", selectedItem.id);
-        await itemService.update(selectedItem.id, values as UpdateItemData);
+        await update(selectedItem.id, values as UpdateItemData);
         setSnackbar({
           open: true,
           message: "Item updated successfully",
@@ -230,8 +273,8 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         });
       } else {
         // Create new item
-        console.log("Creating new item");
-        await itemService.create(values as CreateItemData);
+        const result = await create(values as CreateItemData);
+        console.log("Created new item:", result);
         setSnackbar({
           open: true,
           message: "Item created successfully",
@@ -239,10 +282,10 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         });
       }
 
-      // Close modal and refresh items list
+      // Close modal
       setIsModalOpen(false);
       setSelectedItem(undefined);
-      fetchItems(); // Refresh the items list
+      refresh(); // Refresh the items list
     } catch (error) {
       console.error("Error submitting item:", error);
       setSnackbar({
@@ -257,8 +300,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   //visibility toggle function
   const visibilityToggle = (item: Item) => {
-    console.log("Visibility off for:", item);
-
     setItemVisibility((prevVisibility) => ({
       ...prevVisibility,
       [item.id]: !prevVisibility[item.id],
@@ -271,361 +312,10 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
-  //HANDLE TABLE VIEW
-  const handleListView = () => {
-    return (
-      <TableContainer sx={{ maxHeight: 800 }}>
-        <Table stickyHeader>
-          {/* Added stickyHeader for better UX */}
-          <TableHead>
-            <TableRow>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                ID
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Image{" "}
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Name
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Description{" "}
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Size
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Color{" "}
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Item Location
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Storage Location
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Quantity{" "}
-              </TableCell>
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Category{" "}
-              </TableCell>
-              {/* <TableCell>Storage Location</TableCell> */}
-              <TableCell
-                sx={{
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                {" "}
-                Action
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {currentItems.map((item) => {
-              const category = categories.find((c) => c.id === item.categoryId);
-              return (
-                <TableRow
-                  key={item.id}
-                  style={{ opacity: itemVisibility[item.id] ? 1 : 0.5 }}
-                  onClick={() => openModal(item)}
-                >
-                  <TableCell>{item.id}</TableCell>
-                  <TableCell>
-                    {item.imageUrl ? (
-                      <img
-                        src={item.imageUrl}
-                        alt={item.description}
-                        style={{
-                          width: "150px",
-                          height: "150px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      <img
-                        src={camera} // Use the camera variable here
-                        alt="No Image Available"
-                        style={{
-                          width: "150px",
-                          height: "150px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    )}
-                  </TableCell>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.description}</TableCell>
-                  <TableCell>{item.size}</TableCell>
-                  <TableCell>{item.color}</TableCell>
-                  <TableCell>{item.itemLocation}</TableCell>
-                  <TableCell>
-                    {item.storageLocation || item.storage_location || "N/A"}
-                  </TableCell>
-                  <TableCell>{item.quantity}</TableCell>
-                  <TableCell>
-                    {category
-                      ? category.name
-                      : item.categoryId
-                      ? `Category ${item.categoryId}`
-                      : "N/A"}
-                  </TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <IconButton
-                        color="primary"
-                        onClick={(event) => {event.stopPropagation();handleEdit(item);}}
-                        size="medium"
-                      >
-                        {" "}
-                        <EditIcon />{" "}
-                      </IconButton>
-                      <IconButton
-                        color="primary"
-                        onClick={() => confirmDelete(item.id)}
-                        size="medium"
-                      >
-                        {" "}
-                        <DeleteIcon />{" "}
-                      </IconButton>
-                      <IconButton
-                        color="primary"
-                        onClick={() => visibilityToggle(item)}
-                        size="medium"
-                      >
-                        {itemVisibility[item.id] ? (
-                          <VisibilityIcon />
-                        ) : (
-                          <VisibilityOffIcon />
-                        )}
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
-  };
-
-  //HANDLE GRID VIEW
-  const handleGridView = () => {
-    return (
-      <div>
-        <Paper
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: 4,
-            padding: 2,
-          }}
-        >
-          {currentItems.map((item) => {
-            const category = categories.find((c) => c.id === item.categoryId);
-            return (
-              <Card
-                key={item.id}
-                sx={{
-                  height: 400,
-                  width: 250,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  boxShadow: 3,
-                  borderRadius: 2,
-                  overflow: "hidden",
-                }}
-                style={{ opacity: itemVisibility[item.id] ? 1 : 0.5 }}
-              >
-                <CardMedia
-                  sx={{ height: 200, width: "100%", objectFit: "cover" }}
-                  image={item.imageUrl || camera}
-                 
-                  title={item.description}
-                />
-                <CardContent
-                  sx={{ textAlign: "center", cursor: "pointer" }}
-                  onClick={() => openModal(item)}
-                >
-                  <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
-                  <p style={{ margin: 0 }}>{item.description}</p>
-                  <p style={{ margin: 0 }}>ID: {item.id}</p>
-                  <p style={{ margin: 0, color: "gray" }}>
-                    Category:{" "}
-                    {category
-                      ? category.name
-                      : item.categoryId
-                      ? `Category ${item.categoryId}`
-                      : "N/A"}
-                  </p>
-                </CardContent>
-                <CardActions>
-                  <Button onClick={() => handleEdit(item)}>Edit</Button>
-                  <Button onClick={() => confirmDelete(item.id)}>Delete</Button>
-                  <Button onClick={() => visibilityToggle(item)} size="medium">
-                    {itemVisibility[item.id] ? "Hide" : "Show"}
-                  </Button>
-                </CardActions>
-              </Card>
-            );
-          })}
-        </Paper>
-      </div>
-    );
-  };
-
-  //FETCH ALL ITEMS
-  const fetchItems = async () => {
-    try {
-      setLoading(true);
-      console.log("Fetching items...");
-      const data = await itemService.getAll();
-      console.log("Fetched items:", data);
-      setItems(data);
-      setFilteredItems(data);
-
-      const initialVisibility: { [itemId: number]: boolean } = {};
-      data.forEach((item) => {
-        initialVisibility[item.id] = true;
-      });
-      setItemVisibility(initialVisibility);
-    } catch (error) {
-      console.error("Error fetching items:", error);
-      // message.error("Failed to fetch items");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
-  useEffect(() => {
-    console.log("Categories in ItemList:", categories);
-  }, [categories]);
-
-  // Filter items by category
-  useEffect(() => {
-    if (categoryFilter === "all") {
-      setFilteredItems(items);
-    } else {
-      setFilteredItems(
-        items.filter((item) => item.categoryId === parseInt(categoryFilter))
-      );
-    }
-    // Reset any pagination if implemented later
-  }, [categoryFilter, items]);
-
   //HANDLE CATEGORY FILTER
   const handleByCategory = (event: SelectChangeEvent) => {
     setCategoryFilter(event.target.value);
   };
-
-  // const toggleDisplayMode = () => {
-  //   setModeDisplay(prevMode => (prevMode === "table" ? "grid" : "table"));
-  // };
-
-  // grid view
-  //  const handleGridView = () => {
-  //   console.log("grid");
-  //   setGrid(!grid);
-  // };
-
-  // list view
-  // const handleListView = () => {
-  //   console.log("list");
-  //   setList(!list);
-  // };
 
   // handle add new item
   const handleCreate = () => {
@@ -654,12 +344,10 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   // SEARCH MANUALLY TYPED ITEMS
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("searching");
     event.preventDefault();
 
     const searchInput = event.target.value;
     setSearchInput(searchInput);
-    console.log("searchInput", searchInput);
 
     if (searchInput === "") {
       setFilteredItems(items);
@@ -670,6 +358,15 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
       setFilteredItems(filteredItems);
     }
   };
+
+  // If loading is true, show a loading indicator
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <div>
@@ -691,36 +388,71 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           display: "column",
           marginBottom: "50px",
           marginTop: "10px",
-          gap: "20px",
+          gap: { xs: "30px", sm: "20px" },
           paddingX: "20px",
         }}
       >
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             justifyContent: "center",
+            alignItems: { xs: "stretch", sm: "center" },
             marginTop: "50px",
-            gap: "50px",
+            gap: { xs: "20px", sm: "50px" },
           }}
         >
           <TextField
             onChange={handleSearch}
             value={searchInput}
             label="search item"
-            sx={{ width: "50%" }}
-          ></TextField>
-          <Button onClick={handleCreate}>ADD NEW ITEM</Button>
+            sx={{
+              width: { xs: "100%", sm: "50%" },
+              "& .MuiInputBase-root": {
+                height: { xs: "40px", sm: "56px" },
+              },
+            }}
+          />
+          <Button
+            onClick={handleCreate}
+            sx={{
+              width: { xs: "100%", sm: "auto" },
+              height: { xs: "40px", sm: "56px" },
+              fontSize: { xs: "0.875rem", sm: "1rem" },
+              // fontWeight: "bold",
+              backgroundColor: "primary.main",
+              color: "white",
+              "&:hover": { backgroundColor: "primary.dark" },
+            }}
+          >
+            ADD NEW ITEM
+          </Button>
         </Box>
-
+      </Box>
+      <Box sx={{ marginBottom: "10px" }}>
         {/* filter by category */}
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: { xs: "stretch", sm: "center" },
+            gap: { xs: "20px", sm: "0" },
+            marginTop: { xs: "20px", sm: "0" },
+            padding: { xs: "20px", sm: "0" },
+            backgroundColor: { xs: "background.paper", sm: "transparent" },
+            borderRadius: { xs: 2, sm: 0 },
+            boxShadow: { xs: 2, sm: 0 },
           }}
         >
-          <FormControl sx={{ width: 200 }}>
+          <FormControl
+            sx={{
+              width: { xs: "100%", sm: 200 },
+              "& .MuiInputBase-root": {
+                height: { xs: "40px", sm: "56px" },
+              },
+            }}
+          >
             <InputLabel id="category-filter-label">
               Filter by Category
             </InputLabel>
@@ -746,27 +478,332 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           </FormControl>
 
           {/* grid and list views */}
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <AppsIcon
-              sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }}
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              justifyContent: { xs: "center", sm: "flex-end" },
+              marginTop: { xs: "10px", sm: "0" },
+            }}
+          >
+            <IconButton
               onClick={toggleDisplayMode}
-            />
-            <TableRowsIcon
-              sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }}
+              sx={{
+                fontSize: { xs: 30, sm: 40 },
+                color: "primary.main",
+                cursor: "pointer",
+              }}
+            >
+              <AppsIcon />
+            </IconButton>
+            <IconButton
               onClick={toggleDisplayMode}
-            />
+              sx={{
+                fontSize: { xs: 30, sm: 40 },
+                color: "primary.main",
+                cursor: "pointer",
+              }}
+            >
+              <TableRowsIcon />
+            </IconButton>
           </Box>
         </Box>
       </Box>
 
-      {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-          <CircularProgress size={60} />
+      {modeDisplay === "table" ? (
+        <Box
+          sx={{
+            width: "100%",
+            overflowX: "auto",
+            marginTop: { xs: 2, sm: 4 },
+            padding: { xs: 1, sm: 2 },
+            "& .MuiTableCell-root": {
+              whiteSpace: "nowrap",
+              maxWidth: "200px",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              padding: { xs: "8px 4px", sm: "16px" },
+              fontSize: { xs: "0.75rem", sm: "0.875rem" },
+            },
+            "& .MuiTableHead-root": {
+              "& .MuiTableCell-root": {
+                fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                fontWeight: "bold",
+                backgroundColor: "primary.main",
+                color: "white",
+                padding: { xs: "8px 4px", sm: "16px" },
+              },
+            },
+            "& .MuiTableRow-root": {
+              "&:hover": {
+                backgroundColor: "action.hover",
+              },
+              "&:last-child td": {
+                borderBottom: 0,
+              },
+            },
+          }}
+        >
+          <TableContainer
+            sx={{
+              maxHeight: 800,
+              borderRadius: 2,
+              boxShadow: 2,
+              "&::-webkit-scrollbar": {
+                width: "8px",
+                height: "8px",
+              },
+              "&::-webkit-scrollbar-track": {
+                background: "#f1f1f1",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                background: "#888",
+                borderRadius: "4px",
+              },
+              "&::-webkit-scrollbar-thumb:hover": {
+                background: "#555",
+              },
+            }}
+          >
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "80px", sm: "100px" },
+                    }}
+                  >
+                    Image
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "120px", sm: "150px" },
+                    }}
+                  >
+                    Name
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "150px", sm: "200px" },
+                    }}
+                  >
+                    Description
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "60px", sm: "80px" },
+                    }}
+                  >
+                    Size
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "60px", sm: "80px" },
+                    }}
+                  >
+                    Color
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "60px", sm: "80px" },
+                    }}
+                  >
+                    Quantity
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "100px", sm: "120px" },
+                    }}
+                  >
+                    Item Location
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "80px", sm: "100px" },
+                    }}
+                  >
+                    Category
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      minWidth: { xs: "100px", sm: "120px" },
+                    }}
+                  >
+                    Action
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {currentItems.map((item) => {
+                  const category = categories.find(
+                    (c) => c.id === item.categoryId
+                  );
+                  return (
+                    <TableRow
+                      key={item.id}
+                      onClick={() => openModal(item)}
+                      sx={{
+                        cursor: "pointer",
+                        "&:hover": {
+                          backgroundColor: "action.hover",
+                        },
+                      }}
+                    >
+                      <TableCell>
+                        <Box
+                          sx={{
+                            width: { xs: 50, sm: 100 },
+                            height: { xs: 50, sm: 100 },
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <img
+                            src={item.imageUrl || camera}
+                            alt={item.description || "No Image Available"}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              borderRadius: "4px",
+                            }}
+                          />
+                        </Box>
+                      </TableCell>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>{item.description}</TableCell>
+                      <TableCell>{item.size}</TableCell>
+                      <TableCell>{item.color}</TableCell>
+                      <TableCell>{item.quantity}</TableCell>
+                      <TableCell>{item.itemLocation}</TableCell>
+                      <TableCell>
+                        {category
+                          ? category.name
+                          : item.categoryId
+                          ? `Category ${item.categoryId}`
+                          : "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            gap: { xs: 0.5, sm: 1 },
+                            "& .MuiIconButton-root": {
+                              padding: { xs: "4px", sm: "8px" },
+                            },
+                          }}
+                        >
+                          <IconButton
+                            color="primary"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleEdit(item);
+                            }}
+                            size="small"
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            color="primary"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              confirmDelete(item.id);
+                            }}
+                            size="small"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                          <IconButton
+                            color="primary"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              visibilityToggle(item);
+                            }}
+                            size="small"
+                          >
+                            {itemVisibility[item.id] ? (
+                              <VisibilityIcon />
+                            ) : (
+                              <VisibilityOffIcon />
+                            )}
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
-      ) : modeDisplay === "table" ? (
-        handleListView()
       ) : (
-        handleGridView()
+        <div>
+          <Paper
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: 4,
+              padding: 2,
+            }}
+          >
+            {currentItems.map((item) => {
+              const category = categories.find((c) => c.id === item.categoryId);
+              return (
+                <Card
+                  key={item.id}
+                  sx={{
+                    height: 400,
+                    width: 250,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    boxShadow: 3,
+                    borderRadius: 2,
+                    overflow: "hidden",
+                  }}
+                  style={{ opacity: itemVisibility[item.id] ? 1 : 0.5 }}
+                >
+                  <CardMedia
+                    sx={{ height: 200, width: "100%", objectFit: "cover" }}
+                    image={item.imageUrl || camera}
+                    title={item.description}
+                  />
+                  <CardContent
+                    sx={{ textAlign: "center", cursor: "pointer" }}
+                    onClick={() => openModal(item)}
+                  >
+                    <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
+                    <p style={{ margin: 0 }}>{item.description}</p>
+                    <p style={{ margin: 0 }}>ID: {item.id}</p>
+                    <p style={{ margin: 0, color: "gray" }}>
+                      Category:{" "}
+                      {category
+                        ? category.name
+                        : item.categoryId
+                        ? `Category ${item.categoryId}`
+                        : "N/A"}
+                    </p>
+                  </CardContent>
+                  <CardActions>
+                    <Button onClick={() => handleEdit(item)}>Edit</Button>
+                    <Button onClick={() => confirmDelete(item.id)}>
+                      Delete
+                    </Button>
+                    <Button
+                      onClick={() => visibilityToggle(item)}
+                      size="medium"
+                    >
+                      {itemVisibility[item.id] ? "Hide" : "Show"}
+                    </Button>
+                  </CardActions>
+                </Card>
+              );
+            })}
+          </Paper>
+        </div>
       )}
 
       {/* open a modal to edit/create an item */}
@@ -872,7 +909,15 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
       {singleItemModal && selectedProduct && (
         <div>
-          <UserSingleProduct item={selectedProduct} onClose={closeModal} buttonText="Edit" onEdit={() => {closeModal(); handleEdit(selectedProduct)}}/>
+          <UserSingleProduct
+            item={selectedProduct}
+            onClose={closeModal}
+            buttonText="Edit"
+            onEdit={() => {
+              closeModal();
+              handleEdit(selectedProduct);
+            }}
+          />
         </div>
       )}
     </div>
