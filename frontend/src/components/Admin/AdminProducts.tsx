@@ -34,16 +34,14 @@ import {
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
-//import { useState } from "react";
 import React, { useEffect, useState } from "react";
-// import box from "../images/box.png";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useItems, {
   UpdateItemData,
   CreateItemData,
+  Item,
 } from "../../services/itemService";
-import { Item } from "../../services/itemService";
 import camera from "../../images/camera.png";
 import ItemForm from "../Items/ItemForm";
 import { useAuth } from "../../context/AuthContext";
@@ -59,7 +57,15 @@ interface ItemListProps {
 const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const itemsService = useItems();
+  const {
+    items,
+    loading,
+    error,
+    create,
+    update,
+    delete: deleteItem,
+    refresh,
+  } = useItems();
 
   // Add debug logging
   console.log("isMobile:", isMobile);
@@ -72,11 +78,11 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const [selectedItem, setSelectedItem] = useState<Item | undefined>(undefined);
 
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
-  const [searchInput, setSearchInput] = useState<string>(""); // for search bar
+  const [searchInput, setSearchInput] = useState<string>("");
 
   const [itemVisibility, setItemVisibility] = useState<{
     [itemId: number]: boolean;
-  }>({}); // State to track visibility per item
+  }>({});
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
@@ -100,30 +106,39 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   // Initialize the visibility state when items are loaded
   useEffect(() => {
-    console.log("Items loaded in AdminProducts:", itemsService.items);
-    if (itemsService.items && itemsService.items.length > 0) {
+    if (items && items.length > 0) {
       const initialVisibility: { [itemId: number]: boolean } = {};
-      itemsService.items.forEach((item) => {
+      items.forEach((item) => {
         initialVisibility[item.id] = true;
       });
       setItemVisibility(initialVisibility);
     }
-  }, [itemsService.items]);
+  }, [items]);
 
   // Filter items by category
   useEffect(() => {
     if (categoryFilter === "all") {
-      setFilteredItems(itemsService.items);
+      setFilteredItems(items);
     } else {
       setFilteredItems(
-        itemsService.items.filter(
-          (item) => item.categoryId === parseInt(categoryFilter)
-        )
+        items.filter((item) => item.categoryId === parseInt(categoryFilter))
       );
     }
     // Reset pagination when filter changes
     setPage(1);
-  }, [categoryFilter, itemsService.items]);
+  }, [categoryFilter, items]);
+
+  // Handle API errors
+  useEffect(() => {
+    if (error) {
+      console.error("Error fetching items:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to fetch items",
+        severity: "error",
+      });
+    }
+  }, [error]);
 
   const toggleDisplayMode = () => {
     setModeDisplay((prevMode) => (prevMode === "table" ? "grid" : "table"));
@@ -164,13 +179,13 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     if (itemToDelete === null) return;
 
     try {
-      await itemsService.delete(itemToDelete);
+      await deleteItem(itemToDelete);
       setSnackbar({
         open: true,
         message: "Item deleted successfully",
         severity: "success",
       });
-      // Deletion handled by the service, no need to refetch
+      refresh();
     } catch (error) {
       console.error("Error deleting item:", error);
       setSnackbar({
@@ -250,7 +265,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
       if (selectedItem) {
         // Update existing item
-        await itemsService.update(selectedItem.id, values as UpdateItemData);
+        await update(selectedItem.id, values as UpdateItemData);
         setSnackbar({
           open: true,
           message: "Item updated successfully",
@@ -258,7 +273,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         });
       } else {
         // Create new item
-        const result = await itemsService.create(values as CreateItemData);
+        const result = await create(values as CreateItemData);
         console.log("Created new item:", result);
         setSnackbar({
           open: true,
@@ -270,8 +285,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
       // Close modal
       setIsModalOpen(false);
       setSelectedItem(undefined);
-
-      // The items list will be automatically refreshed by the hook
+      refresh(); // Refresh the items list
     } catch (error) {
       console.error("Error submitting item:", error);
       setSnackbar({
@@ -336,9 +350,9 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     setSearchInput(searchInput);
 
     if (searchInput === "") {
-      setFilteredItems(itemsService.items);
+      setFilteredItems(items);
     } else {
-      const filteredItems = itemsService.items.filter((item) =>
+      const filteredItems = items.filter((item) =>
         item.description.toLowerCase().includes(searchInput.toLowerCase())
       );
       setFilteredItems(filteredItems);
@@ -346,7 +360,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   };
 
   // If loading is true, show a loading indicator
-  if (itemsService.loading) {
+  if (loading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
         <CircularProgress />
