@@ -324,20 +324,10 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   }
 
   // Update the table view to show availability
-  if (!items || items.length === 0) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-        <Typography>No items available at the moment.</Typography>
-      </Box>
-    );
-  }
-
-  // Update the table view to show availability
   const handleListView = () => {
     if (isMobile) {
       // Mobile view for smaller screens
       return (
-        <Box sx={{ mt: 2, px: { xs: 1, sm: 2 } }}>
         <Box sx={{ mt: 2, px: { xs: 1, sm: 2 } }}>
           {currentItems.map((item) => {
             const category = categories.find((c) => c.id === item.categoryId);
