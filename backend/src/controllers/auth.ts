@@ -43,7 +43,7 @@ authRouter.post("/login", async (req: Request, res: Response) => {
 authRouter.post("/logout", (_: Request, res: Response) => {
     // Clear the session cookie to log the user out
     clearSessionCookie(res);
-    res.status(200).json({ message: 'Logged out successfully' });
+    res.status(204).end();
 });
 
 

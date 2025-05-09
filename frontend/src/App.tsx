@@ -42,8 +42,8 @@ const App: React.FC = () => {
             { /* TODO: show error page for /users if user is not admin, once the error page is created */}
             <Route path="/users" element={<UserManagement />} />
 
-            {/* User Routes */}
-            <Route path="/userDashboard" element={<UserDashboard />} />
+          {/* User Routes */}
+          <Route path="/userDashboard" element={<UserDashboard />} />
 
             {/* Admin Routes */}
             <Route path="/adminDashboard" element={<AdminDashboard/>} />

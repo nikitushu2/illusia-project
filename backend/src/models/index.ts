@@ -1,45 +1,61 @@
-import { sequelize } from '../util/db';
-import Item from './item';
-import User from './user';
-import Category from './category';
+import { sequelize } from "../util/db";
+import Item from "./item";
+import User from "./user";
+import Category from "./category";
+import Booking from "./booking";
+import BookingItem from "./bookingItem";
 
 // Initialize models
 const models = {
   Item,
   User,
-  Category
+  Category,
 };
-
-// Define model associations here if needed
-// Example: models.Category.hasMany(models.Item);
-// Example: models.Item.belongsTo(models.Category);
 
 // Set up one-to-many relationship between Category and Item
 Category.hasMany(Item, {
-  foreignKey: 'categoryId',
-  as: 'items'
+  foreignKey: "categoryId",
+  as: "items",
 });
 
 Item.belongsTo(Category, {
-  foreignKey: 'categoryId',
-  as: 'category'
+  foreignKey: "categoryId",
+  as: "category",
 });
 
-// Sync all models with database
-const syncModels = async (): Promise<void> => {
-  await Category.sync();
-  await Item.sync();
-  await User.sync();
-  console.log('Models synchronized with database');
-};
+// User and Booking (one-to-many)
+User.hasMany(Booking, {
+  foreignKey: "userId",
+  as: "bookings",
+});
 
-export { 
-  Item, 
-  User,
-  Category,
-  syncModels,
-  sequelize
-};
+Booking.belongsTo(User, {
+  foreignKey: "userId",
+  as: "user",
+});
+
+// Booking and BookingItem (one-to-many)
+Booking.hasMany(BookingItem, {
+  foreignKey: "bookingId",
+  as: "bookingItems",
+});
+
+BookingItem.belongsTo(Booking, {
+  foreignKey: "bookingId",
+  as: "booking",
+});
+
+// Item and BookingItem (one-to-many)
+Item.hasMany(BookingItem, {
+  foreignKey: "itemId",
+  as: "bookingItems",
+});
+
+BookingItem.belongsTo(Item, {
+  foreignKey: "itemId",
+  as: "item",
+});
+
+export { Item, User, Category, sequelize };
 
 export default models;
-

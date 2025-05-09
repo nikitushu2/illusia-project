@@ -15,13 +15,12 @@ import {
 } from "@mui/material";
 import ItemList from "./ItemList";
 import ItemForm from "./ItemForm";
-import itemService, {
+import useItems, {
   Item,
   CreateItemData,
   UpdateItemData,
 } from "../../services/itemService";
-import categoryService, { Category } from "../../services/categoryService";
-import { API_URL } from "../../config";
+import useCategories, { Category } from "../../services/categoryService";
 
 const ItemManagement: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,18 +30,16 @@ const ItemManagement: React.FC = () => {
   const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Log API URL to help with debugging
-    console.log("API URL being used:", API_URL);
+  const itemsService = useItems();
+  const categoriesService = useCategories();
 
+  useEffect(() => {
     // Fetch categories for the dropdown
     const fetchCategories = async () => {
       setCategoriesLoading(true);
       setCategoriesError(null);
       try {
-        console.log("Fetching categories...");
-        const data = await categoryService.getAll();
-        console.log("Categories fetched successfully:", data);
+        const data = await categoriesService.getAll();
         setCategories(data);
 
         // Fallback to hardcoded values if no categories were returned
@@ -55,11 +52,6 @@ const ItemManagement: React.FC = () => {
               description: "Military helmets",
               createdAt: "",
               updatedAt: "",
-
-              // size: "L",
-              // color: "red",
-              // itemLocation: "Helsinki",
-              // storageLocation: "Storage Room 1",
             },
             {
               id: 2,
@@ -67,11 +59,6 @@ const ItemManagement: React.FC = () => {
               description: "Tactical vests",
               createdAt: "",
               updatedAt: "",
-
-              // size: "L",
-              // color: "black",
-              // itemLocation: "Helsinki",
-              // storageLocation: "Storage Room 2",
             },
             {
               id: 3,
@@ -79,11 +66,6 @@ const ItemManagement: React.FC = () => {
               description: "First aid kits",
               createdAt: "",
               updatedAt: "",
-
-              // size: "L",
-              // color: "white",
-              // itemLocation: "Helsinki",
-              // storageLocation: "Storage Room 3"
             },
             {
               id: 4,
@@ -91,11 +73,6 @@ const ItemManagement: React.FC = () => {
               description: "Protective eyewear and masks",
               createdAt: "",
               updatedAt: "",
-
-              // size: "",
-              // color: "black",
-              // itemLocation: "Helsinki",
-              // storageLocation: "Storage Room 2",
             },
           ]);
         }
@@ -155,14 +132,11 @@ const ItemManagement: React.FC = () => {
   // update edit item not working
   const handleSubmit = async (values: CreateItemData | UpdateItemData) => {
     try {
-      console.log("Submitting form with values:", values);
       if (selectedItem) {
         // Update existing item
-        console.log("Updating item:", selectedItem.id);
-        await itemService.update(selectedItem.id, values as UpdateItemData);
+        await itemsService.update(selectedItem.id, values as UpdateItemData);
       } else {
         // Create new item is removed as it's not needed here
-        console.log("Creating items is not supported in this component");
         return;
       }
       setIsModalOpen(false);

@@ -12,6 +12,7 @@ import {
   Collapse,
   Typography,
   IconButton,
+  CircularProgress,
   //TextField,
 } from "@mui/material";
 // import AppsIcon from "@mui/icons-material/Apps";
@@ -24,9 +25,10 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 //import { Link } from "react-router-dom";
 
+// import UserProducts from "./UserProducts";
 import UserProducts from "./UserProducts";
 import UserBookings from "./UserBookings";
-import categoryService from "../../services/categoryService";
+import useCategories from "../../services/categoryService";
 //import UserSingleProduct from "./UserSingleProduct";
 
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -34,44 +36,19 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 const UserDashboard = () => {
   const [sideLink, setsideLink] = useState<string | null>(null);
-  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
-    []
-  );
-  // const [grid, setGrid] = useState<boolean>(false);
-  // const [list, setList] = useState<boolean>(false);
-
   const [productsOpen, setProductsOpen] = useState(false);
   const [bookingsOpen, setBookingsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [component, setComponent] = useState<React.ReactElement | null>(null);
 
-  // Fetch categories when component mounts
+  const categoriesService = useCategories();
+
+  // Initialize component with user products when categories are loaded
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        console.log("Fetching categories...");
-        const categoriesData = await categoryService.getAll();
-        console.log("Fetched categories:", categoriesData);
-        setCategories(categoriesData);
-
-        // Set default component with categories
-        setComponent(
-          <UserProducts
-            onEdit={(item) => console.log("Edit item:", item)}
-            categories={categoriesData}
-          />
-        );
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        // Set default component without categories
-        setComponent(
-          <UserProducts onEdit={(item) => console.log("Edit item:", item)} />
-        );
-      }
-    };
-
-    fetchCategories();
-  }, []);
+    if (!categoriesService.loading && categoriesService.categories) {
+      setComponent(<UserProducts categories={categoriesService.categories} />);
+    }
+  }, [categoriesService.categories, categoriesService.loading]);
 
   const handleSideBar = (content: JSX.Element | string) => {
     if (typeof content === "string") {
@@ -97,10 +74,10 @@ const UserDashboard = () => {
     setBookingsOpen(!bookingsOpen);
   };
 
-  // handle add new item
-  // const handleAddNew = () => {
-  //   console.log("add new item");
-  // };
+  // Function to handle Products menu item click
+  const handleProductsMenuClick = () => {
+    handleSideBar(<UserProducts categories={categoriesService.categories} />);
+  };
 
   return (
     <div>
@@ -123,7 +100,6 @@ const UserDashboard = () => {
               width: isCollapsed ? "80px" : "290px",
               transition: "width 0.3s ease-in-out",
               position: "relative",
-          
             }}
           >
             <Box
@@ -180,17 +156,13 @@ const UserDashboard = () => {
                           slotProps={{
                             primary: { style: { color: "white" } },
                           }}
-                          onClick={() =>
-                            handleSideBar(
-                              <UserProducts
-                                onEdit={(item) =>
-                                  console.log("Edit item:", item)
-                                }
-                                categories={categories}
-                              />
-                            )
-                          }
+                          onClick={handleProductsMenuClick}
                         />
+                        {productsOpen ? (
+                          <ExpandLess style={{ color: "white" }} />
+                        ) : (
+                          <ExpandMore style={{ color: "white" }} />
+                        )}
                       </>
                     )}
                   </ListItemButton>
@@ -210,7 +182,11 @@ const UserDashboard = () => {
                             primary: { style: { color: "white" } },
                           }}
                         />
-                        {bookingsOpen ? <ExpandLess  style={{color:"white"}}/> : <ExpandMore style={{color:"white"}} />}
+                        {bookingsOpen ? (
+                          <ExpandLess style={{ color: "white" }} />
+                        ) : (
+                          <ExpandMore style={{ color: "white" }} />
+                        )}
                       </>
                     )}
                   </ListItemButton>
@@ -255,7 +231,7 @@ const UserDashboard = () => {
                     </List>
                   </ListItem>
                 </Collapse>
-                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }}/>
+                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} />
 
                 <ListItem disablePadding>
                   <ListItemButton>
@@ -306,9 +282,13 @@ const UserDashboard = () => {
 
             {/* data here */}
             <Box sx={{ marginTop: "50px", marginRight: "50px" }}>
-              {/* DISPLAY DATA HERE    */}
-              {/* {sideLink && <Typography variant="body1" style={{ marginTop: "20px" }}>{sideLink}</Typography>} */}
-              {component || sideLink}
+              {categoriesService.loading ? (
+                <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+                  <CircularProgress />
+                </Box>
+              ) : (
+                component || sideLink
+              )}
             </Box>
           </Box>
         </Box>

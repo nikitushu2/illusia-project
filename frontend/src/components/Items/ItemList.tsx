@@ -27,9 +27,10 @@ import {
   Button,
 } from "@mui/material";
 //import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
-import itemService, { Item } from "../../services/itemService";
+import { Item } from "../../services/itemService";
 
 import UserSingleProduct from "../User/UserSingleProduct";
+import { ApiRole, useFetch } from "../../hooks/useFetch";
 
 interface ItemListProps {
   onEdit: (item: Item) => void;
@@ -37,9 +38,11 @@ interface ItemListProps {
 }
 
 const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
-  const [items, setItems] = useState<Item[]>([]);
+  const { data: items, apiError, loading, get } = useFetch<Item[]>(ApiRole.PUBLIC);
+  const { remove } = useFetch(ApiRole.ADMIN);
+  // const [items, setItems] = useState<Item[]>([]);
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -59,21 +62,13 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const [selectedProduct, setSelectedProduct] = useState<Item | null>(null);
 
   const fetchItems = async () => {
-    try {
-      setLoading(true);
-      console.log("Fetching items...");
-      const data = await itemService.getAll();
-      console.log("Fetched items:", data);
-      setItems(data);
-    } catch (error) {
-      console.error("Error fetching items:", error);
+    await get("/items");
+    if (apiError) {
       setSnackbar({
         open: true,
         message: "Failed to fetch items",
         severity: "error",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -83,10 +78,10 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
 
   useEffect(() => {
     if (categoryFilter === "all") {
-      setFilteredItems(items);
+      setFilteredItems(items || []);
     } else {
       setFilteredItems(
-        items.filter((item) => item.categoryId === parseInt(categoryFilter))
+        items?.filter((item) => item.categoryId === parseInt(categoryFilter)) || []
       );
     }
     // Reset to first page when filter changes
@@ -95,7 +90,6 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
 
   // Log when categories change to help debugging
   useEffect(() => {
-    console.log("Categories in ItemList:", categories);
   }, [categories]);
 
   // Show delete confirmation dialog
@@ -109,7 +103,7 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     if (itemToDelete === null) return;
 
     try {
-      await itemService.delete(itemToDelete);
+      await remove(`/items/${itemToDelete}`);
       setSnackbar({
         open: true,
         message: "Item deleted successfully",
