@@ -25,6 +25,7 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 //import { Link } from "react-router-dom";
 
+// import UserProducts from "./UserProducts";
 import UserProducts from "./UserProducts";
 import UserBookings from "./UserBookings";
 import useCategories from "../../services/categoryService";
@@ -60,12 +61,7 @@ const UserDashboard = () => {
   // Initialize component with user products when categories are loaded
   useEffect(() => {
     if (!categoriesService.loading && categoriesService.categories) {
-      setComponent(
-        <UserProducts
-          onEdit={(item) => console.log("Edit item:", item)}
-          categories={categoriesService.categories}
-        />
-      );
+      setComponent(<UserProducts categories={categoriesService.categories} />);
     }
   }, [categoriesService.categories, categoriesService.loading]);
 
@@ -99,12 +95,7 @@ const UserDashboard = () => {
 
   // Function to handle Products menu item click
   const handleProductsMenuClick = () => {
-    handleSideBar(
-      <UserProducts
-        onEdit={(item) => console.log("Edit item:", item)}
-        categories={categoriesService.categories}
-      />
-    );
+    handleSideBar(<UserProducts categories={categoriesService.categories} />);
   };
 
   return (

@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 
 export enum ApiErrorType {
@@ -89,5 +88,4 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
   const remove = useCallback((url: string, body: any) => fetchData("DELETE", url, body), []);
 
   return { data, ok, apiError, loading, get, post, put, patch, remove };
-
 }

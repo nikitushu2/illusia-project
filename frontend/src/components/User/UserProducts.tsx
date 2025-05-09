@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Paper,
   Table,
@@ -24,6 +25,8 @@ import {
   useMediaQuery,
   Typography,
   CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
@@ -31,39 +34,242 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
-import useItems from "../../services/itemService";
 import { Item } from "../../services/itemService";
 import { useBookingCart } from "../../context/BookingCartContext";
 
-//import { Link } from "react-router-dom";
-//import Helmet from "../../images/helmet.jpeg";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs, { Dayjs } from "dayjs";
+
+import { ApiRole, useFetch } from "../../hooks/useFetch";
+import { BookingStatus, BookingWithDetails } from "../../types/booking";
 
 interface ItemListProps {
-  onEdit: (item: Item) => void;
   categories?: { id: number; name: string }[];
 }
 
-const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
+const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // changed from sm to md (and) add px: { xs: 1, sm: 2 } to mobile view
-
-  const itemsService = useItems();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const navigate = useNavigate();
   const { addItem } = useBookingCart();
 
-  const [modeDisplay, setModeDisplay] = React.useState("table"); // for table and grid view
-
-  const [isModalOpen, setIsModalOpen] = React.useState(false); //modal view for single product
-  const [selectedProduct, setSelectedProduct] = React.useState<Item | null>(
-    null
-  );
-  const [searchInput, setSearchInput] = useState<string>(""); // for search bar
-
+  const [modeDisplay, setModeDisplay] = useState("table");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Item | null>(null);
+  const [searchInput, setSearchInput] = useState<string>("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
-
   const [page, setPage] = useState(1);
+  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
-  const navigate = useNavigate();
+  const {
+    data: items,
+    loading: itemsLoading,
+    apiError,
+    get,
+  } = useFetch<Item[]>(ApiRole.PUBLIC);
+
+  const {
+    data: bookings,
+    loading: bookingsLoading,
+    get: getBookings,
+  } = useFetch<BookingWithDetails[]>(ApiRole.PRIVATE);
+
+  // Fetch items and bookings on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await get("items");
+        await getBookings("bookings/my-bookings");
+      } catch (error) {
+        console.error("Error in initial data fetch:", error);
+        setSnackbar({
+          open: true,
+          message: "Error loading initial data. Please refresh the page.",
+          severity: "error",
+        });
+      }
+    };
+    fetchData();
+  }, [get, getBookings]); // Remove items and bookings from dependencies
+
+  // Update filtered items when items change
+  useEffect(() => {
+    if (items && items.length > 0) {
+      setFilteredItems([...items]);
+    }
+  }, [items]);
+
+  // Handle search input
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = event.target.value.trim().toLowerCase();
+    setSearchInput(searchTerm);
+
+    if (!items) return;
+
+    if (searchTerm === "") {
+      setFilteredItems([...items]);
+      return;
+    }
+
+    const newFilteredItems = items.filter((item) => {
+      const itemName = (item.name || "").toLowerCase();
+      const itemDescription = (item.description || "").toLowerCase();
+      return (
+        itemName.includes(searchTerm) || itemDescription.includes(searchTerm)
+      );
+    });
+
+    setFilteredItems(newFilteredItems);
+  };
+
+  // SEARCH AVAILABILITY BASED ON DATES
+  const searchAvailability = async () => {
+    try {
+      // First validate dates
+      if (!startDate || !endDate) {
+        setSnackbar({
+          open: true,
+          message: "Please select both start and end dates",
+          severity: "error",
+        });
+        return;
+      }
+
+      if (startDate.isAfter(endDate)) {
+        setSnackbar({
+          open: true,
+          message: "Start date must be before end date",
+          severity: "error",
+        });
+        return;
+      }
+
+      // Ensure we have the data before proceeding
+      if (!items || !bookings) {
+        setSnackbar({
+          open: true,
+          message: "Data not available. Please refresh the page and try again.",
+          severity: "error",
+        });
+        return;
+      }
+
+      // Process the availability
+      const activeBookings = bookings.filter((booking) => {
+        // Only count bookings that have been confirmed (reserved or in-progress)
+        const isConfirmed =
+          booking.status === BookingStatus.RESERVED ||
+          booking.status === BookingStatus.IN_PROGRESS;
+        const overlaps =
+          dayjs(booking.startDate).isBefore(endDate) &&
+          dayjs(booking.endDate).isAfter(startDate);
+        return isConfirmed && overlaps;
+      });
+
+      const activeBookingItems = activeBookings.flatMap((booking) =>
+        booking.items.map((item) => ({
+          item_id: item.itemId,
+          quantity: item.quantity,
+        }))
+      );
+
+      const bookedQuantities: Record<number, number> = {};
+      activeBookingItems.forEach((bi) => {
+        if (!bookedQuantities[bi.item_id]) {
+          bookedQuantities[bi.item_id] = 0;
+        }
+        bookedQuantities[bi.item_id] += bi.quantity;
+      });
+
+      // Update the filtered items with availability information
+      const updatedFilteredItems = filteredItems.map((item) => {
+        const booked = bookedQuantities[item.id] || 0;
+        const remainingQuantity = item.quantity - booked;
+        const isAvailable = remainingQuantity > 0;
+
+        return {
+          ...item,
+          isAvailable,
+          remainingQuantity,
+          bookedQuantity: booked,
+        };
+      });
+
+      setFilteredItems(updatedFilteredItems);
+      setPage(1);
+      setHasSearched(true);
+
+      // Show availability message
+      const availableCount = updatedFilteredItems.filter(
+        (item) => item.isAvailable
+      ).length;
+      const unavailableCount = updatedFilteredItems.length - availableCount;
+
+      if (availableCount === 0) {
+        setSnackbar({
+          open: true,
+          message: "No items available for the selected dates",
+          severity: "info",
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: `${availableCount} items available, ${unavailableCount} items fully booked for the selected dates`,
+          severity: "success",
+        });
+      }
+    } catch (error) {
+      console.error("Error in searchAvailability:", error);
+      setSnackbar({
+        open: true,
+        message: "Error checking availability. Please try again.",
+        severity: "error",
+      });
+    }
+  };
+
+  // Add snackbar state
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "info" | "warning";
+  }>({
+    open: false,
+    message: "",
+    severity: "info",
+  });
+
+  const handleCloseSnackbar = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
+  // Handle category filtering
+  useEffect(() => {
+    if (!items) return;
+
+    const newFilteredItems =
+      categoryFilter === "all"
+        ? [...items]
+        : items.filter((item) => item.categoryId === parseInt(categoryFilter));
+
+    setFilteredItems(newFilteredItems);
+  }, [categoryFilter, items]);
+
+  // Clear dates and reset items
+  const handleClearDates = () => {
+    setStartDate(null);
+    setEndDate(null);
+    setHasSearched(false);
+    // Reset filtered items to show all items without availability info
+    if (items) {
+      setFilteredItems([...items]);
+    }
+  };
 
   const toggleDisplayMode = () => {
     setModeDisplay((prevMode) => (prevMode === "table" ? "grid" : "table"));
@@ -79,24 +285,9 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     setIsModalOpen(false);
   };
 
-  //FILTER ITEMS BY CATEGORY
+  // Add logging for categories
   useEffect(() => {
-    if (categoryFilter === "all") {
-      setFilteredItems(itemsService.items);
-    } else {
-      setFilteredItems(
-        itemsService.items.filter(
-          (item) => item.categoryId === parseInt(categoryFilter)
-        )
-      );
-    }
-    //Reset to first page when filter changes
-    setPage(1);
-  }, [categoryFilter, itemsService.items]);
-
-  // Log when categories change to help debugging
-  useEffect(() => {
-    console.log("Categories in ItemList:", categories);
+    console.log("Categories in UserProducts:", categories);
   }, [categories]);
 
   // Pagination
@@ -105,8 +296,8 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
-  // If loading is true, show a loading indicator
-  if (itemsService.loading) {
+  // Show loading state only when items are loading
+  if (itemsLoading || bookingsLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
         <CircularProgress />
@@ -114,14 +305,36 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     );
   }
 
-  //HANDLE TABLE VIEW
+  // Show error state
+  if (apiError) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <Typography color="error">
+          Error loading items: {apiError}. Please try again later.
+        </Typography>
+      </Box>
+    );
+  }
+
+  // If no items are available, show a message
+  if (!items || items.length === 0) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <Typography>No items available at the moment.</Typography>
+      </Box>
+    );
+  }
+
+  // Update the table view to show availability
   const handleListView = () => {
     if (isMobile) {
-      // 📱 Stacked layout for mobile
+      // Mobile view for smaller screens
       return (
         <Box sx={{ mt: 2, px: { xs: 1, sm: 2 } }}>
           {currentItems.map((item) => {
             const category = categories.find((c) => c.id === item.categoryId);
+            const isAvailable = (item as any).isAvailable ?? true;
+
             return (
               <Paper key={item.id} sx={{ p: 2, mb: 2 }}>
                 <Box sx={{ display: "flex", gap: 2 }}>
@@ -153,17 +366,25 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                     <Typography variant="body2">
                       <strong>Description:</strong> {item.description}
                     </Typography>
-                    {/* <Typography variant="body2"><strong>Size:</strong> {item.size}</Typography>
-                    <Typography variant="body2"><strong>Color:</strong> {item.color}</Typography> */}
                     <Typography variant="body2">
                       <strong>Quantity:</strong> {item.quantity}
                     </Typography>
+                    {startDate && endDate && (
+                      <>
+                        <Typography
+                          variant="body2"
+                          color={isAvailable ? "success.main" : "error.main"}
+                        >
+                          <strong>Status:</strong>{" "}
+                          {isAvailable ? "Available" : "Fully Booked"}
+                        </Typography>
+                      </>
+                    )}
                     <Typography variant="body2">
                       <strong>Location:</strong> {item.itemLocation}
                     </Typography>
                     <Typography variant="body2">
-                      <strong>Category:</strong>{" "}
-                      {category ? category.name : `Category ${item.categoryId}`}
+                      <strong>Category:</strong> {category ? category.name : ""}
                     </Typography>
                     <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
                       <Button
@@ -176,12 +397,11 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                           );
                           addItem(item);
                         }}
-                        sx={{
-                          backgroundColor: "#3ec3ba",
-                          "&:hover": { backgroundColor: "#2ba19a" },
-                        }}
+                        disabled={Boolean(startDate && endDate && !isAvailable)}
                       >
-                        Add to Cart
+                        {startDate && endDate && !isAvailable
+                          ? "Not Available"
+                          : " Add to Cart"}
                       </Button>
                     </Box>
                   </Box>
@@ -193,58 +413,11 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
       );
     }
 
+    // Regular table view for larger screens
     return (
-      <Box
-        sx={{
-          width: "100%",
-          overflowX: "auto",
-          "& .MuiTableCell-root": {
-            whiteSpace: "nowrap",
-            maxWidth: "200px",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            "@media (max-width: 600px)": {
-              padding: "8px",
-              fontSize: "0.75rem",
-            },
-          },
-          "& .MuiTableHead-root": {
-            "@media (max-width: 600px)": {
-              "& .MuiTableCell-root": {
-                fontSize: "0.75rem",
-                fontWeight: "bold",
-              },
-            },
-          },
-          "& .MuiTableRow-root": {
-            "@media (max-width: 600px)": {
-              "&:hover": {
-                backgroundColor: "action.hover",
-              },
-            },
-          },
-        }}
-      >
-        <TableContainer
-          sx={{
-            maxHeight: 800,
-            "&::-webkit-scrollbar": {
-              width: "8px",
-              height: "8px",
-            },
-            "&::-webkit-scrollbar-track": {
-              background: "#f1f1f1",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              background: "#888",
-              borderRadius: "4px",
-            },
-            "&::-webkit-scrollbar-thumb:hover": {
-              background: "#555",
-            },
-          }}
-        >
-          <Table stickyHeader>
+      <Box sx={{ width: "100%", overflowX: "auto" }}>
+        <TableContainer>
+          <Table>
             <TableHead>
               <TableRow>
                 <TableCell
@@ -280,28 +453,6 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                 >
                   Description
                 </TableCell>
-                {/* <TableCell
-                  sx={{
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
-                    fontWeight: "bold",
-                    minWidth: "80px",
-                  }}
-                >
-                  Size
-                </TableCell> */}
-                {/* <TableCell
-                  sx={{
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    fontSize: { xs: "0.75rem", sm: "1.1rem" },
-                    fontWeight: "bold",
-                    minWidth: "80px",
-                  }}
-                >
-                  Color
-                </TableCell> */}
                 <TableCell
                   sx={{
                     backgroundColor: "primary.main",
@@ -313,6 +464,21 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                 >
                   Quantity
                 </TableCell>
+                {hasSearched && startDate && endDate && (
+                  <>
+                    <TableCell
+                      sx={{
+                        backgroundColor: "primary.main",
+                        color: "white",
+                        fontSize: { xs: "0.75rem", sm: "1.1rem" },
+                        fontWeight: "bold",
+                        minWidth: "100px",
+                      }}
+                    >
+                      Status
+                    </TableCell>
+                  </>
+                )}
                 <TableCell
                   sx={{
                     backgroundColor: "primary.main",
@@ -322,7 +488,7 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                     minWidth: "120px",
                   }}
                 >
-                  Item Location
+                  Location
                 </TableCell>
                 <TableCell
                   sx={{
@@ -353,63 +519,44 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                 const category = categories.find(
                   (c) => c.id === item.categoryId
                 );
+                const isAvailable = (item as any).isAvailable ?? true;
+
                 return (
                   <TableRow
                     key={item.id}
                     onClick={() => openModal(item)}
                     sx={{
-                      "&:hover": {
-                        cursor: "pointer",
-                        backgroundColor: "action.hover",
-                      },
+                      cursor: "pointer",
+                      "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.04)" },
                     }}
                   >
                     <TableCell>
-                      {item.imageUrl ? (
-                        <img
-                          src={item.imageUrl}
-                          alt={item.description}
-                          style={{
-                            width: "100px",
-                            height: "100px",
-                            objectFit: "cover",
-                            // "@media (max-width: 600px)": {
-                            //   width: "50px",
-                            //   height: "50px",
-                            // },
-                          }}
-                        />
-                      ) : (
-                        <img
-                          src={camera}
-                          alt="No Image Available"
-                          style={{
-                            width: "100px",
-                            height: "100px",
-                            objectFit: "cover",
-                            // "@media (max-width: 600px)": {
-                            //   width: "50px",
-                            //   height: "50px",
-                            // },
-                          }}
-                        />
-                      )}
+                      <img
+                        src={item.imageUrl || camera}
+                        alt={item.description || "No Image"}
+                        style={{ width: 50, height: 50, objectFit: "cover" }}
+                      />
                     </TableCell>
                     <TableCell>{item.name}</TableCell>
                     <TableCell>{item.description}</TableCell>
-                    {/* <TableCell>{item.size}</TableCell>
-                    <TableCell>{item.color}</TableCell> */}
                     <TableCell>{item.quantity}</TableCell>
+                    {hasSearched && startDate && endDate && (
+                      <>
+                        <TableCell>
+                          <Typography
+                            color={isAvailable ? "success.main" : "error.main"}
+                          >
+                            {isAvailable ? "Available" : "Fully Booked"}
+                          </Typography>
+                        </TableCell>
+                      </>
+                    )}
                     <TableCell>{item.itemLocation}</TableCell>
-                    <TableCell>
-                      {category
-                        ? category.name
-                        : item.categoryId
-                        ? `Category ${item.categoryId}`
-                        : "N/A"}
-                    </TableCell>
+                    <TableCell>{category ? category.name : ""}</TableCell>
                     <TableCell>
                       <Button
+                        variant="contained"
+                        color="primary"
                         onClick={(event) => {
                           event.stopPropagation();
                           console.log(
@@ -418,12 +565,13 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                           );
                           addItem(item);
                         }}
-                        sx={{
-                          backgroundColor: "#3ec3ba",
-                          "&:hover": { backgroundColor: "#2ba19a" },
-                        }}
+                        disabled={Boolean(
+                          hasSearched && startDate && endDate && !isAvailable
+                        )}
                       >
-                        Add to Cart
+                        {hasSearched && startDate && endDate && !isAvailable
+                          ? "Not Available"
+                          : "Book"}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -449,100 +597,87 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
             padding: 2,
           }}
         >
-          {currentItems.map((item) => {
-            const category = categories.find((c) => c.id === item.categoryId);
-            return (
-              <Card
-                key={item.id}
-                sx={{
-                  height: 400,
-                  width: 250,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  boxShadow: 3,
-                  borderRadius: 2,
-                  overflow: "hidden",
-                }}
-              >
-                <CardMedia
-                  sx={{ height: 200, width: "100%", objectFit: "cover" }}
-                  image={item.imageUrl || camera}
-                  title={item.description}
-                />
-                <CardContent
-                  sx={{ textAlign: "center", cursor: "pointer" }}
-                  onClick={() => openModal(item)}
+          {currentItems.length > 0 ? (
+            currentItems.map((item) => {
+              const category = categories.find((c) => c.id === item.categoryId);
+              const isAvailable = (item as any).isAvailable ?? true;
+
+              return (
+                <Card
+                  key={item.id}
+                  sx={{
+                    height: 400,
+                    width: 250,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    boxShadow: 3,
+                    borderRadius: 2,
+                    overflow: "hidden",
+                  }}
                 >
-                  <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
-                  <p style={{ margin: 0 }}>{item.description}</p>
-                  <p style={{ margin: 0, color: "gray" }}>
-                    Category:{" "}
-                    {category
-                      ? category.name
-                      : item.categoryId
-                      ? `Category ${item.categoryId}`
-                      : "N/A"}
-                  </p>
-                </CardContent>
-                <CardActions>
-                  <Button
-                    variant="contained"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      console.log("Adding item to cart from grid view:", item);
-                      addItem(item);
-                    }}
-                    sx={{
-                      backgroundColor: "#3ec3ba",
-                      "&:hover": { backgroundColor: "#2ba19a" },
-                    }}
+                  <CardMedia
+                    sx={{ height: 200, width: "100%", objectFit: "cover" }}
+                    image={item.imageUrl || camera}
+                    title={item.description}
+                  />
+                  <CardContent
+                    sx={{ textAlign: "center", cursor: "pointer" }}
+                    onClick={() => openModal(item)}
                   >
-                    Add to Cart
-                  </Button>
-                </CardActions>
-              </Card>
-            );
-          })}
+                    <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
+                    <p style={{ margin: 0 }}>{item.description}</p>
+                    <p style={{ margin: 0, color: "gray" }}>
+                      Category: {category ? category.name : ""}
+                    </p>
+                    {hasSearched && startDate && endDate && (
+                      <>
+                        <p
+                          style={{
+                            margin: "8px 0",
+                            color: isAvailable ? "green" : "red",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {isAvailable ? "Available" : "Fully Booked"}
+                        </p>
+                      </>
+                    )}
+                  </CardContent>
+                  <CardActions>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        navigate(`/product/${item.id}`);
+                      }}
+                      disabled={Boolean(
+                        hasSearched && startDate && endDate && !isAvailable
+                      )}
+                    >
+                      {hasSearched && startDate && endDate && !isAvailable
+                        ? "Not Available"
+                        : "Book"}
+                    </Button>
+                  </CardActions>
+                </Card>
+              );
+            })
+          ) : (
+            <Box sx={{ width: "100%", textAlign: "center", py: 4 }}>
+              No available items found for the selected dates
+            </Box>
+          )}
         </Paper>
       </div>
     );
   };
 
-  //in case you want to move to a new page
-  /*  const handleSingleProduct = () => {
-    console.log("single product");
-    navigate(<UserProducts/>); // wrong way. only strings are accecpted with navigate
-  }; */
-
-  /* const handleBooking = () => {
-    console.log("Booking");
-     navigate("/product/:id");
-  }; */
-
   //HANDLE CATEGORY FILTER
   const handleByCategory = (event: SelectChangeEvent) => {
     setCategoryFilter(event.target.value);
-  };
-
-  // SEARCH MANUALLY TYPED ITEMS
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("searching");
-    event.preventDefault();
-
-    const searchInput = event.target.value;
-    setSearchInput(searchInput);
-    console.log("searchInput", searchInput);
-
-    if (searchInput === "") {
-      setFilteredItems(itemsService.items);
-    } else {
-      const filteredItems = itemsService.items.filter((item) =>
-        item.description.toLowerCase().includes(searchInput.toLowerCase())
-      );
-      setFilteredItems(filteredItems);
-    }
   };
 
   return (
@@ -550,65 +685,132 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
       <Box
         sx={{
           display: "flex",
+          flexDirection: { xs: "column", md: "column" },
           marginBottom: "50px",
           marginTop: "10px",
           gap: "20px",
           paddingX: "20px",
         }}
       >
-        {/* grid and list views  + search bar */}
-        <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
-          <TextField
-            onChange={handleSearch}
-            value={searchInput}
-            label="search item"
-            sx={{ width: "50%" }}
-          ></TextField>
-        </Box>
-
+        {/* First row: search bar and category filter */}
         <Box
           sx={{
             display: "flex",
-            justifyContent: "flex-end",
-            gap: "20px",
-            marginRight: "20px",
+            flexDirection: { xs: "column", md: "row" },
+            justifyContent: "space-between",
+            alignItems: { xs: "stretch", md: "center" },
+            width: "100%",
+            gap: { xs: 2, md: 0 },
           }}
         >
-          <AppsIcon
-            sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }}
-            onClick={toggleDisplayMode}
-          />
-          <TableRowsIcon
-            sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }}
-            onClick={toggleDisplayMode}
-          />
-        </Box>
-      </Box>
+          <Box sx={{ width: { xs: "100%", md: "50%" } }}>
+            <TextField
+              onChange={handleSearch}
+              value={searchInput}
+              label="search item"
+              fullWidth
+            />
+          </Box>
 
-      {/* filter by category */}
-      <Box sx={{ marginBottom: "20px" }}>
-        <FormControl sx={{ width: 200 }}>
-          <InputLabel id="category-filter-label">Filter by Category</InputLabel>
-          <Select
-            labelId="category-filter-label"
-            value={categoryFilter}
-            label="Filter by Category"
-            onChange={handleByCategory}
-          >
-            <MenuItem value="all">All Categories</MenuItem>
-            {categories && categories.length > 0 ? (
-              categories.map((category) => (
-                <MenuItem key={category.id} value={category.id.toString()}>
-                  {category.name}
+          <FormControl sx={{ width: { xs: "100%", md: 200 } }}>
+            <InputLabel id="category-filter-label">
+              Filter by Category
+            </InputLabel>
+            <Select
+              labelId="category-filter-label"
+              value={categoryFilter}
+              label="Filter by Category"
+              onChange={handleByCategory}
+            >
+              <MenuItem value="all">All Categories</MenuItem>
+              {categories && categories.length > 0 ? (
+                categories.map((category) => (
+                  <MenuItem key={category.id} value={category.id.toString()}>
+                    {category.name}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled value="">
+                  No categories available
                 </MenuItem>
-              ))
-            ) : (
-              <MenuItem disabled value="">
-                No categories available
-              </MenuItem>
-            )}
-          </Select>
-        </FormControl>
+              )}
+            </Select>
+          </FormControl>
+        </Box>
+
+        {/* Second row: view toggle icons and date pickers */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            justifyContent: "space-between",
+            alignItems: { xs: "stretch", md: "center" },
+            width: "100%",
+            gap: { xs: 2, md: 0 },
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              gap: "20px",
+              justifyContent: { xs: "center", md: "flex-start" },
+            }}
+          >
+            <AppsIcon
+              sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }}
+              onClick={toggleDisplayMode}
+            />
+            <TableRowsIcon
+              sx={{ fontSize: 40, color: "primary.main", cursor: "pointer" }}
+              onClick={toggleDisplayMode}
+            />
+          </Box>
+
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexDirection: { xs: "column", sm: "row" },
+                width: { xs: "100%", md: "auto" },
+              }}
+            >
+              <DatePicker
+                label="Start Date"
+                value={startDate}
+                onChange={(newValue) => setStartDate(newValue)}
+                sx={{ width: { xs: "100%", sm: 200 } }}
+              />
+              <DatePicker
+                label="End Date"
+                value={endDate}
+                onChange={(newValue) => setEndDate(newValue)}
+                sx={{ width: { xs: "100%", sm: 200 } }}
+              />
+              <Button
+                onClick={searchAvailability}
+                disabled={
+                  !startDate || !endDate || itemsLoading || bookingsLoading
+                }
+                variant="contained"
+                color="primary"
+                sx={{ width: { xs: "100%", sm: "auto" } }}
+              >
+                {itemsLoading || bookingsLoading ? "Loading..." : "Search"}
+              </Button>
+              {(startDate || endDate) && (
+                <Button
+                  onClick={handleClearDates}
+                  variant="outlined"
+                  color="primary"
+                  sx={{ width: { xs: "100%", sm: "auto" } }}
+                >
+                  Clear Dates
+                </Button>
+              )}
+            </Box>
+          </LocalizationProvider>
+        </Box>
       </Box>
 
       {modeDisplay === "table" ? handleListView() : handleGridView()}
@@ -627,6 +829,22 @@ const UserProducts: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
           shape="rounded"
         />
       </Stack>
+
+      {/* Add Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
