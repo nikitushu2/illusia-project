@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Paper,
   Table,
@@ -161,7 +160,6 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
       // Process the availability
       const activeBookings = bookings.filter((booking) => {
-        // Only count bookings that have been confirmed (reserved or in-progress)
         const isConfirmed =
           booking.status === BookingStatus.RESERVED ||
           booking.status === BookingStatus.IN_PROGRESS;
@@ -171,32 +169,26 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         return isConfirmed && overlaps;
       });
 
-      const activeBookingItems = activeBookings.flatMap((booking) =>
-        booking.items.map((item) => ({
-          item_id: item.itemId,
-          quantity: item.quantity,
-        }))
-      );
-
       const bookedQuantities: Record<number, number> = {};
-      activeBookingItems.forEach((bi) => {
-        if (!bookedQuantities[bi.item_id]) {
-          bookedQuantities[bi.item_id] = 0;
-        }
-        bookedQuantities[bi.item_id] += bi.quantity;
+      activeBookings.forEach((booking) => {
+        booking.items.forEach((item) => {
+          if (!bookedQuantities[item.itemId]) {
+            bookedQuantities[item.itemId] = 0;
+          }
+          bookedQuantities[item.itemId] += item.quantity;
+        });
       });
 
       // Update the filtered items with availability information
       const updatedFilteredItems = filteredItems.map((item) => {
         const booked = bookedQuantities[item.id] || 0;
-        const remainingQuantity = item.quantity - booked;
+        const remainingQuantity = item.quantity - booked; // Adjust for booked quantity only
         const isAvailable = remainingQuantity > 0;
 
         return {
           ...item,
           isAvailable,
           remainingQuantity,
-          bookedQuantity: booked,
         };
       });
 
@@ -325,7 +317,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     );
   }
 
-  // Update the table view to show availability
+  // TABLE/LIST VIEW
   const handleListView = () => {
     if (isMobile) {
       // Mobile view for smaller screens
@@ -367,7 +359,10 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       <strong>Description:</strong> {item.description}
                     </Typography>
                     <Typography variant="body2">
-                      <strong>Quantity:</strong> {item.quantity}
+                      <strong>Quantity:</strong>{" "}
+                      {hasSearched && startDate && endDate
+                        ? (item as any).remainingQuantity ?? 0
+                        : item.quantity}
                     </Typography>
                     {startDate && endDate && (
                       <>
@@ -539,7 +534,12 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     </TableCell>
                     <TableCell>{item.name}</TableCell>
                     <TableCell>{item.description}</TableCell>
-                    <TableCell>{item.quantity}</TableCell>
+                    <TableCell>
+                      {hasSearched && startDate && endDate
+                        ? (item as any).remainingQuantity ?? 0 // Show remaining quantity when dates are entered
+                        : item.quantity}{" "}
+                      {/* Default to total quantity */}
+                    </TableCell>
                     {hasSearched && startDate && endDate && (
                       <>
                         <TableCell>
