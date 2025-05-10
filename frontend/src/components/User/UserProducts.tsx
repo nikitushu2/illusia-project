@@ -52,7 +52,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
-  const { addItem } = useBookingCart();
+  const { addItem, setStartDate, setEndDate } = useBookingCart();
 
   const [modeDisplay, setModeDisplay] = useState("table");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,8 +61,8 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
   const [page, setPage] = useState(1);
-  const [startDate, setStartDate] = useState<Dayjs | null>(null);
-  const [endDate, setEndDate] = useState<Dayjs | null>(null);
+  const [startDate, setStartDateLocal] = useState<Dayjs | null>(null);
+  const [endDate, setEndDateLocal] = useState<Dayjs | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
   const {
@@ -131,9 +131,16 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     setFilteredItems((prevItems) =>
       prevItems.map((item) =>
         item.id === itemId
-          ? {...item, selectedQuantity: Math.max(0,Math.min(
-            newQuantity,(item as any).remainingQuantity || item.quantity)
-            )}
+          ? {
+              ...item,
+              selectedQuantity: Math.max(
+                0,
+                Math.min(
+                  newQuantity,
+                  (item as any).remainingQuantity || item.quantity
+                )
+              ),
+            }
           : item
       )
     );
@@ -160,6 +167,10 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         });
         return;
       }
+
+      // Set dates in the context
+      setStartDate(startDate.format("YYYY-MM-DD"));
+      setEndDate(endDate.format("YYYY-MM-DD"));
 
       // Ensure we have the data before proceeding
       if (!items || !bookings) {
@@ -267,8 +278,8 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   // Clear dates and reset items
   const handleClearDates = () => {
-    setStartDate(null);
-    setEndDate(null);
+    setStartDateLocal(null);
+    setEndDateLocal(null);
     setHasSearched(false);
     // Reset filtered items to show all items without availability info
     if (items) {
@@ -472,10 +483,11 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                           fontWeight: "bold",
                         }}
                       >
-                        Available: {(item as any).remainingQuantity || item.quantity}
+                        Available:{" "}
+                        {(item as any).remainingQuantity || item.quantity}
                       </Typography>
                     </Box>
-                    
+
                     <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
                       <Button
                         variant="contained"
@@ -707,12 +719,15 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                         >
                           +
                         </Button>
-
                       </Box>
-                        <Typography
-                          variant="body2"
-                          sx={{ mt: 3,  textAlign: "center", color: "grey",  }} > Available:{(item as any).remainingQuantity || item.quantity}
-                        </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ mt: 3, textAlign: "center", color: "grey" }}
+                      >
+                        {" "}
+                        Available:
+                        {(item as any).remainingQuantity || item.quantity}
+                      </Typography>
                     </TableCell>
 
                     {hasSearched && startDate && endDate && (
@@ -793,14 +808,23 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                   }}
                 >
                   <CardMedia
-                    sx={{ height: 200, width: "100%", objectFit: "cover", cursor: "pointer" }}
+                    sx={{
+                      height: 200,
+                      width: "100%",
+                      objectFit: "cover",
+                      cursor: "pointer",
+                    }}
                     image={item.imageUrl || camera}
                     title={item.description}
                     onClick={() => openModal(item)}
                   />
-                  <CardContent sx={{ textAlign: "center",  }}>
-                    <Typography style={{ fontWeight: "bold", margin: 0 }}>{item.name}</Typography>
-                    <Typography style={{ margin: 0 }}>{item.description}</Typography>
+                  <CardContent sx={{ textAlign: "center" }}>
+                    <Typography style={{ fontWeight: "bold", margin: 0 }}>
+                      {item.name}
+                    </Typography>
+                    <Typography style={{ margin: 0 }}>
+                      {item.description}
+                    </Typography>
                     <Typography style={{ margin: 0, color: "gray" }}>
                       Category: {category ? category.name : ""}
                     </Typography>
@@ -818,17 +842,18 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       </>
                     )}
                     <Typography
-                        variant="body2"
-                        sx={{
-                          ml: 2,
-                          color: "grey",
-                          fontSize: "0.9rem",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        Available: {(item as any).remainingQuantity || item.quantity}
-                      </Typography>
-                     <Box
+                      variant="body2"
+                      sx={{
+                        ml: 2,
+                        color: "grey",
+                        fontSize: "0.9rem",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Available:{" "}
+                      {(item as any).remainingQuantity || item.quantity}
+                    </Typography>
+                    <Box
                       sx={{
                         display: "flex",
                         alignItems: "center",
@@ -894,14 +919,9 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       >
                         +
                       </Button>
-                      
                     </Box>
-
                   </CardContent>
                   <CardActions>
-                
-                   
-                    
                     <Button
                       variant="contained"
                       color="primary"
@@ -1034,13 +1054,13 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               <DatePicker
                 label="Start Date"
                 value={startDate}
-                onChange={(newValue) => setStartDate(newValue)}
+                onChange={(newValue) => setStartDateLocal(newValue)}
                 sx={{ width: { xs: "100%", sm: 200 } }}
               />
               <DatePicker
                 label="End Date"
                 value={endDate}
-                onChange={(newValue) => setEndDate(newValue)}
+                onChange={(newValue) => setEndDateLocal(newValue)}
                 sx={{ width: { xs: "100%", sm: 200 } }}
               />
               <Button

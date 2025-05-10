@@ -22,6 +22,10 @@ interface BookingCartContextType {
   openCart: () => void;
   closeCart: () => void;
   totalItems: number;
+  startDate: string | null;
+  endDate: string | null;
+  setStartDate: (date: string | null) => void;
+  setEndDate: (date: string | null) => void;
 }
 
 // Create context with a default value
@@ -35,6 +39,10 @@ const BookingCartContext = createContext<BookingCartContextType>({
   openCart: () => {},
   closeCart: () => {},
   totalItems: 0,
+  startDate: null,
+  endDate: null,
+  setStartDate: () => {},
+  setEndDate: () => {},
 });
 
 // Key for localStorage
@@ -52,6 +60,8 @@ export const BookingCartProvider = ({ children }: BookingCartProviderProps) => {
     return savedItems ? JSON.parse(savedItems) : [];
   });
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
 
   // Save items to localStorage whenever they change
   useEffect(() => {
@@ -76,7 +86,6 @@ export const BookingCartProvider = ({ children }: BookingCartProviderProps) => {
         return [...prevItems, { ...item, quantity: 1 }];
       }
     });
-    // Remove the auto-opening of cart
   };
 
   const removeItem = (itemId: number) => {
@@ -98,6 +107,8 @@ export const BookingCartProvider = ({ children }: BookingCartProviderProps) => {
 
   const clearCart = () => {
     setItems([]);
+    setStartDate(null);
+    setEndDate(null);
   };
 
   const openCart = () => {
@@ -120,6 +131,10 @@ export const BookingCartProvider = ({ children }: BookingCartProviderProps) => {
     openCart,
     closeCart,
     totalItems,
+    startDate,
+    endDate,
+    setStartDate,
+    setEndDate,
   };
 
   return (

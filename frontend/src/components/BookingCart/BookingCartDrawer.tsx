@@ -30,7 +30,8 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
   open,
   onClose,
 }) => {
-  const { items, removeItem, updateQuantity, clearCart } = useBookingCart();
+  const { items, removeItem, updateQuantity, clearCart, startDate, endDate } =
+    useBookingCart();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -136,6 +137,15 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
         </Box>
       ) : (
         <>
+          <Box sx={{ mt: 3, p: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Booking Start Date: {startDate || "Not selected"}
+            </Typography>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Booking End Date: {endDate || "Not selected"}
+            </Typography>
+          </Box>
+
           <List sx={{ flexGrow: 1, overflow: "auto" }}>
             {items.map((item) => (
               <React.Fragment key={item.id}>
