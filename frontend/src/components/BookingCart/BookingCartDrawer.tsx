@@ -189,6 +189,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                               p: 0,
                               fontSize: "14px",
                             }}
+                            disabled={item.quantity <= 1}
                           >
                             -
                           </Button>
@@ -208,6 +209,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                               p: 0,
                               fontSize: "14px",
                             }}
+                            disabled={ item.quantity >= (item.remainingQuantity )}
                           >
                             +
                           </Button>

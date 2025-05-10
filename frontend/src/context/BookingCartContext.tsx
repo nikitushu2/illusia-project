@@ -10,6 +10,9 @@ import { Item } from "../services/itemService";
 // Define types
 export interface CartItem extends Item {
   quantity: number;
+
+  remainingQuantity: number;
+  selectedQuantity: number;
 }
 
 interface BookingCartContextType {
