@@ -746,7 +746,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       >
                         {hasSearched && startDate && endDate && !isAvailable
                           ? "Not Available"
-                          : "Book"}
+                          : "Add to Cart"}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -915,7 +915,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     >
                       {hasSearched && startDate && endDate && !isAvailable
                         ? "Not Available"
-                        : "Book"}
+                        : "Add to Cart"}
                     </Button>
                   </CardActions>
                 </Card>
