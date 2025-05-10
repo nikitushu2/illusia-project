@@ -34,7 +34,7 @@ import { useNavigate } from "react-router-dom";
 import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
 import { Item } from "../../services/itemService";
-import { useBookingCart } from "../../context/BookingCartContext";
+import { CartItem, useBookingCart } from "../../context/BookingCartContext";
 
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -124,6 +124,19 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     });
 
     setFilteredItems(newFilteredItems);
+  };
+
+  // Handle quantity change
+  const handleQuantityChange = (item: CartItem, newQuantity: number) => {
+    console.log(
+      "Changing quantity for item:",
+      item.id,
+      "from",
+      item.quantity,
+      "to",
+      newQuantity
+    );
+    updateQuantity(item.id, newQuantity);
   };
 
   // SEARCH AVAILABILITY BASED ON DATES
@@ -358,12 +371,14 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     <Typography variant="body2">
                       <strong>Description:</strong> {item.description}
                     </Typography>
+
                     <Typography variant="body2">
                       <strong>Quantity:</strong>{" "}
                       {hasSearched && startDate && endDate
                         ? (item as any).remainingQuantity ?? 0
                         : item.quantity}
                     </Typography>
+
                     {startDate && endDate && (
                       <>
                         <Typography
@@ -519,27 +534,75 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                 return (
                   <TableRow
                     key={item.id}
-                    onClick={() => openModal(item)}
                     sx={{
-                      cursor: "pointer",
+                      cursor: "default", // Remove pointer cursor from the entire row
                       "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.04)" },
                     }}
                   >
-                    <TableCell>
+                    <TableCell
+                      onClick={() => openModal(item)}
+                      sx={{ cursor: "pointer" }}
+                    >
                       <img
                         src={item.imageUrl || camera}
                         alt={item.description || "No Image"}
                         style={{ width: 50, height: 50, objectFit: "cover" }}
                       />
                     </TableCell>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.description}</TableCell>
+                    <TableCell
+                      onClick={() => openModal(item)}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      {item.name}
+                    </TableCell>
+                    <TableCell
+                      onClick={() => openModal(item)}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      {item.description}
+                    </TableCell>
                     <TableCell>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() =>
+                          handleQuantityChange(
+                            item,
+                            Math.max(1, item.quantity - 1)
+                          )
+                        }
+                        sx={{
+                          minWidth: "24px",
+                          width: "24px",
+                          height: "24px",
+                          p: 0,
+                          fontSize: "14px",
+                        }}
+                      >
+                        -
+                      </Button>
                       {hasSearched && startDate && endDate
                         ? (item as any).remainingQuantity ?? 0 // Show remaining quantity when dates are entered
                         : item.quantity}{" "}
                       {/* Default to total quantity */}
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() =>
+                          handleQuantityChange(item, item.quantity + 1)
+                        }
+                        sx={{
+                          minWidth: "24px",
+                          width: "24px",
+                          height: "24px",
+                          p: 0,
+                          fontSize: "14px",
+                        }}
+                      >
+                        +
+                      </Button>
                     </TableCell>
+
                     {hasSearched && startDate && endDate && (
                       <>
                         <TableCell>
@@ -631,6 +694,12 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     <p style={{ margin: 0, color: "gray" }}>
                       Category: {category ? category.name : ""}
                     </p>
+                    {/* <p style={{ margin: 0 , color: "gray" }}>
+                      Quantity: 
+                      {hasSearched && startDate && endDate
+                        ? (item as any).remainingQuantity ?? 0
+                        : item.quantity}{" "}
+                    </p> */}
                     {hasSearched && startDate && endDate && (
                       <>
                         <p
