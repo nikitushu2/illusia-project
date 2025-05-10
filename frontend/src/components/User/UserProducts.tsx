@@ -126,17 +126,17 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     setFilteredItems(newFilteredItems);
   };
 
-  // Handle quantity change
-  const handleQuantityChange = (item: CartItem, newQuantity: number) => {
-    console.log(
-      "Changing quantity for item:",
-      item.id,
-      "from",
-      item.quantity,
-      "to",
-      newQuantity
+  // Handle quantity selection
+  const handleQuantityChange = (itemId: number, newQuantity: number) => {
+    setFilteredItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === itemId
+          ? {...item, selectedQuantity: Math.max(0,Math.min(
+            newQuantity,(item as any).remainingQuantity || item.quantity)
+            )}
+          : item
+      )
     );
-    updateQuantity(item.id, newQuantity);
   };
 
   // SEARCH AVAILABILITY BASED ON DATES
@@ -396,6 +396,86 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     <Typography variant="body2">
                       <strong>Category:</strong> {category ? category.name : ""}
                     </Typography>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 1,
+                        mt: 1,
+                      }}
+                    >
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() =>
+                          handleQuantityChange(
+                            item.id,
+                            (item as any).selectedQuantity
+                              ? (item as any).selectedQuantity - 1
+                              : 0
+                          )
+                        }
+                        sx={{
+                          minWidth: "32px",
+                          width: "32px",
+                          height: "32px",
+                          p: 0,
+                          fontSize: "14px",
+                        }}
+                        disabled={(item as any).selectedQuantity === 0}
+                      >
+                        -
+                      </Button>
+                      <Typography
+                        sx={{
+                          minWidth: "40px",
+                          textAlign: "center",
+                          fontSize: "1rem",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {(item as any).selectedQuantity || 0}
+                      </Typography>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() =>
+                          handleQuantityChange(
+                            item.id,
+                            (item as any).selectedQuantity
+                              ? (item as any).selectedQuantity + 1
+                              : 1
+                          )
+                        }
+                        sx={{
+                          minWidth: "32px",
+                          width: "32px",
+                          height: "32px",
+                          p: 0,
+                          fontSize: "14px",
+                        }}
+                        disabled={
+                          (item as any).selectedQuantity >=
+                          ((item as any).remainingQuantity || item.quantity)
+                        }
+                      >
+                        +
+                      </Button>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          ml: 2,
+                          color: "grey",
+                          fontSize: "0.9rem",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Available: {(item as any).remainingQuantity || item.quantity}
+                      </Typography>
+                    </Box>
+                    
                     <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
                       <Button
                         variant="contained"
@@ -562,45 +642,77 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       {item.description}
                     </TableCell>
                     <TableCell>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() =>
-                          handleQuantityChange(
-                            item,
-                            Math.max(1, item.quantity - 1)
-                          )
-                        }
+                      <Box
                         sx={{
-                          minWidth: "24px",
-                          width: "24px",
-                          height: "24px",
-                          p: 0,
-                          fontSize: "14px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 1,
                         }}
                       >
-                        -
-                      </Button>
-                      {hasSearched && startDate && endDate
-                        ? (item as any).remainingQuantity ?? 0 // Show remaining quantity when dates are entered
-                        : item.quantity}{" "}
-                      {/* Default to total quantity */}
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() =>
-                          handleQuantityChange(item, item.quantity + 1)
-                        }
-                        sx={{
-                          minWidth: "24px",
-                          width: "24px",
-                          height: "24px",
-                          p: 0,
-                          fontSize: "14px",
-                        }}
-                      >
-                        +
-                      </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() =>
+                            handleQuantityChange(
+                              item.id,
+                              (item as any).selectedQuantity
+                                ? (item as any).selectedQuantity - 1
+                                : 0
+                            )
+                          }
+                          sx={{
+                            minWidth: "24px",
+                            width: "24px",
+                            height: "24px",
+                            p: 0,
+                            fontSize: "14px",
+                          }}
+                          disabled={(item as any).selectedQuantity === 0}
+                        >
+                          -
+                        </Button>
+                        <Typography
+                          sx={{
+                            minWidth: "30px",
+                            textAlign: "center",
+                            fontSize: "1rem",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {(item as any).selectedQuantity || 0}
+                        </Typography>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() =>
+                            handleQuantityChange(
+                              item.id,
+                              (item as any).selectedQuantity
+                                ? (item as any).selectedQuantity + 1
+                                : 1
+                            )
+                          }
+                          sx={{
+                            minWidth: "24px",
+                            width: "24px",
+                            height: "24px",
+                            p: 0,
+                            fontSize: "14px",
+                          }}
+                          disabled={
+                            (item as any).selectedQuantity >=
+                            ((item as any).remainingQuantity || item.quantity)
+                          }
+                        >
+                          +
+                        </Button>
+
+                      </Box>
+                        <Typography
+                          variant="body2"
+                          sx={{ mt: 3,  textAlign: "center", color: "grey",  }} > Available:{(item as any).remainingQuantity || item.quantity}
+                        </Typography>
                     </TableCell>
 
                     {hasSearched && startDate && endDate && (
@@ -681,28 +793,20 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                   }}
                 >
                   <CardMedia
-                    sx={{ height: 200, width: "100%", objectFit: "cover" }}
+                    sx={{ height: 200, width: "100%", objectFit: "cover", cursor: "pointer" }}
                     image={item.imageUrl || camera}
                     title={item.description}
-                  />
-                  <CardContent
-                    sx={{ textAlign: "center", cursor: "pointer" }}
                     onClick={() => openModal(item)}
-                  >
-                    <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
-                    <p style={{ margin: 0 }}>{item.description}</p>
-                    <p style={{ margin: 0, color: "gray" }}>
+                  />
+                  <CardContent sx={{ textAlign: "center",  }}>
+                    <Typography style={{ fontWeight: "bold", margin: 0 }}>{item.name}</Typography>
+                    <Typography style={{ margin: 0 }}>{item.description}</Typography>
+                    <Typography style={{ margin: 0, color: "gray" }}>
                       Category: {category ? category.name : ""}
-                    </p>
-                    {/* <p style={{ margin: 0 , color: "gray" }}>
-                      Quantity: 
-                      {hasSearched && startDate && endDate
-                        ? (item as any).remainingQuantity ?? 0
-                        : item.quantity}{" "}
-                    </p> */}
+                    </Typography>
                     {hasSearched && startDate && endDate && (
                       <>
-                        <p
+                        <Typography
                           style={{
                             margin: "8px 0",
                             color: isAvailable ? "green" : "red",
@@ -710,11 +814,94 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                           }}
                         >
                           {isAvailable ? "Available" : "Fully Booked"}
-                        </p>
+                        </Typography>
                       </>
                     )}
+                    <Typography
+                        variant="body2"
+                        sx={{
+                          ml: 2,
+                          color: "grey",
+                          fontSize: "0.9rem",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Available: {(item as any).remainingQuantity || item.quantity}
+                      </Typography>
+                     <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 1,
+                        mt: 1,
+                      }}
+                    >
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() =>
+                          handleQuantityChange(
+                            item.id,
+                            (item as any).selectedQuantity
+                              ? (item as any).selectedQuantity - 1
+                              : 0
+                          )
+                        }
+                        sx={{
+                          minWidth: "32px",
+                          width: "32px",
+                          height: "32px",
+                          p: 0,
+                          fontSize: "14px",
+                        }}
+                        disabled={(item as any).selectedQuantity === 0}
+                      >
+                        -
+                      </Button>
+                      <Typography
+                        sx={{
+                          minWidth: "40px",
+                          textAlign: "center",
+                          fontSize: "1rem",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {(item as any).selectedQuantity || 0}
+                      </Typography>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() =>
+                          handleQuantityChange(
+                            item.id,
+                            (item as any).selectedQuantity
+                              ? (item as any).selectedQuantity + 1
+                              : 1
+                          )
+                        }
+                        sx={{
+                          minWidth: "32px",
+                          width: "32px",
+                          height: "32px",
+                          p: 0,
+                          fontSize: "14px",
+                        }}
+                        disabled={
+                          (item as any).selectedQuantity >=
+                          ((item as any).remainingQuantity || item.quantity)
+                        }
+                      >
+                        +
+                      </Button>
+                      
+                    </Box>
+
                   </CardContent>
                   <CardActions>
+                
+                   
+                    
                     <Button
                       variant="contained"
                       color="primary"
