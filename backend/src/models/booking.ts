@@ -83,12 +83,19 @@ Booking.init(
         if (
           booking.previousValues.status &&
           booking.previousValues.status !== booking.status &&
-          booking.status == "RESERVED"
+          (booking.status === BookingStatus.RESERVED ||
+            booking.status === BookingStatus.CANCELLED)
         ) {
           try {
             // Get user information
             const user = await sequelize.models.user.findByPk(booking.userId);
             if (user) {
+              // Get booking items
+              const bookingItems = await sequelize.models.BookingItem.findAll({
+                where: { bookingId: booking.id },
+                include: [{ model: sequelize.models.Item, as: "item" }],
+              });
+
               // Send email notification
               await emailService.sendStatusChangeEmail(
                 {
@@ -96,7 +103,10 @@ Booking.init(
                   displayName: user.get("displayName") as string,
                 },
                 booking.id,
-                booking.status as BookingStatus
+                booking.status as BookingStatus,
+                booking.startDate,
+                booking.endDate,
+                bookingItems
               );
             }
           } catch (error) {

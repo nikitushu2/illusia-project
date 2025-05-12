@@ -181,34 +181,34 @@ export const createCompleteBooking = async (
 };
 
 export const updateCompleteBooking = async (
-  exixtingBooking: UpdateBookingData
+  existingBooking: UpdateBookingData
 ) => {
   const transaction = await sequelize.transaction();
 
   try {
     // Update booking details
     const bookingUpdateData: Partial<BookingCreationAttributes> = {};
-    if (exixtingBooking.startDate)
-      bookingUpdateData.startDate = exixtingBooking.startDate;
-    if (exixtingBooking.endDate)
-      bookingUpdateData.endDate = exixtingBooking.endDate;
-    if (exixtingBooking.status)
-      bookingUpdateData.status = exixtingBooking.status;
+    if (existingBooking.startDate)
+      bookingUpdateData.startDate = existingBooking.startDate;
+    if (existingBooking.endDate)
+      bookingUpdateData.endDate = existingBooking.endDate;
+    if (existingBooking.status)
+      bookingUpdateData.status = existingBooking.status;
 
     await Booking.update(bookingUpdateData, {
-      where: { id: exixtingBooking.id },
+      where: { id: existingBooking.id },
       transaction,
     });
 
     // Handle booking items if provided
-    if (exixtingBooking.items !== undefined) {
-      for (const item of exixtingBooking.items) {
+    if (existingBooking.items !== undefined) {
+      for (const item of existingBooking.items) {
         if (item.id) {
           // Update existing item
           await BookingItem.update(
             { quantity: item.quantity, itemId: item.itemId },
             {
-              where: { id: item.id, bookingId: exixtingBooking.id },
+              where: { id: item.id, bookingId: existingBooking.id },
               transaction,
             }
           );
@@ -216,7 +216,7 @@ export const updateCompleteBooking = async (
           // Create new item
           await BookingItem.create(
             {
-              bookingId: exixtingBooking.id,
+              bookingId: existingBooking.id,
               itemId: item.itemId,
               quantity: item.quantity,
             },
@@ -228,7 +228,7 @@ export const updateCompleteBooking = async (
 
     await transaction.commit();
 
-    const result = await findById(exixtingBooking.id);
+    const result = await findById(existingBooking.id);
     if (!result) {
       throw new Error("Failed to retrieve the created booking");
     }
