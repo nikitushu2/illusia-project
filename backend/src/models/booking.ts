@@ -1,6 +1,7 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import { sequelize } from "../util/db";
 import { BookingStatus } from "../types/booking";
+import * as emailService from "../services/emailService";
 
 // Interface for all attributes a Booking can have
 export interface BookingAttributes {
@@ -26,6 +27,9 @@ class Booking
   public endDate!: Date;
   public status!: string;
   public readonly createdAt!: Date;
+
+  // Add a field to track previous values
+  public previousValues: Partial<BookingAttributes> = {};
 }
 
 Booking.init(
@@ -52,9 +56,7 @@ Booking.init(
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        isIn: [
-          Object.values(BookingStatus),
-        ],
+        isIn: [Object.values(BookingStatus)],
       },
     },
     createdAt: {
@@ -67,6 +69,53 @@ Booking.init(
     sequelize,
     tableName: "bookings",
     underscored: true,
+    hooks: {
+      beforeUpdate: async (booking: Booking) => {
+        const previousBooking = await Booking.findByPk(booking.id);
+        if (previousBooking) {
+          booking.previousValues = {
+            status: previousBooking.status,
+          };
+        }
+      },
+      afterUpdate: async (booking: Booking) => {
+        // If status has changed
+        if (
+          booking.previousValues.status &&
+          booking.previousValues.status !== booking.status &&
+          (booking.status === BookingStatus.RESERVED ||
+            booking.status === BookingStatus.CANCELLED)
+        ) {
+          try {
+            // Get user information
+            const user = await sequelize.models.user.findByPk(booking.userId);
+            if (user) {
+              // Get booking items
+              const bookingItems = await sequelize.models.BookingItem.findAll({
+                where: { bookingId: booking.id },
+                include: [{ model: sequelize.models.Item, as: "item" }],
+              });
+
+              // Send email notification
+              await emailService.sendStatusChangeEmail(
+                {
+                  email: user.get("email") as string,
+                  displayName: user.get("displayName") as string,
+                },
+                booking.id,
+                booking.status as BookingStatus,
+                booking.startDate,
+                booking.endDate,
+                bookingItems
+              );
+            }
+          } catch (error) {
+            console.error("Error sending status change email:", error);
+            // Don't throw here to avoid disrupting the main operation
+          }
+        }
+      },
+    },
   }
 );
 
