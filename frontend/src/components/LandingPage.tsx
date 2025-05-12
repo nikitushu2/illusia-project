@@ -1,10 +1,8 @@
 import {
   Box,
-  Card,
   Container,
   Fade,
   // IconButton,
-  Rating,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -229,12 +227,11 @@ const LandingPage = () => {
     <Box>
     <Typography variant="h4" align="center" sx={{ color: "#9c27b0", margin:"50px" }} > Your next adventure starts here</Typography>
 
-    <Typography variant="h6">
-      Step into a world of boundless imagination with Illusia Ry, the creative force behind Odysseus and other unforgettable live-action role-playing (LARP) adventures. Whether you're a
-      seasoned LARPer or new to the scene, we invite you to bring your stories to life with our expertly crafted props, set pieces, and immersive game design.
+    <Typography variant="h6" >
+    Step into a world of imagination with Illusia Ry, the creative team behind Odysseus and other memorable live-action role-playing (LARP) adventures. Whether you're experienced or just starting out, you can bring your stories to life with our detailed props, sets, and engaging game design.
     </Typography>
 
-    <Box  sx={{  display: "flex",  justifyContent: "space-between",  marginTop: "50px",   gap: "70px", marginBottom: "50px", }}>
+    <Box  sx={{  display: "flex",  justifyContent: "space-between",  marginTop: "50px",   gap: "70px", marginBottom: "100px", }}>
       <Box>
         <CalendarMonthIcon sx={{ width: "70px", height: "70px" }} color="secondary" />
           <Typography variant="h5">Booking</Typography>
