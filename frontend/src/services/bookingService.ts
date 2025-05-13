@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { API_URL } from '../config/constants';
 import { BookingStatus } from '../types/booking';
 
@@ -38,18 +37,30 @@ export interface CreateBookingData {
   }[];
 }
 
-// Create authenticated axios instance
-const authAxios = axios.create({
-  baseURL: API_URL,
-  withCredentials: true, // Include cookies with every request
-});
+const BASE_URL = `${API_URL}/private`;
+
+const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
+  const response = await fetch(`${BASE_URL}${url}`, {
+    ...options,
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response.json();
+};
 
 // Booking service
 const bookingService = {
   getAll: async (): Promise<Booking[]> => {
     try {
-      const response = await authAxios.get('/private/bookings/my-bookings');
-      return response.data;
+      return await fetchWithAuth('/bookings/my-bookings');
     } catch (error) {
       console.error("Error fetching bookings:", error);
       throw error;
@@ -58,8 +69,7 @@ const bookingService = {
 
   getById: async (id: number): Promise<Booking> => {
     try {
-      const response = await authAxios.get(`/private/bookings/${id}`);
-      return response.data;
+      return await fetchWithAuth(`/bookings/${id}`);
     } catch (error) {
       console.error(`Error fetching booking ${id}:`, error);
       throw error;
@@ -67,11 +77,11 @@ const bookingService = {
   },
 
   create: async (data: CreateBookingData): Promise<Booking> => {
-    console.log("Creating booking with data:", data);
     try {
-      const response = await authAxios.post('/private/bookings', data);
-      console.log("Booking created successfully:", response.data);
-      return response.data;
+      return await fetchWithAuth('/bookings', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
     } catch (error) {
       console.error("Error creating booking:", error);
       throw error;
@@ -80,8 +90,10 @@ const bookingService = {
 
   update: async (id: number, data: Partial<Booking>): Promise<Booking> => {
     try {
-      const response = await authAxios.put(`/private/bookings/${id}`, data);
-      return response.data;
+      return await fetchWithAuth(`/bookings/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
     } catch (error) {
       console.error(`Error updating booking ${id}:`, error);
       throw error;
@@ -90,7 +102,9 @@ const bookingService = {
 
   delete: async (id: number): Promise<void> => {
     try {
-      await authAxios.delete(`/private/bookings/${id}`);
+      await fetchWithAuth(`/bookings/${id}`, {
+        method: 'DELETE',
+      });
     } catch (error) {
       console.error(`Error deleting booking ${id}:`, error);
       throw error;
@@ -99,8 +113,9 @@ const bookingService = {
 
   cancel: async (id: number): Promise<Booking> => {
     try {
-      const response = await authAxios.post(`/private/bookings/${id}/cancel`);
-      return response.data;
+      return await fetchWithAuth(`/bookings/${id}/cancel`, {
+        method: 'POST',
+      });
     } catch (error) {
       console.error(`Error cancelling booking ${id}:`, error);
       throw error;
@@ -109,8 +124,9 @@ const bookingService = {
 
   complete: async (id: number): Promise<Booking> => {
     try {
-      const response = await authAxios.post(`/private/bookings/${id}/complete`);
-      return response.data;
+      return await fetchWithAuth(`/bookings/${id}/complete`, {
+        method: 'POST',
+      });
     } catch (error) {
       console.error(`Error completing booking ${id}:`, error);
       throw error;

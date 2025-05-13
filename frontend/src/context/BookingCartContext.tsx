@@ -8,16 +8,20 @@ import React, {
 import { Item } from "../services/itemService";
 
 // Define types
+interface ExtendedItem extends Item {
+  remainingQuantity?: number;
+  selectedQuantity?: number;
+}
+
 export interface CartItem extends Item {
   quantity: number;
-
-  remainingQuantity: number;
-  selectedQuantity: number;
+  remainingQuantity?: number;
+  selectedQuantity?: number;
 }
 
 interface BookingCartContextType {
   items: CartItem[];
-  addItem: (item: Item) => void;
+  addItem: (item: Item, quantity?: number) => void;
   removeItem: (itemId: number) => void;
   updateQuantity: (itemId: number, quantity: number) => void;
   clearCart: () => void;
@@ -71,22 +75,30 @@ export const BookingCartProvider = ({ children }: BookingCartProviderProps) => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  const addItem = (item: Item) => {
-    console.log("Adding item to cart:", item);
+  const addItem = (item: ExtendedItem, quantity: number = 1) => {
+    console.log("Adding item to cart:", item, "with quantity:", quantity);
     setItems((prevItems) => {
       const existingItemIndex = prevItems.findIndex((i) => i.id === item.id);
 
       if (existingItemIndex >= 0) {
-        // If item already exists, increment quantity
+        // If item already exists, update quantity
         const newItems = [...prevItems];
         newItems[existingItemIndex] = {
           ...newItems[existingItemIndex],
-          quantity: newItems[existingItemIndex].quantity + 1,
+          quantity: quantity,
+          remainingQuantity: item.remainingQuantity || item.quantity,
         };
         return newItems;
       } else {
-        // Add new item with quantity 1
-        return [...prevItems, { ...item, quantity: 1 }];
+        // Add new item with specified quantity
+        return [
+          ...prevItems,
+          {
+            ...item,
+            quantity: quantity,
+            remainingQuantity: item.remainingQuantity || item.quantity,
+          },
+        ];
       }
     });
   };

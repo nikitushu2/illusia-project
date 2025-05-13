@@ -234,13 +234,13 @@ export const updateCompleteBooking = async (
         }
       }
       // Delete removed items not present in the update payload
-      const providedIds = exixtingBooking.items
+      const providedIds = existingBooking.items
         .filter((item) => item.id != null)
         .map((item) => item.id as number);
       if (providedIds.length > 0) {
         await BookingItem.destroy({
           where: {
-            bookingId: exixtingBooking.id,
+            bookingId: existingBooking.id,
             id: { [Op.notIn]: providedIds },
           },
           transaction,
@@ -248,7 +248,7 @@ export const updateCompleteBooking = async (
       } else {
         // No items provided: delete all items for this booking
         await BookingItem.destroy({
-          where: { bookingId: exixtingBooking.id },
+          where: { bookingId: existingBooking.id },
           transaction,
         });
       }

@@ -34,7 +34,7 @@ import { useNavigate } from "react-router-dom";
 import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
 import { Item } from "../../services/itemService";
-import { CartItem, useBookingCart } from "../../context/BookingCartContext";
+import { useBookingCart } from "../../context/BookingCartContext";
 
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -43,6 +43,13 @@ import dayjs, { Dayjs } from "dayjs";
 
 import { ApiRole, useFetch } from "../../hooks/useFetch";
 import { BookingStatus, BookingWithDetails } from "../../types/booking";
+
+// Add extended Item type
+interface ExtendedItem extends Item {
+  selectedQuantity?: number;
+  remainingQuantity?: number;
+  isAvailable?: boolean;
+}
 
 interface ItemListProps {
   categories?: { id: number; name: string }[];
@@ -56,10 +63,12 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   const [modeDisplay, setModeDisplay] = useState("table");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Item | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ExtendedItem | null>(
+    null
+  );
   const [searchInput, setSearchInput] = useState<string>("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [filteredItems, setFilteredItems] = useState<Item[]>([]);
+  const [filteredItems, setFilteredItems] = useState<ExtendedItem[]>([]);
   const [page, setPage] = useState(1);
   const [startDate, setStartDateLocal] = useState<Dayjs | null>(null);
   const [endDate, setEndDateLocal] = useState<Dayjs | null>(null);
@@ -135,10 +144,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               ...item,
               selectedQuantity: Math.max(
                 0,
-                Math.min(
-                  newQuantity,
-                  (item as any).remainingQuantity || item.quantity
-                )
+                Math.min(newQuantity, item.remainingQuantity || item.quantity)
               ),
             }
           : item
@@ -186,7 +192,9 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
       const activeBookings = bookings.filter((booking) => {
         const isConfirmed =
           booking.status === BookingStatus.RESERVED ||
-          booking.status === BookingStatus.IN_PROGRESS;
+          booking.status === BookingStatus.IN_PROGRESS ||
+          booking.status === BookingStatus.PENDING_APPROVAL ||
+          booking.status === BookingStatus.IN_QUEUE;
         const overlaps =
           dayjs(booking.startDate).isBefore(endDate) &&
           dayjs(booking.endDate).isAfter(startDate);
@@ -291,7 +299,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     setModeDisplay((prevMode) => (prevMode === "table" ? "grid" : "table"));
   };
 
-  const openModal = (item: Item) => {
+  const openModal = (item: ExtendedItem) => {
     setSelectedProduct(item);
     setIsModalOpen(true);
   };
@@ -349,7 +357,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         <Box sx={{ mt: 2, px: { xs: 1, sm: 2 } }}>
           {currentItems.map((item) => {
             const category = categories.find((c) => c.id === item.categoryId);
-            const isAvailable = (item as any).isAvailable ?? true;
+            const isAvailable = item.isAvailable ?? true;
 
             return (
               <Paper key={item.id} sx={{ p: 2, mb: 2 }}>
@@ -386,7 +394,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     <Typography variant="body2">
                       <strong>Quantity:</strong>{" "}
                       {hasSearched && startDate && endDate
-                        ? (item as any).remainingQuantity ?? 0
+                        ? item.remainingQuantity ?? 0
                         : item.quantity}
                     </Typography>
 
@@ -423,8 +431,8 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                         onClick={() =>
                           handleQuantityChange(
                             item.id,
-                            (item as any).selectedQuantity
-                              ? (item as any).selectedQuantity - 1
+                            item.selectedQuantity
+                              ? item.selectedQuantity - 1
                               : 0
                           )
                         }
@@ -435,7 +443,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                           p: 0,
                           fontSize: "14px",
                         }}
-                        disabled={(item as any).selectedQuantity === 0}
+                        disabled={item.selectedQuantity === 0}
                       >
                         -
                       </Button>
@@ -447,7 +455,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                           fontWeight: "bold",
                         }}
                       >
-                        {(item as any).selectedQuantity || 0}
+                        {item.selectedQuantity || 0}
                       </Typography>
                       <Button
                         size="small"
@@ -455,8 +463,8 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                         onClick={() =>
                           handleQuantityChange(
                             item.id,
-                            (item as any).selectedQuantity
-                              ? (item as any).selectedQuantity + 1
+                            item.selectedQuantity
+                              ? item.selectedQuantity + 1
                               : 1
                           )
                         }
@@ -468,8 +476,8 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                           fontSize: "14px",
                         }}
                         disabled={
-                          (item as any).selectedQuantity >=
-                          ((item as any).remainingQuantity || item.quantity)
+                          item.selectedQuantity >=
+                          (item.remainingQuantity || item.quantity)
                         }
                       >
                         +
@@ -483,8 +491,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                           fontWeight: "bold",
                         }}
                       >
-                        Available:{" "}
-                        {(item as any).remainingQuantity || item.quantity}
+                        Available: {item.remainingQuantity || item.quantity}
                       </Typography>
                     </Box>
 
@@ -497,7 +504,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                             "Adding item to cart from mobile view:",
                             item
                           );
-                          addItem(item);
+                          addItem(item, item.selectedQuantity ?? 1);
                         }}
                         disabled={Boolean(startDate && endDate && !isAvailable)}
                       >
@@ -621,7 +628,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                 const category = categories.find(
                   (c) => c.id === item.categoryId
                 );
-                const isAvailable = (item as any).isAvailable ?? true;
+                const isAvailable = item.isAvailable ?? true;
 
                 return (
                   <TableRow
@@ -668,8 +675,8 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                           onClick={() =>
                             handleQuantityChange(
                               item.id,
-                              (item as any).selectedQuantity
-                                ? (item as any).selectedQuantity - 1
+                              item.selectedQuantity
+                                ? item.selectedQuantity - 1
                                 : 0
                             )
                           }
@@ -680,7 +687,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                             p: 0,
                             fontSize: "14px",
                           }}
-                          disabled={(item as any).selectedQuantity === 0}
+                          disabled={item.selectedQuantity === 0}
                         >
                           -
                         </Button>
@@ -692,7 +699,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                             fontWeight: "bold",
                           }}
                         >
-                          {(item as any).selectedQuantity || 0}
+                          {item.selectedQuantity || 0}
                         </Typography>
                         <Button
                           size="small"
@@ -700,8 +707,8 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                           onClick={() =>
                             handleQuantityChange(
                               item.id,
-                              (item as any).selectedQuantity
-                                ? (item as any).selectedQuantity + 1
+                              item.selectedQuantity
+                                ? item.selectedQuantity + 1
                                 : 1
                             )
                           }
@@ -713,8 +720,8 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                             fontSize: "14px",
                           }}
                           disabled={
-                            (item as any).selectedQuantity >=
-                            ((item as any).remainingQuantity || item.quantity)
+                            item.selectedQuantity >=
+                            (item.remainingQuantity || item.quantity)
                           }
                         >
                           +
@@ -726,7 +733,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       >
                         {" "}
                         Available:
-                        {(item as any).remainingQuantity || item.quantity}
+                        {item.remainingQuantity || item.quantity}
                       </Typography>
                     </TableCell>
 
@@ -753,7 +760,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                             "Adding item to cart from table view:",
                             item
                           );
-                          addItem(item);
+                          addItem(item, item.selectedQuantity ?? 1);
                         }}
                         disabled={Boolean(
                           hasSearched && startDate && endDate && !isAvailable
@@ -790,7 +797,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           {currentItems.length > 0 ? (
             currentItems.map((item) => {
               const category = categories.find((c) => c.id === item.categoryId);
-              const isAvailable = (item as any).isAvailable ?? true;
+              const isAvailable = item.isAvailable ?? true;
 
               return (
                 <Card
@@ -850,8 +857,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                         fontWeight: "bold",
                       }}
                     >
-                      Available:{" "}
-                      {(item as any).remainingQuantity || item.quantity}
+                      Available: {item.remainingQuantity || item.quantity}
                     </Typography>
                     <Box
                       sx={{
@@ -868,8 +874,8 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                         onClick={() =>
                           handleQuantityChange(
                             item.id,
-                            (item as any).selectedQuantity
-                              ? (item as any).selectedQuantity - 1
+                            item.selectedQuantity
+                              ? item.selectedQuantity - 1
                               : 0
                           )
                         }
@@ -880,7 +886,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                           p: 0,
                           fontSize: "14px",
                         }}
-                        disabled={(item as any).selectedQuantity === 0}
+                        disabled={item.selectedQuantity === 0}
                       >
                         -
                       </Button>
@@ -892,7 +898,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                           fontWeight: "bold",
                         }}
                       >
-                        {(item as any).selectedQuantity || 0}
+                        {item.selectedQuantity || 0}
                       </Typography>
                       <Button
                         size="small"
@@ -900,8 +906,8 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                         onClick={() =>
                           handleQuantityChange(
                             item.id,
-                            (item as any).selectedQuantity
-                              ? (item as any).selectedQuantity + 1
+                            item.selectedQuantity
+                              ? item.selectedQuantity + 1
                               : 1
                           )
                         }
@@ -913,8 +919,8 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                           fontSize: "14px",
                         }}
                         disabled={
-                          (item as any).selectedQuantity >=
-                          ((item as any).remainingQuantity || item.quantity)
+                          item.selectedQuantity >=
+                          (item.remainingQuantity || item.quantity)
                         }
                       >
                         +
@@ -927,7 +933,11 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       color="primary"
                       onClick={(event) => {
                         event.stopPropagation();
-                        navigate(`/product/${item.id}`);
+                        console.log(
+                          "Adding item to cart from grid view:",
+                          item
+                        );
+                        addItem(item, item.selectedQuantity ?? 1);
                       }}
                       disabled={Boolean(
                         hasSearched && startDate && endDate && !isAvailable

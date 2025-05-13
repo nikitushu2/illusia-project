@@ -146,7 +146,7 @@ const UserDashboard = () => {
                 sx={{
                   position: "absolute",
                   right: 0,
-                  top: "60px",
+                  top: "10px",
                 }}
                 style={{ color: "white" }}
               >
@@ -274,9 +274,9 @@ const UserDashboard = () => {
                     </List>
                   </ListItem>
                 </Collapse>
-                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} />
+                {/* <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} /> */}
 
-                <ListItem disablePadding>
+                {/* <ListItem disablePadding>
                   <ListItemButton>
                     <ListItemIcon style={{ color: "white" }}>
                       <DraftsIcon />
@@ -291,7 +291,7 @@ const UserDashboard = () => {
                       />
                     )}
                   </ListItemButton>
-                </ListItem>
+                </ListItem> */}
                 <Divider />
               </List>
             </Box>
