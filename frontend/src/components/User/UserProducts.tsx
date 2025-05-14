@@ -34,6 +34,7 @@ import { useNavigate } from "react-router-dom";
 import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
 import { Item } from "../../services/itemService";
+import { useBookingCart } from "../../context/BookingCartContext";
 
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -43,6 +44,13 @@ import dayjs, { Dayjs } from "dayjs";
 import { ApiRole, useFetch } from "../../hooks/useFetch";
 import { BookingStatus, BookingWithDetails } from "../../types/booking";
 
+// Add extended Item type
+interface ExtendedItem extends Item {
+  selectedQuantity?: number;
+  remainingQuantity?: number;
+  isAvailable?: boolean;
+}
+
 interface ItemListProps {
   categories?: { id: number; name: string }[];
 }
@@ -51,16 +59,19 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
+  const { addItem, setStartDate, setEndDate } = useBookingCart();
 
   const [modeDisplay, setModeDisplay] = useState("table");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Item | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ExtendedItem | null>(
+    null
+  );
   const [searchInput, setSearchInput] = useState<string>("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [filteredItems, setFilteredItems] = useState<Item[]>([]);
+  const [filteredItems, setFilteredItems] = useState<ExtendedItem[]>([]);
   const [page, setPage] = useState(1);
-  const [startDate, setStartDate] = useState<Dayjs | null>(null);
-  const [endDate, setEndDate] = useState<Dayjs | null>(null);
+  const [startDate, setStartDateLocal] = useState<Dayjs | null>(null);
+  const [endDate, setEndDateLocal] = useState<Dayjs | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
   const {
@@ -124,6 +135,23 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     setFilteredItems(newFilteredItems);
   };
 
+  // Handle quantity selection
+  const handleQuantityChange = (itemId: number, newQuantity: number) => {
+    setFilteredItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === itemId
+          ? {
+              ...item,
+              selectedQuantity: Math.max(
+                0,
+                Math.min(newQuantity, item.remainingQuantity || item.quantity)
+              ),
+            }
+          : item
+      )
+    );
+  };
+
   // SEARCH AVAILABILITY BASED ON DATES
   const searchAvailability = async () => {
     try {
@@ -146,6 +174,10 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         return;
       }
 
+      // Set dates in the context
+      setStartDate(startDate.format("YYYY-MM-DD"));
+      setEndDate(endDate.format("YYYY-MM-DD"));
+
       // Ensure we have the data before proceeding
       if (!items || !bookings) {
         setSnackbar({
@@ -158,43 +190,37 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
       // Process the availability
       const activeBookings = bookings.filter((booking) => {
-        const isActive =
-          (booking.status === BookingStatus.PENDING_APPROVAL ||
-            booking.status === BookingStatus.IN_PROGRESS ||
-            booking.status === BookingStatus.RESERVED ||
-            booking.status === BookingStatus.IN_QUEUE) &&
+        const isConfirmed =
+          booking.status === BookingStatus.RESERVED ||
+          booking.status === BookingStatus.IN_PROGRESS ||
+          booking.status === BookingStatus.PENDING_APPROVAL ||
+          booking.status === BookingStatus.IN_QUEUE;
+        const overlaps =
           dayjs(booking.startDate).isBefore(endDate) &&
           dayjs(booking.endDate).isAfter(startDate);
-
-        return isActive;
+        return isConfirmed && overlaps;
       });
 
-      const activeBookingItems = activeBookings.flatMap((booking) =>
-        booking.items.map((item) => ({
-          item_id: item.itemId,
-          quantity: item.quantity,
-        }))
-      );
-
       const bookedQuantities: Record<number, number> = {};
-      activeBookingItems.forEach((bi) => {
-        if (!bookedQuantities[bi.item_id]) {
-          bookedQuantities[bi.item_id] = 0;
-        }
-        bookedQuantities[bi.item_id] += bi.quantity;
+      activeBookings.forEach((booking) => {
+        booking.items.forEach((item) => {
+          if (!bookedQuantities[item.itemId]) {
+            bookedQuantities[item.itemId] = 0;
+          }
+          bookedQuantities[item.itemId] += item.quantity;
+        });
       });
 
       // Update the filtered items with availability information
       const updatedFilteredItems = filteredItems.map((item) => {
         const booked = bookedQuantities[item.id] || 0;
-        const remainingQuantity = item.quantity - booked;
+        const remainingQuantity = item.quantity - booked; // Adjust for booked quantity only
         const isAvailable = remainingQuantity > 0;
 
         return {
           ...item,
           isAvailable,
           remainingQuantity,
-          bookedQuantity: booked,
         };
       });
 
@@ -260,8 +286,8 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
   // Clear dates and reset items
   const handleClearDates = () => {
-    setStartDate(null);
-    setEndDate(null);
+    setStartDateLocal(null);
+    setEndDateLocal(null);
     setHasSearched(false);
     // Reset filtered items to show all items without availability info
     if (items) {
@@ -273,7 +299,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     setModeDisplay((prevMode) => (prevMode === "table" ? "grid" : "table"));
   };
 
-  const openModal = (item: Item) => {
+  const openModal = (item: ExtendedItem) => {
     setSelectedProduct(item);
     setIsModalOpen(true);
   };
@@ -323,7 +349,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     );
   }
 
-  // Update the table view to show availability
+  // TABLE/LIST VIEW
   const handleListView = () => {
     if (isMobile) {
       // Mobile view for smaller screens
@@ -331,9 +357,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         <Box sx={{ mt: 2, px: { xs: 1, sm: 2 } }}>
           {currentItems.map((item) => {
             const category = categories.find((c) => c.id === item.categoryId);
-            const booked = (item as any).bookedQuantity || 0;
-            const remaining = (item as any).remainingQuantity || item.quantity;
-            const isAvailable = (item as any).isAvailable ?? true;
+            const isAvailable = item.isAvailable ?? true;
 
             return (
               <Paper key={item.id} sx={{ p: 2, mb: 2 }}>
@@ -366,9 +390,14 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     <Typography variant="body2">
                       <strong>Description:</strong> {item.description}
                     </Typography>
+
                     <Typography variant="body2">
-                      <strong>Quantity:</strong> {item.quantity}
+                      <strong>Quantity:</strong>{" "}
+                      {hasSearched && startDate && endDate
+                        ? item.remainingQuantity ?? 0
+                        : item.quantity}
                     </Typography>
+
                     {startDate && endDate && (
                       <>
                         <Typography
@@ -386,19 +415,102 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     <Typography variant="body2">
                       <strong>Category:</strong> {category ? category.name : ""}
                     </Typography>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 1,
+                        mt: 1,
+                      }}
+                    >
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() =>
+                          handleQuantityChange(
+                            item.id,
+                            item.selectedQuantity
+                              ? item.selectedQuantity - 1
+                              : 0
+                          )
+                        }
+                        sx={{
+                          minWidth: "32px",
+                          width: "32px",
+                          height: "32px",
+                          p: 0,
+                          fontSize: "14px",
+                        }}
+                        disabled={item.selectedQuantity === 0}
+                      >
+                        -
+                      </Button>
+                      <Typography
+                        sx={{
+                          minWidth: "40px",
+                          textAlign: "center",
+                          fontSize: "1rem",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {item.selectedQuantity || 0}
+                      </Typography>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() =>
+                          handleQuantityChange(
+                            item.id,
+                            item.selectedQuantity
+                              ? item.selectedQuantity + 1
+                              : 1
+                          )
+                        }
+                        sx={{
+                          minWidth: "32px",
+                          width: "32px",
+                          height: "32px",
+                          p: 0,
+                          fontSize: "14px",
+                        }}
+                        disabled={
+                          item.selectedQuantity >=
+                          (item.remainingQuantity || item.quantity)
+                        }
+                      >
+                        +
+                      </Button>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          ml: 2,
+                          color: "grey",
+                          fontSize: "0.9rem",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Available: {item.remainingQuantity || item.quantity}
+                      </Typography>
+                    </Box>
+
                     <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
                       <Button
                         variant="contained"
-                        color="primary"
                         onClick={(event) => {
                           event.stopPropagation();
-                          navigate(`/product/${item.id}`);
+                          console.log(
+                            "Adding item to cart from mobile view:",
+                            item
+                          );
+                          addItem(item, item.selectedQuantity ?? 1);
                         }}
-                        disabled={startDate && endDate && !isAvailable}
+                        disabled={Boolean(startDate && endDate && !isAvailable)}
                       >
                         {startDate && endDate && !isAvailable
                           ? "Not Available"
-                          : "Book"}
+                          : " Add to Cart"}
                       </Button>
                     </Box>
                   </Box>
@@ -516,30 +628,115 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                 const category = categories.find(
                   (c) => c.id === item.categoryId
                 );
-                const booked = (item as any).bookedQuantity || 0;
-                const remaining =
-                  (item as any).remainingQuantity || item.quantity;
-                const isAvailable = (item as any).isAvailable ?? true;
+                const isAvailable = item.isAvailable ?? true;
 
                 return (
                   <TableRow
                     key={item.id}
-                    onClick={() => openModal(item)}
                     sx={{
-                      cursor: "pointer",
+                      cursor: "default", // Remove pointer cursor from the entire row
                       "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.04)" },
                     }}
                   >
-                    <TableCell>
+                    <TableCell
+                      onClick={() => openModal(item)}
+                      sx={{ cursor: "pointer" }}
+                    >
                       <img
                         src={item.imageUrl || camera}
                         alt={item.description || "No Image"}
                         style={{ width: 50, height: 50, objectFit: "cover" }}
                       />
                     </TableCell>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.description}</TableCell>
-                    <TableCell>{item.quantity}</TableCell>
+                    <TableCell
+                      onClick={() => openModal(item)}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      {item.name}
+                    </TableCell>
+                    <TableCell
+                      onClick={() => openModal(item)}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      {item.description}
+                    </TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() =>
+                            handleQuantityChange(
+                              item.id,
+                              item.selectedQuantity
+                                ? item.selectedQuantity - 1
+                                : 0
+                            )
+                          }
+                          sx={{
+                            minWidth: "24px",
+                            width: "24px",
+                            height: "24px",
+                            p: 0,
+                            fontSize: "14px",
+                          }}
+                          disabled={item.selectedQuantity === 0}
+                        >
+                          -
+                        </Button>
+                        <Typography
+                          sx={{
+                            minWidth: "30px",
+                            textAlign: "center",
+                            fontSize: "1rem",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {item.selectedQuantity || 0}
+                        </Typography>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() =>
+                            handleQuantityChange(
+                              item.id,
+                              item.selectedQuantity
+                                ? item.selectedQuantity + 1
+                                : 1
+                            )
+                          }
+                          sx={{
+                            minWidth: "24px",
+                            width: "24px",
+                            height: "24px",
+                            p: 0,
+                            fontSize: "14px",
+                          }}
+                          disabled={
+                            item.selectedQuantity >=
+                            (item.remainingQuantity || item.quantity)
+                          }
+                        >
+                          +
+                        </Button>
+                      </Box>
+                      <Typography
+                        variant="body2"
+                        sx={{ mt: 3, textAlign: "center", color: "grey" }}
+                      >
+                        {" "}
+                        Available:
+                        {item.remainingQuantity || item.quantity}
+                      </Typography>
+                    </TableCell>
+
                     {hasSearched && startDate && endDate && (
                       <>
                         <TableCell>
@@ -559,15 +756,19 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                         color="primary"
                         onClick={(event) => {
                           event.stopPropagation();
-                          navigate(`/product/${item.id}`);
+                          console.log(
+                            "Adding item to cart from table view:",
+                            item
+                          );
+                          addItem(item, item.selectedQuantity ?? 1);
                         }}
-                        disabled={
+                        disabled={Boolean(
                           hasSearched && startDate && endDate && !isAvailable
-                        }
+                        )}
                       >
                         {hasSearched && startDate && endDate && !isAvailable
                           ? "Not Available"
-                          : "Book"}
+                          : "Add to Cart"}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -596,10 +797,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           {currentItems.length > 0 ? (
             currentItems.map((item) => {
               const category = categories.find((c) => c.id === item.categoryId);
-              const booked = (item as any).bookedQuantity || 0;
-              const remaining =
-                (item as any).remainingQuantity || item.quantity;
-              const isAvailable = (item as any).isAvailable ?? true;
+              const isAvailable = item.isAvailable ?? true;
 
               return (
                 <Card
@@ -617,22 +815,29 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                   }}
                 >
                   <CardMedia
-                    sx={{ height: 200, width: "100%", objectFit: "cover" }}
+                    sx={{
+                      height: 200,
+                      width: "100%",
+                      objectFit: "cover",
+                      cursor: "pointer",
+                    }}
                     image={item.imageUrl || camera}
                     title={item.description}
-                  />
-                  <CardContent
-                    sx={{ textAlign: "center", cursor: "pointer" }}
                     onClick={() => openModal(item)}
-                  >
-                    <p style={{ fontWeight: "bold", margin: 0 }}>{item.name}</p>
-                    <p style={{ margin: 0 }}>{item.description}</p>
-                    <p style={{ margin: 0, color: "gray" }}>
+                  />
+                  <CardContent sx={{ textAlign: "center" }}>
+                    <Typography style={{ fontWeight: "bold", margin: 0 }}>
+                      {item.name}
+                    </Typography>
+                    <Typography style={{ margin: 0 }}>
+                      {item.description}
+                    </Typography>
+                    <Typography style={{ margin: 0, color: "gray" }}>
                       Category: {category ? category.name : ""}
-                    </p>
+                    </Typography>
                     {hasSearched && startDate && endDate && (
                       <>
-                        <p
+                        <Typography
                           style={{
                             margin: "8px 0",
                             color: isAvailable ? "green" : "red",
@@ -640,9 +845,87 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                           }}
                         >
                           {isAvailable ? "Available" : "Fully Booked"}
-                        </p>
+                        </Typography>
                       </>
                     )}
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        ml: 2,
+                        color: "grey",
+                        fontSize: "0.9rem",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Available: {item.remainingQuantity || item.quantity}
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 1,
+                        mt: 1,
+                      }}
+                    >
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() =>
+                          handleQuantityChange(
+                            item.id,
+                            item.selectedQuantity
+                              ? item.selectedQuantity - 1
+                              : 0
+                          )
+                        }
+                        sx={{
+                          minWidth: "32px",
+                          width: "32px",
+                          height: "32px",
+                          p: 0,
+                          fontSize: "14px",
+                        }}
+                        disabled={item.selectedQuantity === 0}
+                      >
+                        -
+                      </Button>
+                      <Typography
+                        sx={{
+                          minWidth: "40px",
+                          textAlign: "center",
+                          fontSize: "1rem",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {item.selectedQuantity || 0}
+                      </Typography>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() =>
+                          handleQuantityChange(
+                            item.id,
+                            item.selectedQuantity
+                              ? item.selectedQuantity + 1
+                              : 1
+                          )
+                        }
+                        sx={{
+                          minWidth: "32px",
+                          width: "32px",
+                          height: "32px",
+                          p: 0,
+                          fontSize: "14px",
+                        }}
+                        disabled={
+                          item.selectedQuantity >=
+                          (item.remainingQuantity || item.quantity)
+                        }
+                      >
+                        +
+                      </Button>
+                    </Box>
                   </CardContent>
                   <CardActions>
                     <Button
@@ -650,15 +933,19 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       color="primary"
                       onClick={(event) => {
                         event.stopPropagation();
-                        navigate(`/product/${item.id}`);
+                        console.log(
+                          "Adding item to cart from grid view:",
+                          item
+                        );
+                        addItem(item, item.selectedQuantity ?? 1);
                       }}
-                      disabled={
+                      disabled={Boolean(
                         hasSearched && startDate && endDate && !isAvailable
-                      }
+                      )}
                     >
                       {hasSearched && startDate && endDate && !isAvailable
                         ? "Not Available"
-                        : "Book"}
+                        : "Add to Cart"}
                     </Button>
                   </CardActions>
                 </Card>
@@ -777,13 +1064,13 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               <DatePicker
                 label="Start Date"
                 value={startDate}
-                onChange={(newValue) => setStartDate(newValue)}
+                onChange={(newValue) => setStartDateLocal(newValue)}
                 sx={{ width: { xs: "100%", sm: 200 } }}
               />
               <DatePicker
                 label="End Date"
                 value={endDate}
-                onChange={(newValue) => setEndDate(newValue)}
+                onChange={(newValue) => setEndDateLocal(newValue)}
                 sx={{ width: { xs: "100%", sm: 200 } }}
               />
               <Button

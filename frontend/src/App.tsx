@@ -12,45 +12,57 @@ import { Header } from "./components/Header";
 import { UserManagement } from "./components/userManagement/UserManagement";
 import Footer from "./components/Footer";
 
-
 import UserDashboard from "./components/User/UserDashboard";
-
+import { BookingCartProvider } from "./context/BookingCartContext";
 import AdminNewProductForm from "./components/Admin/AdminNewProductForm";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import Events from "./components/Events";
 import Info from "./components/Info";
-
-
+import { AuthProvider } from "./context/AuthContext";
 
 const App: React.FC = () => {
+  console.log("App rendering with BookingCartProvider");
+
   return (
-    <Router>
-      <CssBaseline />
-      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}> 
-        <Header />
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          {/* <Route path="/sideBar" element={<Sidebar />} /> */}
-          <Route path="/logoutPage" element={<LogoutPage />} />
-          <Route path="/items" element={<ItemManagement />} />
-          <Route path="/events" element={<Events/>} />
-          <Route path="/info" element={<Info/>} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/login" element={<Login />} />
-          { /* TODO: show error page for /users if user is not admin, once the error page is created */}
-          <Route path="/users" element={<UserManagement />} />
+    <AuthProvider>
+      <BookingCartProvider>
+        <Router>
+          <CssBaseline />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              minHeight: "100vh",
+            }}
+          >
+            <Header />
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              {/* <Route path="/sideBar" element={<Sidebar />} /> */}
+              <Route path="/logoutPage" element={<LogoutPage />} />
+              <Route path="/items" element={<ItemManagement />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/info" element={<Info />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/login" element={<Login />} />
+              {/* TODO: show error page for /users if user is not admin, once the error page is created */}
+              <Route path="/users" element={<UserManagement />} />
 
-          {/* User Routes */}
-          <Route path="/userDashboard" element={<UserDashboard />} />
+              {/* User Routes */}
+              <Route path="/userDashboard" element={<UserDashboard />} />
 
-          {/* Admin Routes */}
-          <Route path="/adminDashboard" element={<AdminDashboard/>} />
-          <Route path="/adminNewProduct" element={<AdminNewProductForm/>} />
-          
-        </Routes>
-        <Footer />
-      </Box>
-    </Router>
+              {/* Admin Routes */}
+              <Route path="/adminDashboard" element={<AdminDashboard />} />
+              <Route
+                path="/adminNewProduct"
+                element={<AdminNewProductForm />}
+              />
+            </Routes>
+            <Footer />
+          </Box>
+        </Router>
+      </BookingCartProvider>
+    </AuthProvider>
   );
 };
 
