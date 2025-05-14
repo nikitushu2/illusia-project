@@ -19,7 +19,7 @@ import HandshakeIcon from "@mui/icons-material/Handshake";
 import image1 from "../images/illusia images/testImage 1.png";
 import image2 from "../images/illusia images/testImage 2.png";
 import image3 from "../images/illusia images/testImage 3.png";
-import image4 from "../images/illusia images/testImage 4.png";
+import image4 from "../images/image4.png";
 
 const LandingPage = () => {
 
@@ -34,7 +34,7 @@ const LandingPage = () => {
         setCurrentImage((prev) => (prev + 1) % images.length);
         setFadeIn(true);
       }, 500);
-    }, 5000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [images.length]);

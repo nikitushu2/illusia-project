@@ -43,6 +43,7 @@ import dayjs, { Dayjs } from "dayjs";
 
 import { ApiRole, useFetch } from "../../hooks/useFetch";
 import { BookingStatus, BookingWithDetails } from "../../types/booking";
+import noImage from "../../images/noImage.png";
 
 // Add extended Item type
 interface ExtendedItem extends Item {
@@ -381,7 +382,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     }}
                   >
                     <img
-                      src={item.imageUrl || camera}
+                      src={item.imageUrl || noImage}
                       alt={item.description || "No Image"}
                       style={{
                         width: "100%",
@@ -669,7 +670,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       sx={{ cursor: "pointer" }}
                     >
                       <img
-                        src={item.imageUrl || camera}
+                        src={item.imageUrl || noImage}
                         alt={item.description || "No Image"}
                         style={{ width: 50, height: 50, objectFit: "cover" }}
                       />
@@ -864,7 +865,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       objectFit: "cover",
                       cursor: "pointer",
                     }}
-                    image={item.imageUrl || camera}
+                    image={item.imageUrl || noImage}
                     title={item.description}
                     onClick={() => openModal(item)}
                   />
