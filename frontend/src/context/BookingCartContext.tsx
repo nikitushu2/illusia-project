@@ -6,6 +6,7 @@ import React, {
   useEffect,
 } from "react";
 import { Item } from "../services/itemService";
+import dayjs from "dayjs";
 
 // Define types
 interface ExtendedItem extends Item {
@@ -69,6 +70,27 @@ export const BookingCartProvider = ({ children }: BookingCartProviderProps) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
+
+  // Custom date setters that ensure proper formatting
+  const handleSetStartDate = (date: string | null) => {
+    if (date) {
+      // Ensure date is in YYYY-MM-DD format
+      const formattedDate = dayjs(date).format("YYYY-MM-DD");
+      setStartDate(formattedDate);
+    } else {
+      setStartDate(null);
+    }
+  };
+
+  const handleSetEndDate = (date: string | null) => {
+    if (date) {
+      // Ensure date is in YYYY-MM-DD format
+      const formattedDate = dayjs(date).format("YYYY-MM-DD");
+      setEndDate(formattedDate);
+    } else {
+      setEndDate(null);
+    }
+  };
 
   // Save items to localStorage whenever they change
   useEffect(() => {
@@ -148,8 +170,8 @@ export const BookingCartProvider = ({ children }: BookingCartProviderProps) => {
     totalItems,
     startDate,
     endDate,
-    setStartDate,
-    setEndDate,
+    setStartDate: handleSetStartDate,
+    setEndDate: handleSetEndDate,
   };
 
   return (

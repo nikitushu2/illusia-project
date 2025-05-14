@@ -276,22 +276,7 @@ const UserDashboard = () => {
                 </Collapse>
                 {/* <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} /> */}
 
-                {/* <ListItem disablePadding>
-                  <ListItemButton>
-                    <ListItemIcon style={{ color: "white" }}>
-                      <DraftsIcon />
-                    </ListItemIcon>
-                    {!isCollapsed && (
-                      <ListItemText
-                        primary="Messages"
-                        slotProps={{
-                          primary: { style: { color: "white" } },
-                        }}
-                        onClick={() => handleSideBar("Display messages")}
-                      />
-                    )}
-                  </ListItemButton>
-                </ListItem> */}
+                
                 <Divider />
               </List>
             </Box>
@@ -314,13 +299,7 @@ const UserDashboard = () => {
                 gap: "50px",
               }}
             >
-              {/* <Button onClick={handleAddNew} component={Link} to="/adminNewProduct">ADD NEW ITEM</Button> */}
-
-              {/* grid and list views */}
-              {/* <Box sx={{ display: "flex", marginRight:"50px", justifyContent: "flex-end", marginTop: "10px" }}>
-                    <AppsIcon sx={{ fontSize: 40, color: "primary.main" }} onClick={handleGridView} />
-                    <TableRowsIcon sx={{ fontSize: 40, color: "primary.main" }} onClick={handleListView} />
-                </Box> */}
+            
             </Box>
 
             {/* data here */}
