@@ -34,6 +34,9 @@ import useCategories from "../../services/categoryService";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
+// Import useLocation from react-router-dom
+import { useLocation } from "react-router-dom";
+
 const UserDashboard = () => {
   const [sideLink, setsideLink] = useState<string | null>(null);
   const [productsOpen, setProductsOpen] = useState(false);
@@ -42,6 +45,18 @@ const UserDashboard = () => {
   const [component, setComponent] = useState<React.ReactElement | null>(null);
 
   const categoriesService = useCategories();
+
+  // Inside the component, add this near the beginning
+  const location = useLocation();
+  const state = location.state as { showBookings?: boolean } | null;
+
+  // Add an effect to check for showBookings state and open bookings tab if needed
+  useEffect(() => {
+    if (state && state.showBookings) {
+      setBookingsOpen(true);
+      handleSideBar(<UserBookings />);
+    }
+  }, [state]);
 
   // Initialize component with user products when categories are loaded
   useEffect(() => {
@@ -72,6 +87,10 @@ const UserDashboard = () => {
   //handle arrow up/down for bookings
   const handleBookingsClick = () => {
     setBookingsOpen(!bookingsOpen);
+    // Show bookings when clicking on bookings menu item
+    if (!bookingsOpen) {
+      handleSideBar(<UserBookings />);
+    }
   };
 
   // Function to handle Products menu item click
@@ -127,7 +146,7 @@ const UserDashboard = () => {
                 sx={{
                   position: "absolute",
                   right: 0,
-                  top: "60px",
+                  top: "10px",
                 }}
                 style={{ color: "white" }}
               >
@@ -255,9 +274,9 @@ const UserDashboard = () => {
                     </List>
                   </ListItem>
                 </Collapse>
-                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} />
+                {/* <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} /> */}
 
-                <ListItem disablePadding>
+                {/* <ListItem disablePadding>
                   <ListItemButton>
                     <ListItemIcon style={{ color: "white" }}>
                       <DraftsIcon />
@@ -272,7 +291,7 @@ const UserDashboard = () => {
                       />
                     )}
                   </ListItemButton>
-                </ListItem>
+                </ListItem> */}
                 <Divider />
               </List>
             </Box>
