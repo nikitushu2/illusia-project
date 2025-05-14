@@ -36,7 +36,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  console.log("Cart items in drawer:", items);
+
 
   const handleQuantityChange = (item: CartItem, newQuantity: number) => {
     console.log(
@@ -77,11 +77,11 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
         })),
       };
 
-      console.log("Creating booking with data:", bookingData);
+
 
       // Call the real API to create the booking
       const createdBooking = await bookingService.create(bookingData);
-      console.log("Successfully created booking:", createdBooking);
+      //console.log("Successfully created booking:", createdBooking);
 
       // Show success notification
       alert("Booking created successfully! It is now pending admin approval.");

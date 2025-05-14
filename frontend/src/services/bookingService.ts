@@ -1,4 +1,3 @@
-import { API_URL } from '../config/constants';
 import { BookingStatus } from '../types/booking';
 
 // Types
@@ -37,7 +36,7 @@ export interface CreateBookingData {
   }[];
 }
 
-const BASE_URL = `${API_URL}/private`;
+const BASE_URL = `http://localhost:3000/api/private`;
 
 const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
   const response = await fetch(`${BASE_URL}${url}`, {
