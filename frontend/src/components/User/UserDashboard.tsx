@@ -284,25 +284,11 @@ const UserDashboard = () => {
               margin: "10px",
               width: isCollapsed ? "calc(100% - 100px)" : "calc(100% - 270px)", //
               transition: "width 0.3s ease-in-out",
+
+              display: "flex",
+              justifyContent: "center",
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                marginBottom: "20px",
-                justifyContent: "center",
-                marginTop: "10px",
-                gap: "50px",
-              }}
-            >
-              {/* <Button onClick={handleAddNew} component={Link} to="/adminNewProduct">ADD NEW ITEM</Button> */}
-
-              {/* grid and list views */}
-              {/* <Box sx={{ display: "flex", marginRight:"50px", justifyContent: "flex-end", marginTop: "10px" }}>
-                    <AppsIcon sx={{ fontSize: 40, color: "primary.main" }} onClick={handleGridView} />
-                    <TableRowsIcon sx={{ fontSize: 40, color: "primary.main" }} onClick={handleListView} />
-                </Box> */}
-            </Box>
 
             {/* data here */}
             <Box sx={{ marginTop: "50px", marginRight: "50px" }}>
