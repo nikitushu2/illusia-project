@@ -15,6 +15,8 @@ interface BookingItem {
     itemName: string;
     itemImage: string;
     bookedQuantity: number;
+    startDate: Date;
+    endDate: Date;
 }
 
 interface Status {
@@ -53,11 +55,15 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
     
 
     const bookingItems: BookingItem[] = booking.items.map((bookingItem) => {
+        console.log("Booking user", booking);
+        console.log("Items", items);
         const item = items.find((i) => i.id === bookingItem.itemId);
         return {
             itemName: item?.name || "",
             itemImage: item?.imageUrl || "",
             bookedQuantity: bookingItem?.quantity || 0,
+            startDate: booking.startDate,
+            endDate: booking.endDate,
         };
     });
 
@@ -155,13 +161,77 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
                 </AccordionSummary>
                 <AccordionDetails>
                     <Box>
-                        <TableContainer sx={{ marginTop: 3 }}>
+                    {isMobile ? (
+            // Mobile: Stacked layout using Box and Typography
+            <Box>
+                {bookingItems.map((item, index) => (
+                    <Box
+                        key={index}
+                        sx={{
+                            mb: 2,
+                            p: 2,
+                            border: 1,
+                            borderColor: 'divider',
+                            borderRadius: 2,
+                            backgroundColor: 'background.default',
+                        }}
+                    >
+                        <Typography variant="subtitle2"><b>Item Name:</b> {item.itemName}</Typography>
+                        <Typography variant="subtitle2"><b>Item Image:</b>
+                            <Box sx={{ my: 1 }}>
+                                <img src={item.itemImage} alt={item.itemName} style={{ width: "50px", height: "50px" }} />
+                            </Box>
+                        </Typography>
+                       
+                        <Typography variant="body2"><b>Booked Quantity:</b> {item.bookedQuantity}</Typography>
+                        <Typography variant="body2"><b>Start date:</b> {item.startDate ? new Date(item.startDate).toLocaleDateString() : ""}</Typography>
+                        <Typography variant="body2"><b>End date:</b> {item.endDate ? new Date(item.endDate).toLocaleDateString() : ""}</Typography>
+                    </Box>
+                ))}
+            </Box>
+        ) : (
+            // Desktop: Table layout
+            <TableContainer sx={{ marginTop: 3 }}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><b>Item Name</b></TableCell>
+                            <TableCell><b>Item Image</b></TableCell>
+                            <TableCell><b>Booked Quantity</b></TableCell>
+                            <TableCell><b>Start date</b></TableCell>
+                            <TableCell><b>End date</b></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {bookingItems.map((item, index) => (
+                            <TableRow key={index}>
+                                <TableCell>{item.itemName}</TableCell>
+                                <TableCell>
+                                    <img src={item.itemImage} alt={item.itemName} style={{ width: "50px", height: "50px" }} />
+                                </TableCell>
+                                <TableCell>{item.bookedQuantity}</TableCell>
+                                <TableCell>
+                                    {item.startDate ? new Date(item.startDate).toLocaleDateString() : ""}
+                                </TableCell>
+                                <TableCell>
+                                    {item.endDate ? new Date(item.endDate).toLocaleDateString() : ""}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        )}
+                        {/* <TableContainer sx={{ marginTop: 3 }}>
                             <Table>
                                 <TableHead>
                                     <TableRow>
                                         <TableCell><b>Item Name</b></TableCell>
                                         <TableCell><b>Item Image</b></TableCell>
                                         <TableCell><b>Booked Quantity</b></TableCell>
+                                        <TableCell><b>Start date</b></TableCell>
+                                        <TableCell><b>End date</b></TableCell>
+                                        
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -172,11 +242,17 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
                                                 <img src={item.itemImage} alt={item.itemName} style={{ width: "50px", height: "50px" }} />
                                             </TableCell>
                                             <TableCell>{item.bookedQuantity}</TableCell>
+                                            <TableCell>
+                                            {item.startDate ? new Date(item.startDate).toLocaleDateString() : ""}
+                                            </TableCell>
+                                            <TableCell>
+                                                {item.endDate ? new Date(item.endDate).toLocaleDateString() : ""}
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
                             </Table>
-                        </TableContainer>
+                        </TableContainer> */}
                         <Box display={"flex"} gap={2} marginTop={3} paddingX={2}>
                             <Button
                                 variant="contained"

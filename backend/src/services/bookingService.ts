@@ -30,6 +30,8 @@ export function mapBookingToDetails(booking: any): BookingWithDetails {
       id: bi.id,
       itemId: bi.itemId,
       quantity: bi.quantity,
+      startDate: bi.startDate, // <-- Add this line
+      endDate: bi.endDate,
       item: bi.item
         ? {
             id: bi.item.id,
