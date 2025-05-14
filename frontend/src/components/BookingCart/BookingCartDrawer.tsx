@@ -36,8 +36,6 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-
-
   const handleQuantityChange = (item: CartItem, newQuantity: number) => {
     console.log(
       "Changing quantity for item:",
@@ -56,20 +54,26 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
       return;
     }
 
+    if (!startDate || !endDate) {
+      setError("Please select booking dates first");
+      return;
+    }
+
+    // Basic validation
+    if (new Date(startDate) > new Date(endDate)) {
+      setError("Start date must be before end date");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      // Add a startDate and endDate for the booking - use the current date and two weeks later
-      const today = new Date();
-      const twoWeeksLater = new Date(today);
-      twoWeeksLater.setDate(today.getDate() + 14);
-
-      // Create the booking with the correct data structure
+      // Create the booking with the correct data structure with dates in YYYY-MM-DD format
       const bookingData = {
-        startDate: today.toISOString().split("T")[0], // Format as YYYY-MM-DD
-        endDate: twoWeeksLater.toISOString().split("T")[0], // Format as YYYY-MM-DD
-        status: BookingStatus.PENDING_APPROVAL, // Use the enum value
+        startDate: startDate,
+        endDate: endDate,
+        status: BookingStatus.PENDING_APPROVAL,
 
         items: items.map((item) => ({
           itemId: item.id,
@@ -77,11 +81,10 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
         })),
       };
 
-
+   
 
       // Call the real API to create the booking
-      const createdBooking = await bookingService.create(bookingData);
-      //console.log("Successfully created booking:", createdBooking);
+      await bookingService.create(bookingData);
 
       // Show success notification
       alert("Booking created successfully! It is now pending admin approval.");
@@ -139,10 +142,27 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
         <>
           <Box sx={{ mt: 3, p: 2 }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
-              Booking Start Date: {startDate || "Not selected"}
+              Booking Start Date:{" "}
+              {startDate ? (
+                new Date(startDate).toLocaleDateString()
+              ) : (
+                <Button
+                  color="primary"
+                  size="small"
+                  onClick={() => {
+                    onClose();
+                    navigate("/");
+                  }}
+                >
+                  Select Dates
+                </Button>
+              )}
             </Typography>
             <Typography variant="h6" sx={{ mb: 2 }}>
-              Booking End Date: {endDate || "Not selected"}
+              Booking End Date:{" "}
+              {endDate
+                ? new Date(endDate).toLocaleDateString()
+                : "Not selected"}
             </Typography>
           </Box>
 
