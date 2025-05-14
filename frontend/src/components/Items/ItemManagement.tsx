@@ -166,7 +166,7 @@ const ItemManagement: React.FC = () => {
             color="primary"
             fontWeight="bold"
           >
-            Item display for All
+            Illusia Item Management
           </Typography>
           {/* Add New Item button removed */}
         </Box>

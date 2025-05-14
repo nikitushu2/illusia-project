@@ -31,7 +31,7 @@ import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import camera from "../../images/camera.png";
+//import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
 import { Item } from "../../services/itemService";
 import { useBookingCart } from "../../context/BookingCartContext";
