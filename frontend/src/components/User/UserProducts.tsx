@@ -176,10 +176,15 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         return;
       }
 
-      // Set dates in the context
-      setStartDate(startDate.format("YYYY-MM-DD"));
-      setEndDate(endDate.format("YYYY-MM-DD"));
+      // Format dates consistently as YYYY-MM-DD
+      const formattedStartDate = startDate.format("YYYY-MM-DD");
+      const formattedEndDate = endDate.format("YYYY-MM-DD");
 
+      // Set dates in the context
+      setStartDate(formattedStartDate);
+      setEndDate(formattedEndDate);
+
+    
       // Ensure we have the data before proceeding
       if (!items || !bookings) {
         setSnackbar({

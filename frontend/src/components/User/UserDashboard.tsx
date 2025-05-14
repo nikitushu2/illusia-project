@@ -276,22 +276,7 @@ const UserDashboard = () => {
                 </Collapse>
                 {/* <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} /> */}
 
-                {/* <ListItem disablePadding>
-                  <ListItemButton>
-                    <ListItemIcon style={{ color: "white" }}>
-                      <DraftsIcon />
-                    </ListItemIcon>
-                    {!isCollapsed && (
-                      <ListItemText
-                        primary="Messages"
-                        slotProps={{
-                          primary: { style: { color: "white" } },
-                        }}
-                        onClick={() => handleSideBar("Display messages")}
-                      />
-                    )}
-                  </ListItemButton>
-                </ListItem> */}
+                
                 <Divider />
               </List>
             </Box>
