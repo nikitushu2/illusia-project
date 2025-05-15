@@ -161,33 +161,6 @@ adminBookingsRouter.put(
   }
 );
 
-// PATCH update booking status - admin only
-adminBookingsRouter.patch(
-  "/id/:id/status",
-  findBookingById,
-  async (
-    req: BookingRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const { status } = req.body as { status: BookingStatus };
-      if (!status) {
-        res.status(400).json({ error: "Status is required" });
-        return;
-      }
-
-      const updatedBooking = await bookingService.updateStatus(
-        Number(req.params.id),
-        status
-      );
-      res.json(updatedBooking);
-    } catch (error) {
-      next(error);
-    }
-  }
-);
-
 // DELETE booking - admin only
 adminBookingsRouter.delete(
   "/id/:id",
@@ -196,6 +169,32 @@ adminBookingsRouter.delete(
     try {
       await bookingService.remove(Number(req.params.id));
       res.status(204).end();
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// approve user booking - admin only
+adminBookingsRouter.patch(`/approve/:id`, findBookingById,
+  async (req: BookingRequest, res: Response, next: NextFunction) => {
+    try {
+      const bookingId = Number(req.params.id);
+      const approvedBooking = await bookingService.approveBooking(bookingId);
+      res.json(approvedBooking);
+    } catch (error) {
+      console.error("Error approving booking:", error);
+      next(error);
+    }
+  }
+);
+// reject user booking - admin only
+adminBookingsRouter.patch("/reject/:id", findBookingById,
+  async (req: BookingRequest, res: Response, next: NextFunction) => {
+    try {
+      const bookingId = Number(req.params.id);
+      const rejectedBooking = await bookingService.rejectBooking(bookingId);
+      res.json(rejectedBooking);
     } catch (error) {
       next(error);
     }
