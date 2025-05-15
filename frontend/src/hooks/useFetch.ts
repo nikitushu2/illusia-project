@@ -48,7 +48,8 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
       const response = await fetch(`${BACKEND_BASE_PATH}${role}/${url}`, options);
       if (response.ok) {
         setOk(true);
-        const data = await response.json() as T;
+        const text = await response.text();
+        const data = text ? (JSON.parse(text) as T) : null;
         setData(data);
       } else {
         let errorMessage: ApiErrorType;

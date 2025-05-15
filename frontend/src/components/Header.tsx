@@ -232,9 +232,8 @@ export const Header = () => {
                         <Typography
                           variant="body1"
                           sx={{ color: "primary.main", fontWeight: "bold" }}
-                        >{`${applicationUser?.email} (${applicationUser?.role})`}</Typography>
+                        >{`(${applicationUser?.role})`}</Typography>
                       }
-                      variant="outlined"
                     />
                     <Button
                       onClick={handleLogout}

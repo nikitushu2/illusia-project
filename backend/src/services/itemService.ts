@@ -1,7 +1,7 @@
 import Item from "../models/item";
 import Category from "../models/category";
 import { ItemAttributes } from "../models/item";
-import { Op } from "sequelize";
+import { Op, Sequelize, Transaction } from "sequelize";
 
 export interface ItemFilterOptions {
   categoryIds?: number[];
@@ -151,4 +151,14 @@ export const searchItems = async (
       },
     ],
   });
+};
+
+export const updateStock = async (itemId: number, quantity: number, transaction: Transaction): Promise<void> => {
+  await Item.update(
+    { quantity: Sequelize.literal(`quantity + ${quantity}`) },
+    {
+      where: { id: itemId },
+      transaction,
+    }
+  );
 };

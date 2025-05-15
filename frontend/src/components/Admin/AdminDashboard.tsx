@@ -28,6 +28,7 @@ import AdminBookings from "./AdminBookings";
 import AdminProducts from "./AdminProducts";
 import useCategories from "../../services/categoryService";
 import { UserManagement } from "../userManagement/UserManagement";
+import { AdminBookingApproval } from "../AdminBookingApproval";
 
 const AdminDashboard = () => {
   const [sideLink, setsideLink] = useState<string | null>(null);
@@ -257,7 +258,7 @@ const AdminDashboard = () => {
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
-                            onClick={() => handleSideBar(<AdminBookings />)}
+                            onClick={() => handleSideBar(<AdminBookingApproval />)}
                           />
                         )}
                       </ListItemButton>

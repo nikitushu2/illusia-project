@@ -33,7 +33,7 @@ app.use(
       process.env.NODE_ENV === "production"
         ? "https://illusia-project-2947763ee03d.herokuapp.com"
         : ["http://localhost:5173", "http://localhost:5174"],
-    methods: "GET,POST,PUT,DELETE",
+    methods: "GET,POST,PUT,PATCH,DELETE",
     credentials: true,
   })
 );

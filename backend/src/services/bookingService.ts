@@ -4,12 +4,8 @@ import BookingItem from "../models/bookingItem";
 import Item from "../models/item";
 import { InferCreationAttributes, Op } from "sequelize";
 import { sequelize } from "../util/db";
-import {
-  BookingStatus,
-  BookingWithDetails,
-  CreateBookingData,
-  UpdateBookingData,
-} from "../types/booking";
+import { BookingStatus, BookingWithDetails, CreateBookingData, UpdateBookingData } from "../types/booking";
+import { updateStock } from "./itemService";
 
 export type BookingCreationAttributes = Omit<
   InferCreationAttributes<Booking>,
@@ -34,6 +30,8 @@ export function mapBookingToDetails(booking: any): BookingWithDetails {
       id: bi.id,
       itemId: bi.itemId,
       quantity: bi.quantity,
+      startDate: bi.startDate, // <-- Add this line
+      endDate: bi.endDate,
       item: bi.item
         ? {
             id: bi.item.id,
@@ -109,32 +107,55 @@ export const findByUserId = async (
   }
 };
 
-export const updateStatus = async (
-  id: number,
-  status: BookingStatus
-): Promise<BookingWithDetails> => {
+export const approveBooking = async (id: number): Promise<BookingWithDetails> => {
   try {
-    // First, find the booking
-    const booking = await Booking.findByPk(id);
-    if (!booking) {
+    const [rowsUpdated, updatedBookings] = await Booking.update({ status: BookingStatus.RESERVED }, 
+      {
+        where: { id },
+        returning: true,
+      });
+    if (rowsUpdated === 0) {
       throw new Error("Booking not found");
     }
-
-    // Update the status - this will trigger the hooks
-    booking.status = status;
-    await booking.save();
-
-    // Return the updated booking with details
-    const result = await findById(id);
-    if (!result) {
+    const bookingDetails = await findById(updatedBookings[0].id);
+    if (!bookingDetails) {
       throw new Error("Failed to retrieve the updated booking");
     }
-    return result;
+    return bookingDetails;
   } catch (error) {
     console.error("Error updating booking status:", error);
     throw error;
   }
 };
+
+export const rejectBooking = async (id: number): Promise<BookingWithDetails> => {
+  const transaction = await sequelize.transaction();
+  try {
+    const booking = await findById(id);
+    if (!booking) {
+      throw new Error("Booking not found");
+    }
+    await Booking.update({ status: BookingStatus.CANCELLED }, 
+      {
+        where: { id: booking.id },
+        transaction,
+      });
+    for (const bookingItem of booking.items) {
+      await updateStock(bookingItem.itemId, bookingItem.quantity, transaction);
+    }  
+    transaction.commit();
+
+    const bookingDetails = await findById(booking.id);
+    if (!bookingDetails) {
+      throw new Error("Failed to retrieve the updated booking");
+    }
+    return bookingDetails;
+  } catch (error) {
+    transaction.rollback();
+    console.error("Error rejecting booking:", error);
+    throw error;
+  }
+}
 
 export const remove = async (id: number): Promise<void> => {
   try {
