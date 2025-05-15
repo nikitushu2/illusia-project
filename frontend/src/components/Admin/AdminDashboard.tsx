@@ -24,7 +24,6 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
-//import AdminBookings from "./AdminBookings";
 import AdminProducts from "./AdminProducts";
 import useCategories from "../../services/categoryService";
 import { UserManagement } from "../userManagement/UserManagement";
@@ -252,23 +251,6 @@ const AdminDashboard = () => {
                     </List>
                   </ListItem>
                 </Collapse>
-
-                {/* <ListItem disablePadding>
-                  <ListItemButton>
-                    <ListItemIcon style={{ color: "white" }}>
-                      <DraftsIcon />
-                    </ListItemIcon>
-                    {!isCollapsed && (
-                      <ListItemText
-                        primary="Messages"
-                        slotProps={{
-                          primary: { style: { color: "white" } },
-                        }}
-                        onClick={() => handleSideBar("Display messages")}
-                      />
-                    )}
-                  </ListItemButton>
-                </ListItem> */}
               </List>
             </Box>
           </Box>
