@@ -177,11 +177,6 @@ const UserDashboard = () => {
                           }}
                           onClick={handleProductsMenuClick}
                         />
-                        {productsOpen ? (
-                          <ExpandLess style={{ color: "white" }} />
-                        ) : (
-                          <ExpandMore style={{ color: "white" }} />
-                        )}
                       </>
                     )}
                   </ListItemButton>
