@@ -24,7 +24,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
-import AdminBookings from "./AdminBookings";
+//import AdminBookings from "./AdminBookings";
 import AdminProducts from "./AdminProducts";
 import useCategories from "../../services/categoryService";
 import { UserManagement } from "../userManagement/UserManagement";
@@ -166,11 +166,6 @@ const AdminDashboard = () => {
                           }}
                           onClick={handleProductsMenuClick}
                         />
-                        {/* {productsOpen ? (
-                          <ExpandLess style={{ color: "white" }} />
-                        ) : (
-                          <ExpandMore style={{ color: "white" }} />
-                        )} */}
                       </>
                     )}
                   </ListItemButton>
