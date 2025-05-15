@@ -273,7 +273,7 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                       fontSize: "1.1rem",
                     }}
                   >
-                    location
+                    Location
                   </TableCell>
 
                  {/*  <TableCell

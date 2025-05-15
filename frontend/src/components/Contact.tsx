@@ -3,7 +3,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 
-export const Contact = () => {
+const Contact = () => {
 
   return (
     <Container sx={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "50px", marginTop: "50px" }}>
@@ -14,7 +14,7 @@ export const Contact = () => {
         <TextField id="name" label="Name" variant="outlined" fullWidth />
         <TextField id="email" label="Email" variant="outlined" fullWidth />
         <TextField id="message" label="Message" variant="outlined" multiline rows={4} fullWidth />
-        <Button id="submit" label="Submit" type="submit" color="inherit" variant="contained" sx={{ fontSize: "1rem", fontWeight: "bold" }}> Submit</Button>
+        <Button id="submit" type="submit" color="inherit" variant="contained" sx={{ fontSize: "1rem", fontWeight: "bold" }}> Submit</Button>
       </Box>
 
       <Box
@@ -59,3 +59,5 @@ export const Contact = () => {
     </Container>
   )
 }
+
+export default Contact;

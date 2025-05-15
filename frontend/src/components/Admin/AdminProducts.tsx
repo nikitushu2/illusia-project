@@ -42,12 +42,14 @@ import useItems, {
   CreateItemData,
   Item,
 } from "../../services/itemService";
-import camera from "../../images/camera.png";
+//import camera from "../../images/camera.png";
 import ItemForm from "../Items/ItemForm";
 import { useAuth } from "../../context/AuthContext";
 import UserSingleProduct from "../User/UserSingleProduct";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+
+import noImage from "../../images/noImage.png";
 
 interface ItemListProps {
   onEdit?: (item: Item) => void;
@@ -657,10 +659,11 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
+                            
                           }}
                         >
                           <img
-                            src={item.imageUrl || camera}
+                            src={item.imageUrl || noImage}
                             alt={item.description || "No Image Available"}
                             style={{
                               width: "100%",
@@ -686,13 +689,14 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       </TableCell>
                       <TableCell>
                         <Box
-                          sx={{
-                            display: "flex",
-                            gap: { xs: 0.5, sm: 1 },
-                            "& .MuiIconButton-root": {
-                              padding: { xs: "4px", sm: "8px" },
-                            },
-                          }}
+                          // sx={{
+                          //   display: "flex",
+                          //   gap: { xs: 0.5, sm: 1 },
+                          //   "& .MuiIconButton-root": {
+                          //     padding: { xs: "4px", sm: "8px" },
+                          //   },
+                          // }}
+
                         >
                           <IconButton
                             color="primary"
@@ -701,6 +705,12 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                               handleEdit(item);
                             }}
                             size="small"
+                            sx={{
+                              "&:hover": {
+                            backgroundColor: "primary.dark",
+                            color: "white",
+                          },
+                            }}
                           >
                             <EditIcon />
                           </IconButton>
@@ -768,7 +778,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                 >
                   <CardMedia
                     sx={{ height: 200, width: "100%", objectFit: "cover" }}
-                    image={item.imageUrl || camera}
+                    image={item.imageUrl || noImage}
                     title={item.description}
                   />
                   <CardContent

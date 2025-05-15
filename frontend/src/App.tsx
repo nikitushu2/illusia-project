@@ -18,7 +18,7 @@ import AdminNewProductForm from "./components/Admin/AdminNewProductForm";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import Events from "./components/Events";
 import Info from "./components/Info";
-import { Contact } from "./components/Contact";
+import Contact from "./components/Contact";
 import { AuthProvider } from "./context/AuthContext";
 
 const App: React.FC = () => {

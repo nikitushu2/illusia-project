@@ -133,7 +133,7 @@ const AdminDashboard = () => {
                 sx={{
                   position: "absolute",
                   right: 0,
-                  top: "60px",
+                  top: "10px",
                 }}
                 style={{ color: "white" }}
               >
@@ -165,11 +165,11 @@ const AdminDashboard = () => {
                           }}
                           onClick={handleProductsMenuClick}
                         />
-                        {productsOpen ? (
+                        {/* {productsOpen ? (
                           <ExpandLess style={{ color: "white" }} />
                         ) : (
                           <ExpandMore style={{ color: "white" }} />
-                        )}
+                        )} */}
                       </>
                     )}
                   </ListItemButton>
@@ -192,7 +192,7 @@ const AdminDashboard = () => {
                     )}
                   </ListItemButton>
                 </ListItem>
-
+                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} />
                 <ListItem disablePadding>
                   <ListItemButton onClick={handleBookingsClick}>
                     <ListItemIcon style={{ color: "white" }}>
@@ -256,9 +256,8 @@ const AdminDashboard = () => {
                     </List>
                   </ListItem>
                 </Collapse>
-                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} />
 
-                <ListItem disablePadding>
+                {/* <ListItem disablePadding>
                   <ListItemButton>
                     <ListItemIcon style={{ color: "white" }}>
                       <DraftsIcon />
@@ -273,7 +272,7 @@ const AdminDashboard = () => {
                       />
                     )}
                   </ListItemButton>
-                </ListItem>
+                </ListItem> */}
               </List>
             </Box>
           </Box>
@@ -282,8 +281,11 @@ const AdminDashboard = () => {
           <Box
             sx={{
               margin: "10px",
-              width: isCollapsed ? "calc(100% - 100px)" : "calc(100% - 300px)",
+              width: isCollapsed ? "calc(100% - 100px)" : "calc(100% - 270px)",
               transition: "width 0.3s ease-in-out",
+
+              display: "flex",
+              justifyContent: "center",
             }}
           >
             {/* data here */}
