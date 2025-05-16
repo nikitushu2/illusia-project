@@ -48,13 +48,16 @@ import { useAuth } from "../../context/AuthContext";
 import UserSingleProduct from "../User/UserSingleProduct";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import useCategories, {
+  CreateCategoryData,
+} from "../../services/categoryService";
 
 interface ItemListProps {
   onEdit?: (item: Item) => void;
   categories?: { id: number; name: string }[];
 }
 
-const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
+const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const {
@@ -103,6 +106,9 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     message: "",
     severity: "success",
   });
+
+  // Add category functionality
+  const { create: createCategory } = useCategories();
 
   // Initialize the visibility state when items are loaded
   useEffect(() => {
@@ -356,6 +362,45 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         item.description.toLowerCase().includes(searchInput.toLowerCase())
       );
       setFilteredItems(filteredItems);
+    }
+  };
+
+  // Handle creating a new category
+  const handleCreateCategory = async (categoryData: CreateCategoryData) => {
+    if (!isAdmin) {
+      setSnackbar({
+        open: true,
+        message: "Only admins can create categories",
+        severity: "error",
+      });
+      return null;
+    }
+
+    try {
+      const result = await createCategory(categoryData);
+      if (result) {
+        // Add a small delay to ensure the category is saved in the database
+        setTimeout(() => {
+          // Force reload the page to refresh categories
+          window.location.reload();
+        }, 500);
+
+        setSnackbar({
+          open: true,
+          message: "Category created successfully",
+          severity: "success",
+        });
+        return result;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error creating category:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to create category",
+        severity: "error",
+      });
+      throw error;
     }
   };
 
@@ -837,6 +882,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             categories={categories}
+            onCategoryCreate={handleCreateCategory}
           />
         </DialogContent>
         <DialogActions
@@ -915,7 +961,9 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
             buttonText="Edit"
             onEdit={() => {
               closeModal();
-              handleEdit(selectedProduct);
+              if (selectedProduct) {
+                handleEdit(selectedProduct);
+              }
             }}
           />
         </div>

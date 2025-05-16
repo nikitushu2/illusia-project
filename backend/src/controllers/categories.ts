@@ -28,7 +28,7 @@ categoriesRouter.get("/", async (_req: Request, res: Response) => {
   res.json(categories);
 });
 
-// Create a new category
+// Create a new category - Admin verification is now handled by the router
 categoriesRouter.post("/", async (req: Request<{}, {}, CategoryCreationAttributes>, res: Response, next: NextFunction) => {
   try {
     const category = await categoryService.create(req.body);

@@ -33,90 +33,39 @@ const ItemManagement: React.FC = () => {
   const itemsService = useItems();
   const categoriesService = useCategories();
 
-  useEffect(() => {
-    // Fetch categories for the dropdown
-    const fetchCategories = async () => {
-      setCategoriesLoading(true);
-      setCategoriesError(null);
-      try {
-        const data = await categoriesService.getAll();
-        setCategories(data);
+  // Function to fetch categories
+  const fetchCategories = async () => {
+    setCategoriesLoading(true);
+    setCategoriesError(null);
+    try {
+      // Force a refresh of categories from the server
+      await categoriesService.refresh();
+      const data = await categoriesService.getAll();
+      console.log("Fetched categories:", data);
+      setCategories(data);
 
-        // Fallback to hardcoded values if no categories were returned
-        if (!data || data.length === 0) {
-          console.warn("No categories returned from API, using fallback data");
-          setCategories([
-            {
-              id: 1,
-              name: "Helmets",
-              description: "Military helmets",
-              createdAt: "",
-              updatedAt: "",
-            },
-            {
-              id: 2,
-              name: "Combat Vests",
-              description: "Tactical vests",
-              createdAt: "",
-              updatedAt: "",
-            },
-            {
-              id: 3,
-              name: "Gloves (Disposable)",
-              description: "First aid kits",
-              createdAt: "",
-              updatedAt: "",
-            },
-            {
-              id: 4,
-              name: "Goggles/Masks",
-              description: "Protective eyewear and masks",
-              createdAt: "",
-              updatedAt: "",
-            },
-          ]);
-        }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        setCategoriesError("Failed to load categories. Using fallback data.");
-
-        // Use fallback categories if API fails
-        setCategories([
-          {
-            id: 1,
-            name: "Helmets",
-            description: "Military helmets",
-            createdAt: "",
-            updatedAt: "",
-          },
-          {
-            id: 2,
-            name: "Combat Vests",
-            description: "Tactical vests",
-            createdAt: "",
-            updatedAt: "",
-          },
-          {
-            id: 3,
-            name: "Gloves (Disposable)",
-            description: "First aid kits",
-            createdAt: "",
-            updatedAt: "",
-          },
-          {
-            id: 4,
-            name: "Goggles/Masks",
-            description: "Protective eyewear and masks",
-            createdAt: "",
-            updatedAt: "",
-          },
-        ]);
-      } finally {
-        setCategoriesLoading(false);
+      if (!data || data.length === 0) {
+        setCategoriesError("No categories available.");
       }
-    };
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      setCategoriesError("Failed to load categories.");
+    } finally {
+      setCategoriesLoading(false);
+    }
+  };
 
+  // Fetch categories on component mount
+  useEffect(() => {
     fetchCategories();
+
+    // Set up a polling system to check for new categories every 30 seconds
+    const intervalId = setInterval(() => {
+      fetchCategories();
+    }, 30000);
+
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleEdit = (item: Item) => {
@@ -168,7 +117,14 @@ const ItemManagement: React.FC = () => {
           >
             Item display for All
           </Typography>
-          {/* Add New Item button removed */}
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={fetchCategories}
+            disabled={categoriesLoading}
+          >
+            {categoriesLoading ? "Refreshing..." : "Refresh Categories"}
+          </Button>
         </Box>
 
         <Divider sx={{ mb: 3 }} />
