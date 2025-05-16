@@ -29,6 +29,7 @@ export default tseslint.config({
         '@typescript-eslint/no-floating-promises': 'off',
         '@typescript-eslint/no-empty-object-type': 'off',
         '@typescript-eslint/no-unsafe-argument': 'off',
+        '@typescript-eslint/ban-ts-comment': 'off',
         '@typescript-eslint/no-unused-vars': [
             'error',
             { 'argsIgnorePattern': '^_' }

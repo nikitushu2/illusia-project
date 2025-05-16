@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { Router } from "express";
-import { Item } from "../models";
+import Item from "../models/item";
 import * as itemService from "../services/itemService";
 
 interface ItemRequest extends Request {
@@ -91,37 +91,21 @@ privateItemsRouter.get('/:id', (req: Request, res: Response, next: NextFunction)
 });
 
 adminItemsRouter.put('/:id', (req: Request, res: Response, next: NextFunction) => itemFinder(req as ItemRequest, res, next), async (req: Request<{id: string}, {}, ItemUpdateRequest>, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const query = req.query.q as string;
-      if (!query) {
-        res.status(400).json({ error: "Search query is required" });
-        return;
-      }
+  try {
+    const typedReq = req as unknown as ItemRequest;
+    const item = typedReq.item;
 
-      const items = await itemService.search(query);
-      res.json(items);
-    } catch (error) {
-      next(error);
+    if (!item) {
+      res.status(404).end();
+      return;
     }
+
+    const id = parseInt(req.params.id, 10);
+    const updatedItem = await itemService.update(id, req.body);
+    res.json(updatedItem);
+  } catch (error) {
+    next(error);
   }
-);
-
-privateItemsRouter.post(
-  "/",
-  async (
-    req: Request<{}, {}, ItemCreationAttributes>,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      console.log("Creating item with data:", req.body);
-      const item = await itemService.create(req.body);
-      console.log("Item created successfully:", item);
-      res.status(201).json(item);
-    } catch (error) {
-      console.error("Error creating item:", error);
-      next(error);
-    }
   }
 );
 
