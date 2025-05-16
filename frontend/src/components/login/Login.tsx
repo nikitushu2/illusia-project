@@ -8,8 +8,8 @@ export const Login = () => {
   return (
     <Box sx={{ margin: "auto", textAlign: "center", maxWidth: 600, px: 2 }}>
       <Box sx={{ paddingTop: 2, mb: 6 }}>
-        <Typography variant="h3">Welcome to Illusia RY</Typography>
-        <Typography variant="subtitle1">Sign up/Log in to place orders</Typography>
+        <Typography variant="h3" sx={{color: "primary.main"}}>WELCOME TO ILLUSIA RY</Typography>
+        <Typography sx={{fontStyle:"italic"}} >Sign up/Log in to place orders</Typography>
       </Box>
 
       <Box>
@@ -29,6 +29,7 @@ export const Login = () => {
             marginLeft: "auto",
             marginRight: "auto",
             textAlign: "center",
+            fontSize: "1.2rem",
           }}
         >
           <GoogleIcon />

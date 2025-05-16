@@ -177,9 +177,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
             required
             autoFocus
             variant="outlined"
-            InputLabelProps={{
-              sx: { fontWeight: "bold", color: "#444" },
-            }}
           />
         </Grid>
 
@@ -194,11 +191,8 @@ const ItemForm: React.FC<ItemFormProps> = ({
             helperText={errors.description}
             required
             multiline
-            rows={4}
+            rows={1}
             variant="outlined"
-            InputLabelProps={{
-              sx: { fontWeight: "bold", color: "#444" },
-            }}
           />
         </Grid>
 
@@ -210,9 +204,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
             value={formValues.imageUrl || ""}
             onChange={handleChange}
             variant="outlined"
-            InputLabelProps={{
-              sx: { fontWeight: "bold", color: "#444" },
-            }}
           />
         </Grid>
 
@@ -232,9 +223,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
             helperText={errors.price}
             required
             variant="outlined"
-            InputLabelProps={{
-              sx: { fontWeight: "bold", color: "#444" },
-            }}
           />
         </Grid>
 
@@ -244,18 +232,15 @@ const ItemForm: React.FC<ItemFormProps> = ({
             label="Quantity"
             name="quantity"
             type="number"
-            InputProps={{
-              inputProps: { min: 0 },
-            }}
+            // InputProps={{
+            //   inputProps: { min: 0 },
+            // }}
             value={formValues.quantity}
             onChange={handleChange}
             error={!!errors.quantity}
             helperText={errors.quantity}
             required
             variant="outlined"
-            InputLabelProps={{
-              sx: { fontWeight: "bold", color: "#444" },
-            }}
           />
         </Grid>
 
@@ -280,13 +265,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
                     maxHeight: 300,
                   },
                 },
-              },
-            }}
-            InputLabelProps={{
-              sx: {
-                fontWeight: "bold",
-                color: "#000",
-                fontSize: "1rem",
               },
             }}
             sx={{
@@ -335,9 +313,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
             value={formValues.size || ""}
             onChange={handleChange}
             variant="outlined"
-            InputLabelProps={{
-              sx: { fontWeight: "bold", color: "#444" },
-            }}
           />
         </Grid>
 
@@ -349,9 +324,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
             value={formValues.color || ""}
             onChange={handleChange}
             variant="outlined"
-            InputLabelProps={{
-              sx: { fontWeight: "bold", color: "#444" },
-            }}
           />
         </Grid>
 
@@ -363,9 +335,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
             value={formValues.itemLocation || ""}
             onChange={handleChange}
             variant="outlined"
-            InputLabelProps={{
-              sx: { fontWeight: "bold", color: "#444" },
-            }}
           />
         </Grid>
 
@@ -377,9 +346,6 @@ const ItemForm: React.FC<ItemFormProps> = ({
             value={formValues.storageLocation || ""}
             onChange={handleChange}
             variant="outlined"
-            InputLabelProps={{
-              sx: { fontWeight: "bold", color: "#444" },
-            }}
           />
         </Grid>
       </Grid>

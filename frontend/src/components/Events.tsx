@@ -11,7 +11,7 @@ const Events = () => {
         </Box>
 
           <Typography align="center" variant="h5" sx={{color:"primary.main"}}>UPCOMING</Typography>
-          <Box sx={{padding: "10px", borderRadius: "5px", display: "flex", gap:"20px" , marginBottom: "50px"}}>
+          <Box sx={{padding: "10px", borderRadius: "5px", display: "flex", gap:"20px" , marginBottom: "50px", justifyContent: "center"}}>
             <Box sx={{ position: "relative", width: "300px", height: "250px", borderRadius: "5px", overflow: "hidden" }}>
                 <img  src={event}  alt="event"  style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
               <Box sx={{ position: "absolute", bottom: 0, left: 0, width: "100%", backgroundColor: "rgba(0, 0, 0, 0.6)", color: "white", padding: "10px",  textAlign: "center" }}>
@@ -28,7 +28,7 @@ const Events = () => {
         </Box>
 
         <Typography align="center" variant="h5" sx={{color:"secondary.main"}}>PAST EVENTS</Typography>
-          <Box sx={{ padding: "10px", borderRadius: "5px", display: "flex", gap:"20px" }}>
+          <Box sx={{ padding: "10px", borderRadius: "5px", display: "flex", gap:"20px", marginBottom: "50px", justifyContent: "center"}}>
             <Box sx={{ position: "relative", width: "300px", height: "250px", borderRadius: "5px", overflow: "hidden" }}>
                 <img  src={odysseus}  alt="event"  style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
               <Box sx={{ position: "absolute", bottom: 0, left: 0, width: "100%", backgroundColor: "rgba(0, 0, 0, 0.6)", color: "white", padding: "10px",  textAlign: "center" }}>

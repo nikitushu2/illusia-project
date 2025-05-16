@@ -32,6 +32,8 @@ import { Item } from "../../services/itemService";
 import UserSingleProduct from "../User/UserSingleProduct";
 import { ApiRole, useFetch } from "../../hooks/useFetch";
 
+import noImage from "../../images/noImage.png";
+
 interface ItemListProps {
   onEdit: (item: Item) => void;
   categories?: { id: number; name: string }[];
@@ -271,7 +273,7 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                       fontSize: "1.1rem",
                     }}
                   >
-                    location
+                    Location
                   </TableCell>
 
                  {/*  <TableCell
@@ -298,7 +300,7 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
                         </TableCell>
                         <TableCell>
                           <img
-                            src={item.imageUrl}
+                            src={item.imageUrl || noImage}
                             alt={item.name}
                             style={{ width: 50, height: 50 }}
                           />

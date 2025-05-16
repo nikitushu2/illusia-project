@@ -18,6 +18,7 @@ import AdminNewProductForm from "./components/Admin/AdminNewProductForm";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import Events from "./components/Events";
 import Info from "./components/Info";
+import Contact from "./components/Contact";
 import { AuthProvider } from "./context/AuthContext";
 
 const App: React.FC = () => {
@@ -51,13 +52,13 @@ const App: React.FC = () => {
               {/* User Routes */}
               <Route path="/userDashboard" element={<UserDashboard />} />
 
-              {/* Admin Routes */}
+                {/* Admin Routes */}
               <Route path="/adminDashboard" element={<AdminDashboard />} />
-              <Route
-                path="/adminNewProduct"
-                element={<AdminNewProductForm />}
-              />
-            </Routes>
+              <Route path="/adminNewProduct" element={<AdminNewProductForm />} />
+
+              <Route path="/contact" element={<Contact/>} />
+
+              </Routes>
             <Footer />
           </Box>
         </Router>

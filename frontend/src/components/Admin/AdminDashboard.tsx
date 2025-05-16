@@ -24,7 +24,6 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
-import AdminBookings from "./AdminBookings";
 import AdminProducts from "./AdminProducts";
 import useCategories from "../../services/categoryService";
 import { UserManagement } from "../userManagement/UserManagement";
@@ -134,7 +133,7 @@ const AdminDashboard = () => {
                 sx={{
                   position: "absolute",
                   right: 0,
-                  top: "60px",
+                  top: "10px",
                 }}
                 style={{ color: "white" }}
               >
@@ -166,39 +165,10 @@ const AdminDashboard = () => {
                           }}
                           onClick={handleProductsMenuClick}
                         />
-                        {productsOpen ? (
-                          <ExpandLess style={{ color: "white" }} />
-                        ) : (
-                          <ExpandMore style={{ color: "white" }} />
-                        )}
                       </>
                     )}
                   </ListItemButton>
                 </ListItem>
-                <Collapse
-                  in={productsOpen && !isCollapsed}
-                  timeout="auto"
-                  unmountOnExit
-                >
-                  <ListItem disablePadding>
-                    <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 6 }}>
-                        <ListItemIcon style={{ color: "white" }}>
-                          <LeaderboardIcon />
-                        </ListItemIcon>
-                        {!isCollapsed && (
-                          <ListItemText
-                            primary="Inventory"
-                            slotProps={{
-                              primary: { style: { color: "white" } },
-                            }}
-                            onClick={() => handleSideBar("Display inventory")}
-                          />
-                        )}
-                      </ListItemButton>
-                    </List>
-                  </ListItem>
-                </Collapse>
                 <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} />
 
                 <ListItem disablePadding>
@@ -217,7 +187,7 @@ const AdminDashboard = () => {
                     )}
                   </ListItemButton>
                 </ListItem>
-
+                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} />
                 <ListItem disablePadding>
                   <ListItemButton onClick={handleBookingsClick}>
                     <ListItemIcon style={{ color: "white" }}>
@@ -281,24 +251,6 @@ const AdminDashboard = () => {
                     </List>
                   </ListItem>
                 </Collapse>
-                <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} />
-
-                <ListItem disablePadding>
-                  <ListItemButton>
-                    <ListItemIcon style={{ color: "white" }}>
-                      <DraftsIcon />
-                    </ListItemIcon>
-                    {!isCollapsed && (
-                      <ListItemText
-                        primary="Messages"
-                        slotProps={{
-                          primary: { style: { color: "white" } },
-                        }}
-                        onClick={() => handleSideBar("Display messages")}
-                      />
-                    )}
-                  </ListItemButton>
-                </ListItem>
               </List>
             </Box>
           </Box>
@@ -307,8 +259,11 @@ const AdminDashboard = () => {
           <Box
             sx={{
               margin: "10px",
-              width: isCollapsed ? "calc(100% - 100px)" : "calc(100% - 300px)",
+              width: isCollapsed ? "calc(100% - 100px)" : "calc(100% - 270px)",
               transition: "width 0.3s ease-in-out",
+
+              display: "flex",
+              justifyContent: "center",
             }}
           >
             {/* data here */}
