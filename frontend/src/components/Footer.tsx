@@ -1,4 +1,5 @@
-import { Box, Link, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
  return (
@@ -20,7 +21,7 @@ export default function Footer() {
         © {new Date().getFullYear()} Illusia RY
       </Typography>
       <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 1 }}>
-        <Link href="/contact" underline="hover">
+       {/*  <Link href="/contact" underline="hover">
           Contact Us
         </Link>
         <Link href="/terms" underline="hover">
@@ -28,8 +29,17 @@ export default function Footer() {
         </Link>
         <Link href="/privacy" underline="hover">
           Privacy Policy
-        </Link>
+        </Link> */}
 
+        <Link to="/contact" style={{ color: 'white', textDecoration:"none" }}> {/* Use React Router Link */}
+          Contact Us
+        </Link>
+        <Link to="/terms" style={{ color: 'white', textDecoration:"none" }}> {/* Use React Router Link */}
+          Terms & Conditions
+        </Link>
+        <Link to="/privacy" style={{ color: 'white', textDecoration:"none"  }}> {/* Use React Router Link */}
+          Privacy Policy
+        </Link>
       </Box>
     </Box>
   );

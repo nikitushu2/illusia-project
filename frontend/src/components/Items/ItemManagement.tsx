@@ -115,7 +115,7 @@ const ItemManagement: React.FC = () => {
             color="primary"
             fontWeight="bold"
           >
-            Item display for All
+            All Items
           </Typography>
           <Button
             variant="outlined"

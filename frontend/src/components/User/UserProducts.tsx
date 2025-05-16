@@ -31,7 +31,7 @@ import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import camera from "../../images/camera.png";
+//import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
 import { Item } from "../../services/itemService";
 import { useBookingCart } from "../../context/BookingCartContext";
@@ -43,6 +43,7 @@ import dayjs, { Dayjs } from "dayjs";
 
 import { ApiRole, useFetch } from "../../hooks/useFetch";
 import { BookingStatus, BookingWithDetails } from "../../types/booking";
+import noImage from "../../images/noImage.png";
 
 // Add extended Item type
 interface ExtendedItem extends Item {
@@ -58,6 +59,8 @@ interface ItemListProps {
 const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  // navigate is used in other places in this component, or reserved for future use
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const navigate = useNavigate();
   const { addItem, setStartDate, setEndDate } = useBookingCart();
 
@@ -379,7 +382,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     }}
                   >
                     <img
-                      src={item.imageUrl || camera}
+                      src={item.imageUrl || noImage}
                       alt={item.description || "No Image"}
                       style={{
                         width: "100%",
@@ -425,68 +428,77 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "space-between",
+                        justifyContent: "flex-start",
                         gap: 1,
                         mt: 1,
                       }}
                     >
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() =>
-                          handleQuantityChange(
-                            item.id,
-                            item.selectedQuantity
-                              ? item.selectedQuantity - 1
-                              : 0
-                          )
-                        }
-                        sx={{
-                          minWidth: "32px",
-                          width: "32px",
-                          height: "32px",
-                          p: 0,
-                          fontSize: "14px",
-                        }}
-                        disabled={item.selectedQuantity === 0}
-                      >
-                        -
-                      </Button>
-                      <Typography
-                        sx={{
-                          minWidth: "40px",
-                          textAlign: "center",
-                          fontSize: "1rem",
-                          fontWeight: "bold",
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "120px",
                         }}
                       >
-                        {item.selectedQuantity || 0}
-                      </Typography>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() =>
-                          handleQuantityChange(
-                            item.id,
-                            item.selectedQuantity
-                              ? item.selectedQuantity + 1
-                              : 1
-                          )
-                        }
-                        sx={{
-                          minWidth: "32px",
-                          width: "32px",
-                          height: "32px",
-                          p: 0,
-                          fontSize: "14px",
-                        }}
-                        disabled={
-                          item.selectedQuantity >=
-                          (item.remainingQuantity || item.quantity)
-                        }
-                      >
-                        +
-                      </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() =>
+                            handleQuantityChange(
+                              item.id,
+                              item.selectedQuantity
+                                ? item.selectedQuantity - 1
+                                : 0
+                            )
+                          }
+                          sx={{
+                            minWidth: "24px",
+                            width: "32px",
+                            height: "32px",
+                            p: 0,
+                            fontSize: "14px",
+                          }}
+                          disabled={item.selectedQuantity === 0}
+                        >
+                          -
+                        </Button>
+                        <Typography
+                          sx={{
+                            width: "40px",
+                            textAlign: "center",
+                            fontSize: "1rem",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {item.selectedQuantity || 0}
+                        </Typography>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() =>
+                            handleQuantityChange(
+                              item.id,
+                              item.selectedQuantity
+                                ? item.selectedQuantity + 1
+                                : 1
+                            )
+                          }
+                          sx={{
+                            minWidth: "24px",
+                            width: "32px",
+                            height: "32px",
+                            p: 0,
+                            fontSize: "14px",
+                          }}
+                          disabled={
+                            (item.selectedQuantity ?? 0) >=
+                            (item.remainingQuantity || item.quantity)
+                          }
+                        >
+                          +
+                        </Button>
+                      </div>
                       <Typography
                         variant="body2"
                         sx={{
@@ -502,20 +514,30 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
                     <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
                       <Button
-                        variant="contained"
                         onClick={(event) => {
                           event.stopPropagation();
                           console.log(
-                            "Adding item to cart from mobile view:",
+                            "Adding item to cart from table view:",
                             item
                           );
                           addItem(item, item.selectedQuantity ?? 1);
                         }}
-                        disabled={Boolean(startDate && endDate && !isAvailable)}
+                        color="primary"
+                        sx={{
+                          width: { xs: "100%", sm: "auto" },
+                          "&:hover": {
+                            backgroundColor: "primary.main",
+                            color: "white",
+                          },
+                          padding: 1.5,
+                        }}
+                        disabled={Boolean(
+                          hasSearched && startDate && endDate && !isAvailable
+                        )}
                       >
-                        {startDate && endDate && !isAvailable
+                        {hasSearched && startDate && endDate && !isAvailable
                           ? "Not Available"
-                          : " Add to Cart"}
+                          : "Add to Cart"}
                       </Button>
                     </Box>
                   </Box>
@@ -648,7 +670,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       sx={{ cursor: "pointer" }}
                     >
                       <img
-                        src={item.imageUrl || camera}
+                        src={item.imageUrl || noImage}
                         alt={item.description || "No Image"}
                         style={{ width: 50, height: 50, objectFit: "cover" }}
                       />
@@ -674,63 +696,72 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                           gap: 1,
                         }}
                       >
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() =>
-                            handleQuantityChange(
-                              item.id,
-                              item.selectedQuantity
-                                ? item.selectedQuantity - 1
-                                : 0
-                            )
-                          }
-                          sx={{
-                            minWidth: "24px",
-                            width: "24px",
-                            height: "24px",
-                            p: 0,
-                            fontSize: "14px",
-                          }}
-                          disabled={item.selectedQuantity === 0}
-                        >
-                          -
-                        </Button>
-                        <Typography
-                          sx={{
-                            minWidth: "30px",
-                            textAlign: "center",
-                            fontSize: "1rem",
-                            fontWeight: "bold",
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            width: "120px",
                           }}
                         >
-                          {item.selectedQuantity || 0}
-                        </Typography>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() =>
-                            handleQuantityChange(
-                              item.id,
-                              item.selectedQuantity
-                                ? item.selectedQuantity + 1
-                                : 1
-                            )
-                          }
-                          sx={{
-                            minWidth: "24px",
-                            width: "24px",
-                            height: "24px",
-                            p: 0,
-                            fontSize: "14px",
-                          }}
-                          disabled={
-                            item.selectedQuantity >=
-                            (item.remainingQuantity || item.quantity)
-                          }
-                        >
-                          +
-                        </Button>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={() =>
+                              handleQuantityChange(
+                                item.id,
+                                item.selectedQuantity
+                                  ? item.selectedQuantity - 1
+                                  : 0
+                              )
+                            }
+                            sx={{
+                              minWidth: "24px",
+                              width: "32px",
+                              height: "32px",
+                              p: 0,
+                              fontSize: "14px",
+                            }}
+                            disabled={item.selectedQuantity === 0}
+                          >
+                            -
+                          </Button>
+                          <Typography
+                            sx={{
+                              width: "40px",
+                              textAlign: "center",
+                              fontSize: "1rem",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {item.selectedQuantity || 0}
+                          </Typography>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={() =>
+                              handleQuantityChange(
+                                item.id,
+                                item.selectedQuantity
+                                  ? item.selectedQuantity + 1
+                                  : 1
+                              )
+                            }
+                            sx={{
+                              minWidth: "24px",
+                              width: "32px",
+                              height: "32px",
+                              p: 0,
+                              fontSize: "14px",
+                            }}
+                            disabled={
+                              (item.selectedQuantity ?? 0) >=
+                              (item.remainingQuantity || item.quantity)
+                            }
+                          >
+                            +
+                          </Button>
+                        </div>
                       </Box>
                       <Typography
                         variant="body2"
@@ -757,8 +788,6 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     <TableCell>{category ? category.name : ""}</TableCell>
                     <TableCell>
                       <Button
-                        variant="contained"
-                        color="primary"
                         onClick={(event) => {
                           event.stopPropagation();
                           console.log(
@@ -766,6 +795,15 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                             item
                           );
                           addItem(item, item.selectedQuantity ?? 1);
+                        }}
+                        color="primary"
+                        sx={{
+                          width: { xs: "100%", sm: "auto" },
+                          "&:hover": {
+                            backgroundColor: "primary.main",
+                            color: "white",
+                          },
+                          padding: 1.5,
                         }}
                         disabled={Boolean(
                           hasSearched && startDate && endDate && !isAvailable
@@ -801,6 +839,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         >
           {currentItems.length > 0 ? (
             currentItems.map((item) => {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const category = categories.find((c) => c.id === item.categoryId);
               const isAvailable = item.isAvailable ?? true;
 
@@ -826,7 +865,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       objectFit: "cover",
                       cursor: "pointer",
                     }}
-                    image={item.imageUrl || camera}
+                    image={item.imageUrl || noImage}
                     title={item.description}
                     onClick={() => openModal(item)}
                   />
@@ -837,9 +876,9 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     <Typography style={{ margin: 0 }}>
                       {item.description}
                     </Typography>
-                    <Typography style={{ margin: 0, color: "gray" }}>
+                    {/* <Typography style={{ margin: 0, color: "gray" }}>
                       Category: {category ? category.name : ""}
-                    </Typography>
+                    </Typography> */}
                     {hasSearched && startDate && endDate && (
                       <>
                         <Typography
@@ -868,81 +907,98 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "space-between",
-                        gap: 1,
+                        justifyContent: "center",
+                        gap: 2,
                         mt: 1,
+                        width: "100%",
                       }}
                     >
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() =>
-                          handleQuantityChange(
-                            item.id,
-                            item.selectedQuantity
-                              ? item.selectedQuantity - 1
-                              : 0
-                          )
-                        }
-                        sx={{
-                          minWidth: "32px",
-                          width: "32px",
-                          height: "32px",
-                          p: 0,
-                          fontSize: "14px",
-                        }}
-                        disabled={item.selectedQuantity === 0}
-                      >
-                        -
-                      </Button>
-                      <Typography
-                        sx={{
-                          minWidth: "40px",
-                          textAlign: "center",
-                          fontSize: "1rem",
-                          fontWeight: "bold",
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "120px",
                         }}
                       >
-                        {item.selectedQuantity || 0}
-                      </Typography>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() =>
-                          handleQuantityChange(
-                            item.id,
-                            item.selectedQuantity
-                              ? item.selectedQuantity + 1
-                              : 1
-                          )
-                        }
-                        sx={{
-                          minWidth: "32px",
-                          width: "32px",
-                          height: "32px",
-                          p: 0,
-                          fontSize: "14px",
-                        }}
-                        disabled={
-                          item.selectedQuantity >=
-                          (item.remainingQuantity || item.quantity)
-                        }
-                      >
-                        +
-                      </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() =>
+                            handleQuantityChange(
+                              item.id,
+                              item.selectedQuantity
+                                ? item.selectedQuantity - 1
+                                : 0
+                            )
+                          }
+                          sx={{
+                            minWidth: "32px",
+                            width: "32px",
+                            height: "32px",
+                            p: 0,
+                            fontSize: "14px",
+                          }}
+                          disabled={item.selectedQuantity === 0}
+                        >
+                          -
+                        </Button>
+                        <Typography
+                          sx={{
+                            width: "40px",
+                            textAlign: "center",
+                            fontSize: "1rem",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {item.selectedQuantity || 0}
+                        </Typography>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() =>
+                            handleQuantityChange(
+                              item.id,
+                              item.selectedQuantity
+                                ? item.selectedQuantity + 1
+                                : 1
+                            )
+                          }
+                          sx={{
+                            minWidth: "32px",
+                            width: "32px",
+                            height: "32px",
+                            p: 0,
+                            fontSize: "14px",
+                          }}
+                          disabled={
+                            (item.selectedQuantity ?? 0) >=
+                            (item.remainingQuantity || item.quantity)
+                          }
+                        >
+                          +
+                        </Button>
+                      </div>
                     </Box>
                   </CardContent>
                   <CardActions>
                     <Button
-                      variant="contained"
-                      color="primary"
                       onClick={(event) => {
                         event.stopPropagation();
                         console.log(
-                          "Adding item to cart from grid view:",
+                          "Adding item to cart from table view:",
                           item
                         );
                         addItem(item, item.selectedQuantity ?? 1);
+                      }}
+                      color="primary"
+                      sx={{
+                        width: { xs: "100%", sm: "auto" },
+                        "&:hover": {
+                          backgroundColor: "primary.main",
+                          color: "white",
+                        },
+                        padding: 1.5,
                       }}
                       disabled={Boolean(
                         hasSearched && startDate && endDate && !isAvailable
