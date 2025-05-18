@@ -408,11 +408,21 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           <TextField
             onChange={handleSearch}
             value={searchInput}
-            label="search item"
+            label="Search item"
+            variant="outlined"
             sx={{
               width: { xs: "100%", sm: "50%" },
               "& .MuiInputBase-root": {
-                height: { xs: "40px", sm: "56px" },
+                height: "36px",
+                fontSize: "14px",
+              },
+              "& .MuiInputLabel-root": {
+                fontSize: "13px",
+              },
+            }}
+            InputProps={{
+              sx: {
+                height: "36px",
               },
             }}
           />
@@ -441,11 +451,18 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
             marginTop: { xs: "20px", sm: "30px" },
           }}
         >
-          <FormControl
+        <FormControl
             sx={{
               width: { xs: "100%", sm: 200 },
               "& .MuiInputBase-root": {
-                height: { xs: "40px", sm: "56px" },
+                height: "36px", // reduced height
+                fontSize: "14px",
+              },
+              "& .MuiInputLabel-root": {
+                fontSize: "13px",
+              },
+              "& .MuiSelect-select": {
+                padding: "8px 14px", // tighter padding
               },
             }}
           >
@@ -472,7 +489,6 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               )}
             </Select>
           </FormControl>
-
           <Box
             sx={{
               display: "flex",
@@ -784,7 +800,7 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                           {category ? category.name : "n/a"}
                         </TableCell>
                         <TableCell>
-                          <Box sx={{ display: "flex", gap: 1 }}>
+                          <Box sx={{ display: "flex", }}>
                             <IconButton
                               color="primary"
                               onClick={() => handleEdit(item)}
@@ -996,7 +1012,8 @@ const AdminProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         <DialogTitle sx={{ backgroundColor: "primary.main", color: "white" }}>
           Confirm Deletion
         </DialogTitle>
-        <DialogContent sx={{ pt: 2, pb: 1, px: 3, minWidth: "400px" }}>
+        {/* <DialogContent sx={{ pt: 5, pb: 1, px: 3, minWidth: "400px" }}> */}
+        <DialogContent sx={{ p: 5, minWidth: "400px" }}>
           <DialogContentText>
             Are you sure you want to delete this item? This action cannot be
             undone.

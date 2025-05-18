@@ -253,7 +253,7 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
                                 </TableBody>
                             </Table>
                         </TableContainer> */}
-                        <Box display={"flex"} gap={2} marginTop={3} paddingX={2}>
+                        <Box display={"flex"} gap={2} marginTop={3} paddingX={2} justifyContent={"end"}>
                             <Button
                                 variant="contained"
                                 color="primary"
