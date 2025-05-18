@@ -69,6 +69,10 @@ const AdminDashboard = () => {
   //handle arrow up/down for bookings
   const handleBookingsClick = () => {
     setBookingsOpen(!bookingsOpen);
+    // Show bookings when clicking on bookings menu item
+    if (!bookingsOpen) {
+      handleSideBar(<AdminBookingApproval />);
+    }
   };
 
   const toggleSidebar = () => {
@@ -117,12 +121,12 @@ const AdminDashboard = () => {
             >
               {!isCollapsed && (
                 <Typography
-                  color="white"
                   variant="h5"
+                  color="white"
                   sx={{
                     fontWeight: "bold",
                     marginTop: "50px",
-                    marginBottom: "20px",
+                    marginBottom: "50px",
                   }}
                 >
                   Admin Dashboard
@@ -147,7 +151,7 @@ const AdminDashboard = () => {
                 display: "flex",
                 flexDirection: "column",
                 gap: "20px",
-                marginTop: "120px",
+                marginTop: "100px",
               }}
             >
               <List>
@@ -201,7 +205,6 @@ const AdminDashboard = () => {
                             primary: { style: { color: "white" } },
                           }}
                         />
-
                         {bookingsOpen ? (
                           <ExpandLess style={{ color: "white" }} />
                         ) : (
@@ -228,7 +231,9 @@ const AdminDashboard = () => {
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
-                            onClick={() => handleSideBar(<AdminBookingApproval />)}
+                            onClick={() =>
+                              handleSideBar(<AdminBookingApproval />)
+                            }
                           />
                         )}
                       </ListItemButton>
@@ -261,13 +266,20 @@ const AdminDashboard = () => {
               margin: "10px",
               width: isCollapsed ? "calc(100% - 100px)" : "calc(100% - 270px)",
               transition: "width 0.3s ease-in-out",
-
               display: "flex",
               justifyContent: "center",
+              alignItems: "center",
+              minHeight: "100vh",
             }}
           >
             {/* data here */}
-            <Box sx={{ marginTop: "50px", marginRight: "50px" }}>
+            <Box
+              sx={{
+                width: "100%",
+                maxWidth: "1200px",
+                padding: "20px",
+              }}
+            >
               {categoriesService.loading ? (
                 <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
                   <CircularProgress />
