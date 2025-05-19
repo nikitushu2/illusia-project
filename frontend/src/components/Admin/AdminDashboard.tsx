@@ -13,6 +13,8 @@ import {
   Typography,
   IconButton,
   CircularProgress,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { JSX, useState, useEffect } from "react";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
@@ -30,6 +32,8 @@ import { UserManagement } from "../userManagement/UserManagement";
 import { AdminBookingApproval } from "../AdminBookingApproval";
 
 const AdminDashboard = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [sideLink, setsideLink] = useState<string | null>(null);
   const [productsOpen, setProductsOpen] = useState(false);
   const [bookingsOpen, setBookingsOpen] = useState(false);
@@ -37,6 +41,11 @@ const AdminDashboard = () => {
   const [component, setComponent] = useState<React.ReactElement | null>(null);
 
   const categoriesService = useCategories();
+
+  // Add effect to handle automatic collapse
+  useEffect(() => {
+    setIsCollapsed(isMobile);
+  }, [isMobile]);
 
   // Initialize the component with admin products
   useEffect(() => {
@@ -96,7 +105,7 @@ const AdminDashboard = () => {
         <Box
           sx={{
             display: "flex",
-            gap: "20px",
+            gap: "10px",
             margin: "10px",
           }}
         >
@@ -107,7 +116,7 @@ const AdminDashboard = () => {
               backgroundColor: "#44195b",
               padding: "20px",
               borderRadius: "8px 0 0 8px", // Rounded corners only on the right side
-              width: isCollapsed ? "80px" : "290px",
+              width: isCollapsed ? "80px" : "240px",
               transition: "width 0.3s ease-in-out",
               position: "relative",
             }}
@@ -202,7 +211,10 @@ const AdminDashboard = () => {
                         <ListItemText
                           primary="Bookings"
                           slotProps={{
-                            primary: { style: { color: "white" } },
+                            primary: {
+                              style: { color: "white" },
+                              marginRight: "20px",
+                            },
                           }}
                         />
                         {bookingsOpen ? (

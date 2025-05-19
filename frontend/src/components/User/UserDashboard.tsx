@@ -14,6 +14,8 @@ import {
   IconButton,
   CircularProgress,
   //TextField,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 // import AppsIcon from "@mui/icons-material/Apps";
 // import TableRowsIcon from "@mui/icons-material/TableRows";
@@ -38,6 +40,8 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useLocation } from "react-router-dom";
 
 const UserDashboard = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [sideLink, setsideLink] = useState<string | null>(null);
   const [productsOpen, setProductsOpen] = useState(false);
   const [bookingsOpen, setBookingsOpen] = useState(false);
@@ -64,6 +68,11 @@ const UserDashboard = () => {
       setComponent(<UserProducts categories={categoriesService.categories} />);
     }
   }, [categoriesService.categories, categoriesService.loading]);
+
+  // Add effect to handle automatic collapse
+  useEffect(() => {
+    setIsCollapsed(isMobile);
+  }, [isMobile]);
 
   const handleSideBar = (content: JSX.Element | string) => {
     if (typeof content === "string") {
@@ -247,7 +256,6 @@ const UserDashboard = () => {
                 </Collapse>
                 {/* <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} /> */}
 
-                
                 <Divider />
               </List>
             </Box>
@@ -264,7 +272,6 @@ const UserDashboard = () => {
               justifyContent: "center",
             }}
           >
-
             {/* data here */}
             <Box sx={{ marginTop: "50px", marginRight: "50px" }}>
               {categoriesService.loading ? (

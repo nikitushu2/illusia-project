@@ -34,7 +34,7 @@ const LandingPage = () => {
         setCurrentImage((prev) => (prev + 1) % images.length);
         setFadeIn(true);
       }, 500);
-    }, 6000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [images.length]);
