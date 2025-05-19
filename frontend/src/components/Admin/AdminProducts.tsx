@@ -450,6 +450,7 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
             gap: { xs: "20px", sm: "50px" },
           }}
         >
+          {/* height of search bar */}
           <TextField
             onChange={handleSearch}
             value={searchInput}

@@ -227,7 +227,7 @@ const AdminDashboard = () => {
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
-                            primary="Pending"
+                            primary="Details"
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
@@ -243,7 +243,7 @@ const AdminDashboard = () => {
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
-                            primary="Reservations"
+                            primary="Booking History"
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
