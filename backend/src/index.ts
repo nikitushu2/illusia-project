@@ -50,6 +50,7 @@ apiRouter.use("/auth", authRouter);
 
 // Public items route - no authentication required
 apiRouter.use("/items", publicItemsRouter);
+// Use categories router from controllers directly for public route
 apiRouter.use("/categories", categoriesRouter);
 
 // all the private endpoint starts with /api/private
