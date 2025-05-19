@@ -20,14 +20,22 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import { useFetch, ApiRole } from "../../hooks/useFetch";
 import { BookingWithDetails, BookingStatus } from "../../types/booking";
+import { Item } from "../../services/itemService";
 
 const AdminBookingHistory: React.FC = () => {
   const {
     data: bookings,
-    loading,
-    apiError,
-    get,
+    loading: bookingsLoading,
+    apiError: bookingsError,
+    get: getBookings,
   } = useFetch<BookingWithDetails[]>(ApiRole.ADMIN);
+
+  const {
+    data: items,
+    loading: itemsLoading,
+    get: getItems,
+  } = useFetch<Item[]>(ApiRole.PUBLIC);
+
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filteredBookings, setFilteredBookings] = useState<
     BookingWithDetails[]
@@ -35,9 +43,16 @@ const AdminBookingHistory: React.FC = () => {
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
+  // Create a map of item IDs to item objects for quick lookup
+  const itemsMap = React.useMemo(() => {
+    if (!items) return new Map<number, Item>();
+    return new Map(items.map((item) => [item.id, item]));
+  }, [items]);
+
   useEffect(() => {
-    get("bookings");
-  }, [get]);
+    getBookings("bookings");
+    getItems("items");
+  }, [getBookings, getItems]);
 
   // Filter bookings based on search term and status (only show closed and cancelled)
   useEffect(() => {
@@ -82,6 +97,12 @@ const AdminBookingHistory: React.FC = () => {
     }
   };
 
+  // Get item name by id
+  const getItemName = (itemId: number): string => {
+    const item = itemsMap.get(itemId);
+    return item?.name || `Item #${itemId}`;
+  };
+
   // Pagination
   const numberOfPages = filteredBookings
     ? Math.ceil(filteredBookings.length / ITEMS_PER_PAGE)
@@ -92,7 +113,7 @@ const AdminBookingHistory: React.FC = () => {
     ? filteredBookings.slice(startIndex, endIndex)
     : [];
 
-  if (loading) {
+  if (bookingsLoading || itemsLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
         <CircularProgress />
@@ -100,7 +121,7 @@ const AdminBookingHistory: React.FC = () => {
     );
   }
 
-  if (apiError) {
+  if (bookingsError) {
     return (
       <Box sx={{ mt: 2 }}>
         <Alert severity="error">
@@ -208,7 +229,7 @@ const AdminBookingHistory: React.FC = () => {
                       }}
                     >
                       <Typography variant="body2">
-                        Item #{item.itemId} - Qty: {item.quantity}
+                        {getItemName(item.itemId)} - Qty: {item.quantity}
                       </Typography>
                     </Box>
                   ))}

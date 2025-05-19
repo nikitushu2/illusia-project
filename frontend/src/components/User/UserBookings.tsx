@@ -36,6 +36,7 @@ import bookingService, {
 } from "../../services/bookingService";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import { BookingStatus } from "../../types/booking";
 
 const UserBookings: React.FC = () => {
   const theme = useTheme();
@@ -59,7 +60,14 @@ const UserBookings: React.FC = () => {
         const fetchedBookings = await bookingService.getAll();
         console.log("Fetched bookings:", fetchedBookings);
 
-        setBookings(fetchedBookings);
+        // Filter out CLOSED and CANCELLED bookings for pending view
+        const pendingBookings = fetchedBookings.filter(
+          (booking) =>
+            booking.status !== BookingStatus.CLOSED &&
+            booking.status !== BookingStatus.CANCELLED
+        );
+
+        setBookings(pendingBookings);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching bookings:", err);
@@ -535,8 +543,6 @@ const UserBookings: React.FC = () => {
                 const formattedEndDate = editEndDate
                   ? dayjs(editEndDate).format("YYYY-MM-DD")
                   : undefined;
-
-              
 
                 const updated = await bookingService.update(
                   selectedBooking.id,

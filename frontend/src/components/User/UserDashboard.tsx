@@ -219,7 +219,7 @@ const UserDashboard = () => {
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
-                            primary="Pending"
+                            primary="Active Bookings"
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
