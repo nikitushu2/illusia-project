@@ -4,6 +4,7 @@ import { Accordion, AccordionDetails, AccordionSummary, Alert, Box, Button, Circ
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { BookingStatus, BookingWithDetails } from "../types/booking";
 import { Item } from "../services/itemService";
+import { useTranslation } from "react-i18next";
 
 
 interface BookingDetailProps {
@@ -41,6 +42,7 @@ const StatusMessage = ({ status, handleClose }: { status: Status, handleClose: (
 }
 
 export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps) => {
+    const { t } = useTranslation();
     const [booking, setBooking] = useState<BookingWithDetails>(bookingDetails);
     const [status, setStatus] = useState<Status>({
         open: false,
@@ -131,28 +133,40 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
                     {isMobile ? (
                         <Box width="100%">
                             <Box display="flex" flexDirection="column" alignItems="flex-start" gap={1}>
-                                <Typography variant="subtitle2"><b>User:</b> {booking.user.displayName}</Typography>
-                                <Typography variant="subtitle2"><b>Total Quantity:</b> {getTotalBookingQuantity(booking)}</Typography>
-                                <Typography variant="subtitle2"><b>Status:</b> {booking.status}</Typography>
+                                <Typography variant="subtitle2"><b>
+                                    {t("adminBookingDetail.user")}
+                                    </b> {booking.user.displayName}</Typography>
+                                <Typography variant="subtitle2"><b>
+                                    {t("adminBookingDetail.totalQuantity")}
+                                    </b> {getTotalBookingQuantity(booking)}</Typography>
+                                <Typography variant="subtitle2"><b>
+                                    {t("adminBookingDetail.status")}
+                                    </b> {booking.status}</Typography>
                             </Box>
                         </Box>
                     ) : (
                         <Grid container width={"100%"}>
                             <Grid size={4}>
                                 <Box display="flex" flexDirection="column" alignItems="center">
-                                    <Typography variant="subtitle2"><b>User</b></Typography>
+                                    <Typography variant="subtitle2"><b>
+                                        {t("adminBookingDetail.user")}
+                                        </b></Typography>
                                     <Typography variant="body2">{booking.user.displayName}</Typography>
                                 </Box>
                             </Grid>
                             <Grid size={4}>
                                 <Box display="flex" flexDirection="column" alignItems="center">
-                                    <Typography variant="subtitle2"><b>Total Quantity</b></Typography>
+                                    <Typography variant="subtitle2"><b>
+                                        {t("adminBookingDetail.totalQuantity")}
+                                        </b></Typography>
                                     <Typography variant="body2">{getTotalBookingQuantity(booking)}</Typography>
                                 </Box>
                             </Grid>
                             <Grid size={4}>
                                 <Box display="flex" flexDirection="column" alignItems="center">
-                                    <Typography variant="subtitle2"><b>Status</b></Typography>
+                                    <Typography variant="subtitle2"><b>
+                                    {t("adminBookingDetail.status")}
+                                        </b></Typography>
                                     <Typography variant="body2">{booking.status}</Typography>
                                 </Box>
                             </Grid>
@@ -176,16 +190,26 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
                             backgroundColor: 'background.default',
                         }}
                     >
-                        <Typography variant="subtitle2"><b>Item Name:</b> {item.itemName}</Typography>
-                        <Typography variant="subtitle2"><b>Item Image:</b>
+                        <Typography variant="subtitle2"><b>
+                            {t("adminBookingDetail.itemName")}                           
+                            </b> {item.itemName}</Typography>
+                        <Typography variant="subtitle2"><b>
+                            {t("adminBookingDetail.itemImage")}
+                            </b>
                             <Box sx={{ my: 1 }}>
                                 <img src={item.itemImage} alt={item.itemName} style={{ width: "50px", height: "50px" }} />
                             </Box>
                         </Typography>
                        
-                        <Typography variant="body2"><b>Booked Quantity:</b> {item.bookedQuantity}</Typography>
-                        <Typography variant="body2"><b>Start date:</b> {item.startDate ? new Date(item.startDate).toLocaleDateString() : ""}</Typography>
-                        <Typography variant="body2"><b>End date:</b> {item.endDate ? new Date(item.endDate).toLocaleDateString() : ""}</Typography>
+                        <Typography variant="body2"><b>
+                            {t("adminBookingDetail.bookedQuantity")}
+                            </b> {item.bookedQuantity}</Typography>
+                        <Typography variant="body2"><b>
+                            {t("adminBookingDetail.startDate")}
+                            </b> {item.startDate ? new Date(item.startDate).toLocaleDateString() : ""}</Typography>
+                        <Typography variant="body2"><b>
+                            {t("adminBookingDetail.endDate")}
+                            </b> {item.endDate ? new Date(item.endDate).toLocaleDateString() : ""}</Typography>
                     </Box>
                 ))}
             </Box>
@@ -195,11 +219,11 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell><b>Item Name</b></TableCell>
-                            <TableCell><b>Item Image</b></TableCell>
-                            <TableCell><b>Booked Quantity</b></TableCell>
-                            <TableCell><b>Start date</b></TableCell>
-                            <TableCell><b>End date</b></TableCell>
+                            <TableCell><b>{t("adminBookingDetail.itemName")}</b></TableCell>
+                            <TableCell><b>{t("adminBookingDetail.itemImage")}</b></TableCell>
+                            <TableCell><b>{t("adminBookingDetail.bookedQuantity")}</b></TableCell>
+                            <TableCell><b>{t("adminBookingDetail.startDate")}</b></TableCell>
+                            <TableCell><b>{t("adminBookingDetail.endDate")}</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -218,45 +242,14 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
                 </Table>
             </TableContainer>
         )}
-                        {/* <TableContainer sx={{ marginTop: 3 }}>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell><b>Item Name</b></TableCell>
-                                        <TableCell><b>Item Image</b></TableCell>
-                                        <TableCell><b>Booked Quantity</b></TableCell>
-                                        <TableCell><b>Start date</b></TableCell>
-                                        <TableCell><b>End date</b></TableCell>
-                                        
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {bookingItems.map((item, index) => (
-                                        <TableRow key={index}>
-                                            <TableCell>{item.itemName}</TableCell>
-                                            <TableCell>
-                                                <img src={item.itemImage} alt={item.itemName} style={{ width: "50px", height: "50px" }} />
-                                            </TableCell>
-                                            <TableCell>{item.bookedQuantity}</TableCell>
-                                            <TableCell>
-                                            {item.startDate ? new Date(item.startDate).toLocaleDateString() : ""}
-                                            </TableCell>
-                                            <TableCell>
-                                                {item.endDate ? new Date(item.endDate).toLocaleDateString() : ""}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer> */}
-                        <Box display={"flex"} gap={2} marginTop={3} paddingX={2} justifyContent={"end"}>
+                        <Box display={"flex"} gap={2} marginTop={3} paddingX={2}>
                             <Button
                                 variant="contained"
                                 color="primary"
                                 onClick={() => handleApprove()}
                                 disabled={disableButton}
                                 >
-                                {bookingApprovalLoading ? <CircularProgress /> : "Approve"}
+                                {bookingApprovalLoading ? <CircularProgress /> : t("adminBookingDetail.approveButton")}
                             </Button>
                             <Button
                                 variant="contained"
@@ -264,7 +257,7 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
                                 onClick={() => handleReject()}
                                 disabled={disableButton}
                                 >
-                                {bookingRejectionLoading ? <CircularProgress /> : "Reject"}
+                                {bookingRejectionLoading ? <CircularProgress /> : t("adminBookingDetail.rejectButton")}
                             </Button>
                         </Box>
                         <StatusMessage status={status} handleClose={closeStatus} />
@@ -273,4 +266,3 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
             </Accordion>
     );
 };
-
