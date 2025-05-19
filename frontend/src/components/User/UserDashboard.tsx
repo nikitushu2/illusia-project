@@ -28,6 +28,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 // import UserProducts from "./UserProducts";
 import UserProducts from "./UserProducts";
 import UserBookings from "./UserBookings";
+import UserBookingHistory from "./UserBookingHistory";
 import useCategories from "../../services/categoryService";
 //import UserSingleProduct from "./UserSingleProduct";
 
@@ -232,12 +233,12 @@ const UserDashboard = () => {
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
-                            primary="Reservations"
+                            primary="Booking History"
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
                             onClick={() =>
-                              handleSideBar("Display reservations")
+                              handleSideBar(<UserBookingHistory />)
                             }
                           />
                         )}
@@ -247,7 +248,6 @@ const UserDashboard = () => {
                 </Collapse>
                 {/* <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} /> */}
 
-                
                 <Divider />
               </List>
             </Box>
@@ -264,7 +264,6 @@ const UserDashboard = () => {
               justifyContent: "center",
             }}
           >
-
             {/* data here */}
             <Box sx={{ marginTop: "50px", marginRight: "50px" }}>
               {categoriesService.loading ? (
