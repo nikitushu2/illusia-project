@@ -150,6 +150,7 @@ export const Header = () => {
               sx={{
                 alignItems: "center",
                 display: "flex",
+                width: "200px",
               }}
             >
               <Link to="/">
@@ -171,6 +172,9 @@ export const Header = () => {
                 display: { xs: "none", md: "flex" },
                 justifyContent: "center",
                 gap: "20px",
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
               }}
             >
               <Button color="inherit" variant="text" component={Link} to="/">
@@ -207,6 +211,8 @@ export const Header = () => {
                 display: "flex",
                 alignItems: "center",
                 gap: "20px",
+                width: "200px",
+                justifyContent: "flex-end",
               }}
             >
               {isLoggedIn ? (

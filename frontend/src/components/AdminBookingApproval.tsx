@@ -30,16 +30,15 @@ export const AdminBookingApproval = () => {
    
    
   return (
-
-    <Box>
-        <Typography variant="h4" textAlign={"center"} sx={{ marginBottom: 3}}>Booking Details</Typography>
-        {paginatedBooking.map((booking) => (
-            <AdminBookingDetail bookingDetails={booking} items={items || []} />
-        ))}
-        <Stack spacing={2} paddingTop={5} alignItems={'center'}>
-            <Pagination count={numberOfPages} onChange={(_, value) => setPage(value)} variant="outlined" shape="rounded" />
-        </Stack>
-    </Box> 
+<Box sx={{ maxWidth: 800, margin: "0 auto" }}>
+    <Typography variant="h4" textAlign={"center"} sx={{ marginBottom: 3 }}>Booking Details</Typography>
+    {paginatedBooking.map((booking) => (
+        <AdminBookingDetail bookingDetails={booking} items={items || []} />
+    ))}
+    <Stack spacing={2} paddingTop={5} alignItems={'center'}>
+        <Pagination count={numberOfPages} onChange={(_, value) => setPage(value)} variant="outlined" shape="rounded" />
+    </Stack>
+</Box>
   );
 };
 

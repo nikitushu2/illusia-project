@@ -185,7 +185,6 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
       setStartDate(formattedStartDate);
       setEndDate(formattedEndDate);
 
-    
       // Ensure we have the data before proceeding
       if (!items || !bookings) {
         setSnackbar({
@@ -524,12 +523,13 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                         }}
                         color="primary"
                         sx={{
-                          width: { xs: "100%", sm: "auto" },
+                          whiteSpace: "nowrap",
+                          minWidth: "120px",
                           "&:hover": {
                             backgroundColor: "primary.main",
                             color: "white",
                           },
-                          padding: 1.5,
+                          padding: "6px 16px",
                         }}
                         disabled={Boolean(
                           hasSearched && startDate && endDate && !isAvailable
@@ -798,12 +798,13 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                         }}
                         color="primary"
                         sx={{
-                          width: { xs: "100%", sm: "auto" },
+                          whiteSpace: "nowrap",
+                          minWidth: "120px",
                           "&:hover": {
                             backgroundColor: "primary.main",
                             color: "white",
                           },
-                          padding: 1.5,
+                          padding: "6px 16px",
                         }}
                         disabled={Boolean(
                           hasSearched && startDate && endDate && !isAvailable
@@ -1054,12 +1055,49 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
             <TextField
               onChange={handleSearch}
               value={searchInput}
-              label="search item"
-              fullWidth
+              label="Search item"
+              variant="outlined"
+              sx={{
+                width: { xs: "100%", sm: "50%" },
+                "& .MuiInputBase-root": {
+                  height: "36px",
+                  fontSize: "14px",
+                },
+                "& .MuiInputLabel-root": {
+                  fontSize: "14px",
+                  transform: "translate(14px, 8px) scale(1)",
+                  "&.MuiInputLabel-shrink": {
+                    transform: "translate(14px, -9px) scale(0.75)",
+                  },
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  top: 0,
+                },
+              }}
+              InputProps={{
+                sx: {
+                  height: "36px",
+                },
+              }}
             />
           </Box>
 
-          <FormControl sx={{ width: { xs: "100%", md: 200 } }}>
+          <FormControl
+            sx={{
+              width: { xs: "100%", sm: 200 },
+              "& .MuiInputBase-root": {
+                height: "36px",
+                fontSize: "14px",
+              },
+              "& .MuiInputLabel-root": {
+                fontSize: "14px",
+              },
+              "& .MuiSelect-select": {
+                padding: "8px 14px",
+                fontSize: "14px",
+              },
+            }}
+          >
             <InputLabel id="category-filter-label">
               Filter by Category
             </InputLabel>
@@ -1069,15 +1107,21 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               label="Filter by Category"
               onChange={handleByCategory}
             >
-              <MenuItem value="all">All Categories</MenuItem>
+              <MenuItem value="all" sx={{ fontSize: "14px" }}>
+                All Categories
+              </MenuItem>
               {categories && categories.length > 0 ? (
                 categories.map((category) => (
-                  <MenuItem key={category.id} value={category.id.toString()}>
+                  <MenuItem
+                    key={category.id}
+                    value={category.id.toString()}
+                    sx={{ fontSize: "14px" }}
+                  >
                     {category.name}
                   </MenuItem>
                 ))
               ) : (
-                <MenuItem disabled value="">
+                <MenuItem disabled value="" sx={{ fontSize: "14px" }}>
                   No categories available
                 </MenuItem>
               )}
@@ -1126,13 +1170,77 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                 label="Start Date"
                 value={startDate}
                 onChange={(newValue) => setStartDateLocal(newValue)}
-                sx={{ width: { xs: "100%", sm: 200 } }}
+                sx={{
+                  width: { xs: "100%", sm: 200 },
+                  "& .MuiInputBase-root": {
+                    height: "36px",
+                    fontSize: "14px",
+                  },
+                  "& .MuiInputLabel-root": {
+                    fontSize: "14px",
+                  },
+                  "& .MuiInputBase-input": {
+                    padding: "8px 14px",
+                    fontSize: "14px",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    height: "36px",
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    top: 0,
+                  },
+                  "& .MuiInputLabel-shrink": {
+                    transform: "translate(14px, -9px) scale(0.75)",
+                  },
+                }}
+                slotProps={{
+                  textField: {
+                    size: "small",
+                    sx: {
+                      "& .MuiOutlinedInput-root": {
+                        height: "36px",
+                      },
+                    },
+                  },
+                }}
               />
               <DatePicker
                 label="End Date"
                 value={endDate}
                 onChange={(newValue) => setEndDateLocal(newValue)}
-                sx={{ width: { xs: "100%", sm: 200 } }}
+                sx={{
+                  width: { xs: "100%", sm: 200 },
+                  "& .MuiInputBase-root": {
+                    height: "36px",
+                    fontSize: "14px",
+                  },
+                  "& .MuiInputLabel-root": {
+                    fontSize: "14px",
+                  },
+                  "& .MuiInputBase-input": {
+                    padding: "8px 14px",
+                    fontSize: "14px",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    height: "36px",
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    top: 0,
+                  },
+                  "& .MuiInputLabel-shrink": {
+                    transform: "translate(14px, -9px) scale(0.75)",
+                  },
+                }}
+                slotProps={{
+                  textField: {
+                    size: "small",
+                    sx: {
+                      "& .MuiOutlinedInput-root": {
+                        height: "36px",
+                      },
+                    },
+                  },
+                }}
               />
               <Button
                 onClick={searchAvailability}

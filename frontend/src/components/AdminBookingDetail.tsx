@@ -191,7 +191,7 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
             </Box>
         ) : (
             // Desktop: Table layout
-            <TableContainer sx={{ marginTop: 3 }}>
+            <TableContainer>
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -207,15 +207,11 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
                             <TableRow key={index}>
                                 <TableCell>{item.itemName}</TableCell>
                                 <TableCell>
-                                    <img src={item.itemImage} alt={item.itemName} style={{ width: "50px", height: "50px" }} />
+                                    <img src={item.itemImage} alt={item.itemName} style={{ width: "60px", height: "40px" }} />
                                 </TableCell>
                                 <TableCell>{item.bookedQuantity}</TableCell>
-                                <TableCell>
-                                    {item.startDate ? new Date(item.startDate).toLocaleDateString() : ""}
-                                </TableCell>
-                                <TableCell>
-                                    {item.endDate ? new Date(item.endDate).toLocaleDateString() : ""}
-                                </TableCell>
+                                <TableCell>{item.startDate ? new Date(item.startDate).toLocaleDateString() : ""}</TableCell>
+                                <TableCell>{item.endDate ? new Date(item.endDate).toLocaleDateString() : ""}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -253,7 +249,7 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
                                 </TableBody>
                             </Table>
                         </TableContainer> */}
-                        <Box display={"flex"} gap={2} marginTop={3} paddingX={2}>
+                        <Box display={"flex"} gap={2} marginTop={3} paddingX={2} justifyContent={"end"}>
                             <Button
                                 variant="contained"
                                 color="primary"

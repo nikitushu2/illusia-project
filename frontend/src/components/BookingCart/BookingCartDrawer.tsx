@@ -22,6 +22,8 @@ import { useNavigate } from "react-router-dom";
 import bookingService from "../../services/bookingService";
 import { BookingStatus } from "../../types/booking";
 
+import noImage from "../../images/noImage.png";
+
 interface BookingCartDrawerProps {
   open: boolean;
   onClose: () => void;
@@ -141,8 +143,8 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
           </Box>
         ) : (
           <>
-            <Box sx={{ mt: 3, p: 2 }}>
-              <Typography variant="h6" sx={{ mb: 2 }}>
+            <Box sx={{ mt: 2, p: 2 }}>
+              <Typography variant="h6" sx={{ mb: -1 , fontStyle: "italic"}}>
                 Booking Start Date:{" "}
                 {startDate ? (
                   new Date(startDate).toLocaleDateString()
@@ -159,7 +161,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                   </Button>
                 )}
               </Typography>
-              <Typography variant="h6" sx={{ mb: 2 }}>
+              <Typography variant="h6" sx={{ mb: -2 , fontStyle: "italic"}}>
                 Booking End Date:{" "}
                 {endDate
                   ? new Date(endDate).toLocaleDateString()
@@ -177,20 +179,20 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                         edge="end"
                         onClick={() => removeItem(item.id)}
                       >
-                        <DeleteIcon />
+                        <DeleteIcon  sx={{color:"red"}}/>
                       </IconButton>
                     }
                   >
                     <ListItemAvatar>
                       <Avatar
                         alt={item.name}
-                        src={item.imageUrl || undefined}
+                        src={item.imageUrl || noImage}
                       />
                     </ListItemAvatar>
                     <ListItemText
                       primary={item.name}
                       secondary={
-                        <Box sx={{ mt: 1 }}>
+                        <Box >
                           <Typography variant="body2" component="span">
                             €
                             {typeof item.price === "string"
@@ -252,7 +254,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                       }
                     />
                   </ListItem>
-                  <Divider />
+                  <Divider sx={{mt:-1.5}}/>
                 </React.Fragment>
               ))}
             </List>
