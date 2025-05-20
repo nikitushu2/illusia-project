@@ -154,7 +154,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
             mb: 2,
           }}
         >
-          <Typography variant="h5" fontWeight="bold">
+          <Typography variant="h5" sx={{color: "#9537c7"}}>
             Shopping Cart and Summary
           </Typography>
           <IconButton onClick={onClose}>
@@ -171,7 +171,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
             <div>
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="h6" fontWeight="bold">
+                  <Typography variant="h6">
                     Shopping Cart
                   </Typography>
                 </AccordionSummary>
@@ -186,7 +186,8 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                         size="small"
                         onClick={() => {
                           onClose();
-                          navigate("/");
+                          // navigate("/");
+                          navigate("/UserDashboard",{ state: { scrollToDates: true } });
                         }}
                       >
                         Select Dates
@@ -332,6 +333,13 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                       variant="outlined"
                       onClick={checkout}
                       disabled={loading}
+                      sx={{
+                        backgroundColor: "#3ec3ba",
+                        color: "white",
+                        "&:hover": {
+                          backgroundColor: "#primary.main",
+                        },
+                      }}
                     >
                       Checkout
                     </Button>
@@ -344,7 +352,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                 onChange={(_, expanded) => setOrderSummaryExpanded(expanded)}
               >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="h6" fontWeight="bold">
+                  <Typography variant="h6">
                     Order summary
                   </Typography>
                 </AccordionSummary>
@@ -378,7 +386,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                     ))}
                   </List>
                   <Typography variant="h6" sx={{ pl: 2, fontSize: "1rem" }}>
-                    Number of Product items: {items.length}
+                    Product Items: {items.reduce((total, item) => total + item.quantity, 0)}
                   </Typography>
                   <Typography
                     variant="h6"
@@ -399,7 +407,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                       color="primary"
                       onClick={handleSubmit}
                       disabled={loading || items.length === 0}
-                      sx={{ backgroundColor: "#3ec3ba" }}
+                      sx={{ backgroundColor: "#9537c7" }}
                     >
                       {loading ? <CircularProgress /> : "Book Now"}
                     </Button>
