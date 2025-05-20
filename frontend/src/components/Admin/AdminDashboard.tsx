@@ -20,7 +20,7 @@ import { JSX, useState, useEffect } from "react";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import GroupIcon from "@mui/icons-material/Group";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
-import DraftsIcon from "@mui/icons-material/Drafts";
+//import DraftsIcon from "@mui/icons-material/Drafts";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -30,6 +30,9 @@ import AdminProducts from "./AdminProducts";
 import useCategories from "../../services/categoryService";
 import { UserManagement } from "../userManagement/UserManagement";
 import { AdminBookingApproval } from "../AdminBookingApproval";
+
+import HistoryIcon from '@mui/icons-material/History';
+import FeedIcon from '@mui/icons-material/Feed';
 
 const AdminDashboard = () => {
   const theme = useTheme();
@@ -235,7 +238,7 @@ const AdminDashboard = () => {
                     <List component="div" disablePadding>
                       <ListItemButton sx={{ pl: 6 }}>
                         <ListItemIcon style={{ color: "white" }}>
-                          <DraftsIcon />
+                          <FeedIcon />
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
@@ -251,7 +254,7 @@ const AdminDashboard = () => {
                       </ListItemButton>
                       <ListItemButton sx={{ pl: 6 }}>
                         <ListItemIcon style={{ color: "white" }}>
-                          <DraftsIcon />
+                          <HistoryIcon />
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText

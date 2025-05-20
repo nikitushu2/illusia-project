@@ -385,7 +385,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                       </ListItem>
                     ))}
                   </List>
-                  <Typography variant="h6" sx={{ pl: 2, fontSize: "1rem" }}>
+                  <Typography variant="h6" sx={{ pl: 2, fontSize: "1rem" , mb: 1 }}>
                     Product Items: {items.reduce((total, item) => total + item.quantity, 0)}
                   </Typography>
                   <Typography

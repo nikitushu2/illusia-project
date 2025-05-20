@@ -1,7 +1,7 @@
 {
     "common": {
         "home": {
-            "en": "Home",
+            "en": "HOME",
             "fi": "ETUSIVU"
         }
 
@@ -48,8 +48,8 @@
             "fi": "Kiitos, että käytit sovellustamme!"
         },
         "goToLogin": {
-            "en": "Go to login",
-            "fi": "Siirry kirjautumiseen"
+            "en": "GO TO LOGIN",
+            "fi": "SIIRRY KIRJAUTUMISEEN"
         }
     },
 

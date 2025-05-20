@@ -39,6 +39,9 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 // Import useLocation from react-router-dom
 import { useLocation } from "react-router-dom";
 
+import HistoryIcon from '@mui/icons-material/History';
+import FeedIcon from '@mui/icons-material/Feed';
+
 const UserDashboard = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -223,7 +226,7 @@ const UserDashboard = () => {
                     <List component="div" disablePadding>
                       <ListItemButton sx={{ pl: 6 }}>
                         <ListItemIcon style={{ color: "white" }}>
-                          <DraftsIcon />
+                          <FeedIcon />
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
@@ -237,7 +240,7 @@ const UserDashboard = () => {
                       </ListItemButton>
                       <ListItemButton sx={{ pl: 6 }}>
                         <ListItemIcon style={{ color: "white" }}>
-                          <DraftsIcon />
+                          <HistoryIcon />
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText

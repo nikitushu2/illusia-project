@@ -15,7 +15,7 @@ import {
   ListItemButton,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import LanguageIcon from '@mui/icons-material/Language';
+import LanguageIcon from "@mui/icons-material/Language";
 import logo from "../images/logo-transparent.png";
 
 import { Link, useLocation } from "react-router-dom";
@@ -29,8 +29,8 @@ import ShoppingCartIconComponent from "./ShoppingCartIcon";
 import { useTranslation } from "react-i18next";
 
 enum Locale {
-  EN = 'en',
-  FI = 'fi',
+  EN = "en",
+  FI = "fi",
 }
 
 const LocaleSelector = () => {
@@ -41,19 +41,25 @@ const LocaleSelector = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', color: 'primary.main' }}>
-        <LanguageIcon />
-        <select
-          defaultValue={i18n.language as Locale}
-          onChange={(event) => handleLocaleChange(event.target.value as Locale)}
-          style={{ border: 'none', color: 'inherit', fontSize: '1rem', fontWeight: 'bold', marginLeft: '4px' }}
-        >
-          <option value={Locale.EN}>EN</option>
-          <option value={Locale.FI}>FI</option>
-        </select>
+    <Box sx={{ display: "flex", alignItems: "center", color: "primary.main" }}>
+      <LanguageIcon />
+      <select
+        defaultValue={i18n.language as Locale}
+        onChange={(event) => handleLocaleChange(event.target.value as Locale)}
+        style={{
+          border: "none",
+          color: "inherit",
+          fontSize: "1rem",
+          fontWeight: "bold",
+          marginLeft: "4px",
+        }}
+      >
+        <option value={Locale.EN}>EN</option>
+        <option value={Locale.FI}>FI</option>
+      </select>
     </Box>
   );
-}
+};
 
 export const Header = () => {
   const { t } = useTranslation();
@@ -170,7 +176,7 @@ export const Header = () => {
 
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="static" sx={{height:"100px"}}>
         <Container maxWidth="xl">
           <Toolbar
             disableGutters
@@ -181,6 +187,7 @@ export const Header = () => {
                 alignItems: "center",
                 display: "flex",
                 width: "200px",
+                height: "100px",
               }}
             >
               <Link to="/">
@@ -208,9 +215,7 @@ export const Header = () => {
               }}
             >
               <Button color="inherit" variant="text" component={Link} to="/">
-                <Typography variant="body1">
-                  {t("common.home")}
-                  </Typography>
+                <Typography variant="body1">{t("common.home")}</Typography>
               </Button>
               <Button
                 color="inherit"
@@ -218,9 +223,7 @@ export const Header = () => {
                 component={Link}
                 to="/items"
               >
-                <Typography variant="body1">
-                  {t("headerPage.store")}
-                  </Typography>
+                <Typography variant="body1">{t("headerPage.store")}</Typography>
               </Button>
               <Button
                 color="inherit"
@@ -229,8 +232,8 @@ export const Header = () => {
                 to="/events"
               >
                 <Typography variant="body1">
-                {t("headerPage.events")}
-                  </Typography>
+                  {t("headerPage.events")}
+                </Typography>
               </Button>
               <Button
                 color="inherit"
@@ -238,9 +241,7 @@ export const Header = () => {
                 component={Link}
                 to="/info"
               >
-                <Typography variant="body1">
-                {t("headerPage.info")}
-                  </Typography>
+                <Typography variant="body1">{t("headerPage.info")}</Typography>
               </Button>
             </Box>
 
@@ -261,7 +262,7 @@ export const Header = () => {
                     sx={{
                       display: { xs: "none", md: "flex" },
                       alignItems: "center",
-                      gap: "20px",
+                      gap: "2px",
                     }}
                   >
                     <Chip
@@ -281,9 +282,14 @@ export const Header = () => {
                     />
                     <Button
                       onClick={handleLogout}
-                      color="inherit"
-                      variant="contained"
-                      sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                      // color="inherit"
+                      // variant="contained"
+                      sx={{
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        padding: "10px 10px",
+                      }}
                     >
                       {t("headerPage.logout")}
                     </Button>
@@ -291,9 +297,14 @@ export const Header = () => {
                   <Box sx={{ display: { xs: "block", md: "none" } }}>
                     <Button
                       onClick={handleLogout}
-                      color="inherit"
-                      variant="contained"
-                      sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                      // color="inherit"
+                      // variant="contained"
+                      sx={{
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        padding: "10px 10px",
+                      }}
                     >
                       {t("headerPage.logout")}
                     </Button>
@@ -301,23 +312,35 @@ export const Header = () => {
                 </>
               ) : (
                 <>
-                  <Button
-                    onClick={signUp}
-                    color="inherit"
-                    variant="contained"
-                    sx={{ fontSize: "1rem", fontWeight: "bold" }}
-                  >
-                    {t("headerPage.signup")}
-                  </Button>
-                  <Button
-                    to="/login"
-                    component={Link}
-                    color="inherit"
-                    variant="contained"
-                    sx={{ fontSize: "1rem", fontWeight: "bold" }}
-                  >
-                    {t("headerPage.login")}
-                  </Button>
+                  <Box sx={{ display: { xs: "none", md: "flex" } }}>
+                    <Button
+                      onClick={signUp}
+                      // color="inherit"
+                      // variant="contained"
+                      sx={{
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        padding: "10px 10px",
+                      }}
+                    >
+                      {t("headerPage.signup")}
+                    </Button>
+                    <Button
+                      to="/login"
+                      component={Link}
+                      // color="inherit"
+                      // variant="contained"
+                      sx={{
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        padding: "10px 10px",
+                      }}
+                    >
+                      {t("headerPage.login")}
+                    </Button>
+                  </Box>
                 </>
               )}
               <LocaleSelector />
