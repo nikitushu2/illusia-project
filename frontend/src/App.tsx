@@ -22,8 +22,6 @@ import Contact from "./components/Contact";
 import { AuthProvider } from "./context/AuthContext";
 
 const App: React.FC = () => {
-  console.log("App rendering with BookingCartProvider");
-
   return (
     <AuthProvider>
       <BookingCartProvider>

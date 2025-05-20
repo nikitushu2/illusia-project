@@ -15,6 +15,7 @@ import {
   ListItemButton,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import LanguageIcon from '@mui/icons-material/Language';
 import logo from "../images/logo-transparent.png";
 
 import { Link, useLocation } from "react-router-dom";
@@ -25,8 +26,37 @@ import { useNavigate } from "react-router-dom";
 import { useBookingCart } from "../context/BookingCartContext";
 import BookingCartDrawer from "./BookingCart/BookingCartDrawer";
 import ShoppingCartIconComponent from "./ShoppingCartIcon";
+import { useTranslation } from "react-i18next";
+
+enum Locale {
+  EN = 'en',
+  FI = 'fi',
+}
+
+const LocaleSelector = () => {
+  const { i18n } = useTranslation();
+
+  const handleLocaleChange = (lang: Locale) => {
+    i18n.changeLanguage(lang);
+  };
+
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', color: 'primary.main' }}>
+        <LanguageIcon />
+        <select
+          defaultValue={i18n.language as Locale}
+          onChange={(event) => handleLocaleChange(event.target.value as Locale)}
+          style={{ border: 'none', color: 'inherit', fontSize: '1rem', fontWeight: 'bold', marginLeft: '4px' }}
+        >
+          <option value={Locale.EN}>EN</option>
+          <option value={Locale.FI}>FI</option>
+        </select>
+    </Box>
+  );
+}
 
 export const Header = () => {
+  const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const themeContext = useContext(ThemeContext);
   const { logout, isLoggedIn, signUp, signUpUser, isAdmin, applicationUser } =
@@ -75,7 +105,7 @@ export const Header = () => {
             <ListItemText
               primary={
                 <Typography sx={{ fontSize: { xs: "0.8rem", sm: "1rem" } }}>
-                  HOME
+                  {t("common.home")}
                 </Typography>
               }
             />
@@ -86,7 +116,7 @@ export const Header = () => {
             <ListItemText
               primary={
                 <Typography sx={{ fontSize: { xs: "0.8rem", sm: "1rem" } }}>
-                  ITEMS
+                  {t("headerPage.items")}
                 </Typography>
               }
             />
@@ -97,7 +127,7 @@ export const Header = () => {
             <ListItemText
               primary={
                 <Typography sx={{ fontSize: { xs: "0.8rem", sm: "1rem" } }}>
-                  EVENTS
+                  {t("headerPage.events")}
                 </Typography>
               }
             />
@@ -108,7 +138,7 @@ export const Header = () => {
             <ListItemText
               primary={
                 <Typography sx={{ fontSize: { xs: "0.8rem", sm: "1rem" } }}>
-                  INFO
+                  {t("headerPage.info")}
                 </Typography>
               }
             />
@@ -178,7 +208,9 @@ export const Header = () => {
               }}
             >
               <Button color="inherit" variant="text" component={Link} to="/">
-                <Typography variant="body1">HOME</Typography>
+                <Typography variant="body1">
+                  {t("common.home")}
+                  </Typography>
               </Button>
               <Button
                 color="inherit"
@@ -186,7 +218,9 @@ export const Header = () => {
                 component={Link}
                 to="/items"
               >
-                <Typography variant="body1">STORE</Typography>
+                <Typography variant="body1">
+                  {t("headerPage.store")}
+                  </Typography>
               </Button>
               <Button
                 color="inherit"
@@ -194,7 +228,9 @@ export const Header = () => {
                 component={Link}
                 to="/events"
               >
-                <Typography variant="body1">EVENTS</Typography>
+                <Typography variant="body1">
+                {t("headerPage.events")}
+                  </Typography>
               </Button>
               <Button
                 color="inherit"
@@ -202,7 +238,9 @@ export const Header = () => {
                 component={Link}
                 to="/info"
               >
-                <Typography variant="body1">INFO</Typography>
+                <Typography variant="body1">
+                {t("headerPage.info")}
+                  </Typography>
               </Button>
             </Box>
 
@@ -247,7 +285,7 @@ export const Header = () => {
                       variant="contained"
                       sx={{ fontSize: "1rem", fontWeight: "bold" }}
                     >
-                      Logout
+                      {t("headerPage.logout")}
                     </Button>
                   </Box>
                   <Box sx={{ display: { xs: "block", md: "none" } }}>
@@ -257,7 +295,7 @@ export const Header = () => {
                       variant="contained"
                       sx={{ fontSize: "1rem", fontWeight: "bold" }}
                     >
-                      Logout
+                      {t("headerPage.logout")}
                     </Button>
                   </Box>
                 </>
@@ -269,7 +307,7 @@ export const Header = () => {
                     variant="contained"
                     sx={{ fontSize: "1rem", fontWeight: "bold" }}
                   >
-                    Sign Up
+                    {t("headerPage.signup")}
                   </Button>
                   <Button
                     to="/login"
@@ -278,11 +316,11 @@ export const Header = () => {
                     variant="contained"
                     sx={{ fontSize: "1rem", fontWeight: "bold" }}
                   >
-                    Log In
+                    {t("headerPage.login")}
                   </Button>
                 </>
               )}
-
+              <LocaleSelector />
               <Box sx={{ display: { xs: "block", md: "none" } }}>
                 <IconButton
                   color="inherit"
