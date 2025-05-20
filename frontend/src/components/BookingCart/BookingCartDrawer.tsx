@@ -93,8 +93,11 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
       clearCart();
       onClose();
 
-      // Navigate to the user dashboard showing the bookings tab
-      navigate("/userDashboard", { state: { showBookings: true } });
+      // Add a slight delay before navigating to ensure the success message is visible
+      setTimeout(() => {
+        // Navigate to the user bookings page directly to avoid potential routing issues
+        navigate("/userBookings");
+      }, 1500);
     } catch (err) {
       console.error("Error creating booking:", err);
       setError("Failed to create booking. Please try again.");
@@ -316,8 +319,8 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
           }}
         >
           <Typography fontSize="0.875rem" color="white" fontWeight={500}>
-            Your booking has been successfully created, now pending
-            approval from admin.
+            Your booking has been successfully created, now pending approval
+            from admin.
           </Typography>
         </Alert>
       </Snackbar>

@@ -20,6 +20,8 @@ import Events from "./components/Events";
 import Info from "./components/Info";
 import Contact from "./components/Contact";
 import { AuthProvider } from "./context/AuthContext";
+import UserBookings from "./components/User/UserBookings";
+import UserBookingHistory from "./components/User/UserBookingHistory";
 
 const App: React.FC = () => {
   console.log("App rendering with BookingCartProvider");
@@ -51,14 +53,21 @@ const App: React.FC = () => {
 
               {/* User Routes */}
               <Route path="/userDashboard" element={<UserDashboard />} />
+              <Route path="/userBookings" element={<UserBookings />} />
+              <Route
+                path="/userBookingHistory"
+                element={<UserBookingHistory />}
+              />
 
-                {/* Admin Routes */}
+              {/* Admin Routes */}
               <Route path="/adminDashboard" element={<AdminDashboard />} />
-              <Route path="/adminNewProduct" element={<AdminNewProductForm />} />
+              <Route
+                path="/adminNewProduct"
+                element={<AdminNewProductForm />}
+              />
 
-              <Route path="/contact" element={<Contact/>} />
-
-              </Routes>
+              <Route path="/contact" element={<Contact />} />
+            </Routes>
             <Footer />
           </Box>
         </Router>

@@ -155,6 +155,9 @@ const UserBookings: React.FC = () => {
   if (bookings.length === 0) {
     return (
       <Box sx={{ mt: 2, p: 3 }}>
+        <Typography variant="h4" sx={{ mb: 3, color: "#44195b" }}>
+          Active Bookings
+        </Typography>
         <Typography variant="h6">You have no bookings yet</Typography>
       </Box>
     );
@@ -164,6 +167,9 @@ const UserBookings: React.FC = () => {
   const renderMobileView = () => {
     return (
       <Box sx={{ mt: 2, px: 1 }}>
+        <Typography variant="h4" sx={{ mb: 3, color: "#44195b" }}>
+          Active Bookings
+        </Typography>
         {bookings.map((booking) => (
           <Card key={booking.id} sx={{ mb: 2 }}>
             <CardContent>
@@ -424,11 +430,10 @@ const UserBookings: React.FC = () => {
   };
 
   return (
-    <Box sx={{ mt: 2 }}>
-      <Typography variant="h5" gutterBottom>
-        Your Bookings
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" sx={{ mb: 3, color: "#44195b" }}>
+        Active Bookings
       </Typography>
-
       {isMobile ? renderMobileView() : renderTableView()}
 
       {/* Delete Confirmation Dialog */}

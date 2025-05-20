@@ -27,8 +27,6 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 
 // import UserProducts from "./UserProducts";
 import UserProducts from "./UserProducts";
-import UserBookings from "./UserBookings";
-import UserBookingHistory from "./UserBookingHistory";
 import useCategories from "../../services/categoryService";
 //import UserSingleProduct from "./UserSingleProduct";
 
@@ -36,7 +34,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 // Import useLocation from react-router-dom
-import { useLocation } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 
 const UserDashboard = () => {
   const [sideLink, setsideLink] = useState<string | null>(null);
@@ -46,6 +44,7 @@ const UserDashboard = () => {
   const [component, setComponent] = useState<React.ReactElement | null>(null);
 
   const categoriesService = useCategories();
+  const navigate = useNavigate();
 
   // Inside the component, add this near the beginning
   const location = useLocation();
@@ -55,9 +54,10 @@ const UserDashboard = () => {
   useEffect(() => {
     if (state && state.showBookings) {
       setBookingsOpen(true);
-      handleSideBar(<UserBookings />);
+      // Use React Router's navigate function instead of window.location.href
+      navigate("/userBookings");
     }
-  }, [state]);
+  }, [state, navigate]);
 
   // Initialize component with user products when categories are loaded
   useEffect(() => {
@@ -88,10 +88,6 @@ const UserDashboard = () => {
   //handle arrow up/down for bookings
   const handleBookingsClick = () => {
     setBookingsOpen(!bookingsOpen);
-    // Show bookings when clicking on bookings menu item
-    if (!bookingsOpen) {
-      handleSideBar(<UserBookings />);
-    }
   };
 
   // Function to handle Products menu item click
@@ -213,7 +209,11 @@ const UserDashboard = () => {
                 >
                   <ListItem disablePadding>
                     <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 6 }}>
+                      <ListItemButton
+                        sx={{ pl: 6 }}
+                        component={Link}
+                        to="/userBookings"
+                      >
                         <ListItemIcon style={{ color: "white" }}>
                           <DraftsIcon />
                         </ListItemIcon>
@@ -223,11 +223,14 @@ const UserDashboard = () => {
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
-                            onClick={() => handleSideBar(<UserBookings />)}
                           />
                         )}
                       </ListItemButton>
-                      <ListItemButton sx={{ pl: 6 }}>
+                      <ListItemButton
+                        sx={{ pl: 6 }}
+                        component={Link}
+                        to="/userBookingHistory"
+                      >
                         <ListItemIcon style={{ color: "white" }}>
                           <DraftsIcon />
                         </ListItemIcon>
@@ -237,9 +240,6 @@ const UserDashboard = () => {
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
-                            onClick={() =>
-                              handleSideBar(<UserBookingHistory />)
-                            }
                           />
                         )}
                       </ListItemButton>

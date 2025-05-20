@@ -90,6 +90,9 @@ const UserBookingHistory: React.FC = () => {
   if (bookings.length === 0) {
     return (
       <Box sx={{ mt: 2, p: 3 }}>
+        <Typography variant="h4" sx={{ mb: 3, color: "#44195b" }}>
+          Booking History
+        </Typography>
         <Typography variant="h6">You have no booking history yet</Typography>
       </Box>
     );
@@ -99,6 +102,9 @@ const UserBookingHistory: React.FC = () => {
   const renderMobileView = () => {
     return (
       <Box sx={{ mt: 2, px: 1 }}>
+        <Typography variant="h4" sx={{ mb: 3, color: "#44195b" }}>
+          Booking History
+        </Typography>
         {bookings.map((booking) => (
           <Card key={booking.id} sx={{ mb: 2 }}>
             <CardContent>
@@ -281,8 +287,8 @@ const UserBookingHistory: React.FC = () => {
   };
 
   return (
-    <Box sx={{ mt: 2 }}>
-      <Typography variant="h5" gutterBottom>
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" sx={{ mb: 3, color: "#44195b" }}>
         Booking History
       </Typography>
       {isMobile ? renderMobileView() : renderTableView()}
