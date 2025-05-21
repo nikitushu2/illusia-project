@@ -18,7 +18,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import LanguageIcon from "@mui/icons-material/Language";
 import logo from "../images/logo-transparent.png";
 
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ThemeContext } from "../themes/themeContext";
 import { useContext, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
@@ -68,9 +68,7 @@ export const Header = () => {
   const { logout, isLoggedIn, signUp, signUpUser, isAdmin, applicationUser } =
     useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const { isCartOpen, closeCart } = useBookingCart();
-  const isUserDashboard = location.pathname === "/userDashboard";
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -176,7 +174,7 @@ export const Header = () => {
 
   return (
     <>
-      <AppBar position="static" sx={{height:"100px"}}>
+      <AppBar position="static" sx={{ height: "100px" }}>
         <Container maxWidth="xl">
           <Toolbar
             disableGutters
@@ -217,14 +215,33 @@ export const Header = () => {
               <Button color="inherit" variant="text" component={Link} to="/">
                 <Typography variant="body1">{t("common.home")}</Typography>
               </Button>
-              <Button
-                color="inherit"
-                variant="text"
-                component={Link}
-                to="/items"
-              >
-                <Typography variant="body1">{t("headerPage.store")}</Typography>
-              </Button>
+              {/* Store or Dashboard button */}
+              {!isLoggedIn ? (
+                <Button
+                  color="inherit"
+                  variant="text"
+                  component={Link}
+                  to="/items"
+                >
+                  <Typography variant="body1">
+                    {t("headerPage.store")}
+                  </Typography>
+                </Button>
+              ) : (
+                <Button
+                  color="inherit"
+                  variant="text"
+                  onClick={() => {
+                    if (isAdmin) {
+                      navigate("/adminDashboard");
+                    } else {
+                      navigate("/userDashboard");
+                    }
+                  }}
+                >
+                  <Typography variant="body1">DASHBOARD</Typography>
+                </Button>
+              )}
               <Button
                 color="inherit"
                 variant="text"
@@ -256,7 +273,8 @@ export const Header = () => {
             >
               {isLoggedIn ? (
                 <>
-                  {isUserDashboard && !isAdmin && <ShoppingCartIconComponent />}
+                  {/* Show cart icon for all signed-in, non-admin users */}
+                  {isLoggedIn && !isAdmin && <ShoppingCartIconComponent />}
 
                   <Box
                     sx={{
