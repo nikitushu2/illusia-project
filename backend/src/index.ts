@@ -29,10 +29,7 @@ const app = express();
 
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? process.env.FRONTEND_ORIGIN_DEV
-        : ["http://localhost:5173", "http://localhost:5174"],
+    origin:process.env.FRONTEND_ORIGIN_DEV,
     methods: "GET,POST,PUT,PATCH,DELETE",
     credentials: true,
   })
