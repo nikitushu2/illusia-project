@@ -48,7 +48,10 @@ const UserDashboard = () => {
 
   // Inside the component, add this near the beginning
   const location = useLocation();
-  const state = location.state as { showBookings?: boolean } | null;
+  const state = location.state as {
+    showBookings?: boolean;
+    selectDates?: boolean;
+  } | null;
 
   // Add an effect to check for showBookings state and open bookings tab if needed
   useEffect(() => {
@@ -56,6 +59,23 @@ const UserDashboard = () => {
       setBookingsOpen(true);
       // Use React Router's navigate function instead of window.location.href
       navigate("/userBookings");
+    }
+
+    // Handle selectDates state if it exists
+    if (state && state.selectDates) {
+      // Focus on Products section which contains the date picker
+      setProductsOpen(true);
+      handleProductsMenuClick();
+
+      // Wait for the component to render, then scroll to the date picker section
+      setTimeout(() => {
+        const datePickerElement = document.getElementById(
+          "date-picker-section"
+        );
+        if (datePickerElement) {
+          datePickerElement.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 500);
     }
   }, [state, navigate]);
 

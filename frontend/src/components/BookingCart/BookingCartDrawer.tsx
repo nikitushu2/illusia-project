@@ -155,7 +155,9 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                     size="small"
                     onClick={() => {
                       onClose();
-                      navigate("/");
+                      navigate("/userDashboard", {
+                        state: { selectDates: true },
+                      });
                     }}
                   >
                     Select Dates
