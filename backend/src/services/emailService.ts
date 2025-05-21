@@ -96,7 +96,7 @@ const generateStatusChangeEmailContent = async (
             background-color: #ffffff;
           }
           .email-header {
-            background-color: #4a86e8;
+            background-color: #44195b;
             color: white;
             padding: 15px;
             border-radius: 5px 5px 0 0;
@@ -162,9 +162,9 @@ const generateStatusChangeEmailContent = async (
           <div class="booking-info">
             <p><strong>Booking ID:</strong> ${bookingId}</p>
             <p><strong>Booking Period:</strong> ${startDate
-              .toString()
+              .toISOString()
               .replace(/(\d{4})-(\d{2})-(\d{2})T.*/g, "$2-$3-$1")} to ${endDate
-    .toString()
+    .toISOString()
     .replace(/(\d{4})-(\d{2})-(\d{2})T.*/g, "$2-$3-$1")}</p>
           </div>
           
