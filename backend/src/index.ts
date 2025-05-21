@@ -31,7 +31,7 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV === "production"
-        ? "https://illusia-project-2947763ee03d.herokuapp.com"
+        ? process.env.FRONTEND_ORIGIN_DEV
         : ["http://localhost:5173", "http://localhost:5174"],
     methods: "GET,POST,PUT,PATCH,DELETE",
     credentials: true,
