@@ -35,13 +35,11 @@ import {
   
     // grid view
     const handleGridView = () => {
-      console.log("grid");
       setGrid(!grid);
     };
   
     // list view
     const handleListView = () => {
-      console.log("list");
       setList(!list);
     };
   

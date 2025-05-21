@@ -20,9 +20,10 @@ import image1 from "../images/illusia images/testImage 1.png";
 import image2 from "../images/illusia images/testImage 2.png";
 import image3 from "../images/illusia images/testImage 3.png";
 import image4 from "../images/image4.png";
+import { useTranslation } from "react-i18next";
 
 const LandingPage = () => {
-
+  const { t } = useTranslation();
   const images = [image1, image2, image3, image4];
   const [currentImage, setCurrentImage] = useState(0);
   const [fadeIn, setFadeIn] = useState(true);
@@ -49,7 +50,7 @@ const LandingPage = () => {
       <Box sx={{width: "40%",height: "100%", clipPath: "polygon(0% 0%, 100% 0%, 80% 100%, 0% 100%)" }}>
         <Box sx={{ padding: 4, height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <Typography variant="h4" align="center" sx={{ color: "#9c27b0" , fontStyle:"italic", padding:"15px", fontWeight:"bold"}} >
-          Welcome to Illusia Ry – The Heart of Immersive LARP Experiences!
+          {t("landingPage.welcomeText")}
         </Typography>
         </Box>
       </Box>
@@ -63,27 +64,29 @@ const LandingPage = () => {
     </Box>
 
     <Box>
-    <Typography variant="h4" align="center" sx={{ color: "#9c27b0", margin:"50px" }} > Your next adventure starts here</Typography>
+    <Typography variant="h4" align="center" sx={{ color: "#9c27b0", margin:"50px" }} >
+      {t("landingPage.YourNextAdventureStartsHere")}
+      </Typography>
 
     <Typography variant="h6" >
-    Step into a world of imagination with Illusia Ry, the creative team behind Odysseus and other memorable live-action role-playing (LARP) adventures. Whether you're experienced or just starting out, you can bring your stories to life with our detailed props, sets, and engaging game design.
+      {t("landingPage.description")}
     </Typography>
 
     <Box  sx={{  display: "flex",  justifyContent: "space-between",  marginTop: "50px",   gap: "70px", marginBottom: "100px", }}>
       <Box>
         <CalendarMonthIcon sx={{ width: "70px", height: "70px" }} color="secondary" />
-          <Typography variant="h5">Booking</Typography>
-            <Typography variant="h6">Book your next event or use our porps </Typography>
+          <Typography variant="h5">{t("landingPage.booking")}</Typography>
+            <Typography variant="h6">{t("landingPage.bookingDescription")} </Typography>
       </Box>
       <Box>
         <TheaterComedyIcon sx={{ width: "70px", height: "70px" }} color="secondary"  />
-          <Typography variant="h5">Events</Typography>
-          <Typography variant="h6">Events and games for you to join </Typography>
+          <Typography variant="h5">{t("landingPage.events")}</Typography>
+          <Typography variant="h6">{t("landingPage.eventsDescription")}</Typography>
       </Box>
       <Box>
         <HandshakeIcon sx={{ width: "70px", height: "70px" }} color="secondary" />
-        <Typography variant="h5">Location</Typography>
-        <Typography variant="h6">  Real live events for you to join</Typography>
+        <Typography variant="h5">{t("landingPage.locations")}</Typography>
+        <Typography variant="h6">{t("landingPage.locationDescription")}</Typography>
       </Box>
     </Box>
 

@@ -34,9 +34,11 @@ import { AdminBookingApproval } from "../AdminBookingApproval";
 
 import HistoryIcon from '@mui/icons-material/History';
 import FeedIcon from '@mui/icons-material/Feed';
+import { useTranslation } from "react-i18next";
 
 const AdminDashboard = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [sideLink, setsideLink] = useState<string | null>(null);
   const [productsOpen, setProductsOpen] = useState(false);
@@ -142,7 +144,7 @@ const AdminDashboard = () => {
                     marginBottom: "50px",
                   }}
                 >
-                  Admin Dashboard
+                  {t("sidebar.adminDashboard")}
                 </Typography>
               )}
               <IconButton
@@ -176,7 +178,7 @@ const AdminDashboard = () => {
                     {!isCollapsed && (
                       <>
                         <ListItemText
-                          primary="Products"
+                          primary={t("sidebar.products")}
                           slotProps={{
                             primary: { style: { color: "white" } },
                           }}
@@ -195,7 +197,7 @@ const AdminDashboard = () => {
                     </ListItemIcon>
                     {!isCollapsed && (
                       <ListItemText
-                        primary="Users"
+                        primary={t("sidebar.users")}
                         slotProps={{
                           primary: { style: { color: "white" } },
                         }}
@@ -213,7 +215,7 @@ const AdminDashboard = () => {
                     {!isCollapsed && (
                       <>
                         <ListItemText
-                          primary="Bookings"
+                          primary={t("sidebar.bookings")}
                           slotProps={{
                             primary: {
                               style: { color: "white" },
@@ -243,7 +245,7 @@ const AdminDashboard = () => {
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
-                            primary="Details"
+                            primary={t("sidebar.details")}
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
@@ -259,7 +261,7 @@ const AdminDashboard = () => {
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
-                            primary="Booking History"
+                            primary={t("sidebar.bookingHistory")}
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
