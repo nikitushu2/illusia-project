@@ -463,7 +463,14 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
                 fontSize: "14px",
               },
               "& .MuiInputLabel-root": {
-                fontSize: "13px",
+                fontSize: "14px",
+                transform: "translate(14px, 8px) scale(1)",
+                "&.MuiInputLabel-shrink": {
+                  transform: "translate(14px, -9px) scale(0.75)",
+                },
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                top: 0,
               },
             }}
             InputProps={{
@@ -475,11 +482,13 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
           <Button
             onClick={handleCreate}
             sx={{
-              width: { xs: "100%", sm: "auto" },
-              height: { xs: "40px", sm: "56px" },
-              fontSize: { xs: "0.875rem", sm: "1rem" },
+              width: { xs: "auto", sm: "auto" },
+              height: "37px",
+              fontSize: "0.875rem",
               backgroundColor: "primary.main",
               color: "white",
+              padding: "16px",
+              borderRadius: "15px", // Reduce the rounding of the button sides
               "&:hover": { backgroundColor: "primary.dark" },
             }}
           >
@@ -497,7 +506,7 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
             marginTop: { xs: "20px", sm: "30px" },
           }}
         >
-        <FormControl
+          <FormControl
             sx={{
               width: { xs: "100%", sm: 200 },
               "& .MuiInputBase-root": {
@@ -678,6 +687,7 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
               overflowX: "auto",
               marginTop: { xs: 2, sm: 4 },
               padding: { xs: 1, sm: 2 },
+              maxWidth: "100%",
             }}
           >
             <TableContainer
@@ -686,6 +696,7 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
                 borderRadius: 2,
                 boxShadow: 2,
                 overflowX: "auto",
+                width: "100%",
                 "&::-webkit-scrollbar": {
                   width: "8px",
                   height: "8px",
@@ -846,7 +857,7 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
                           {category ? category.name : "n/a"}
                         </TableCell>
                         <TableCell>
-                          <Box sx={{ display: "flex", }}>
+                          <Box sx={{ display: "flex" }}>
                             <IconButton
                               color="primary"
                               onClick={() => handleEdit(item)}

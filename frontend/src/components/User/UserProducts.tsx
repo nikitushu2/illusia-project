@@ -1060,12 +1060,12 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               sx={{
                 width: { xs: "100%", sm: "50%" },
                 "& .MuiInputBase-root": {
-                  height: "36px",
-                  fontSize: "14px",
+                  height: "45px",
+                  fontSize: "16px",
                 },
                 "& .MuiInputLabel-root": {
-                  fontSize: "14px",
-                  transform: "translate(14px, 8px) scale(1)",
+                  fontSize: "16px",
+                  transform: "translate(16px, 12px) scale(1)",
                   "&.MuiInputLabel-shrink": {
                     transform: "translate(14px, -9px) scale(0.75)",
                   },
@@ -1076,7 +1076,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
               }}
               InputProps={{
                 sx: {
-                  height: "36px",
+                  height: "45px",
                 },
               }}
             />
@@ -1086,15 +1086,15 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
             sx={{
               width: { xs: "100%", sm: 200 },
               "& .MuiInputBase-root": {
-                height: "36px",
-                fontSize: "14px",
+                height: "45px",
+                fontSize: "16px",
               },
               "& .MuiInputLabel-root": {
-                fontSize: "14px",
+                fontSize: "16px",
               },
               "& .MuiSelect-select": {
                 padding: "8px 14px",
-                fontSize: "14px",
+                fontSize: "16px",
               },
             }}
           >
@@ -1178,6 +1178,10 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                   },
                   "& .MuiInputLabel-root": {
                     fontSize: "14px",
+                    transform: "translate(14px, 8px) scale(1)",
+                    "&.MuiInputLabel-shrink": {
+                      transform: "translate(14px, -9px) scale(0.75)",
+                    },
                   },
                   "& .MuiInputBase-input": {
                     padding: "8px 14px",
@@ -1188,9 +1192,6 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                   },
                   "& .MuiOutlinedInput-notchedOutline": {
                     top: 0,
-                  },
-                  "& .MuiInputLabel-shrink": {
-                    transform: "translate(14px, -9px) scale(0.75)",
                   },
                 }}
                 slotProps={{
@@ -1212,23 +1213,24 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                   width: { xs: "100%", sm: 200 },
                   "& .MuiInputBase-root": {
                     height: "36px",
-                    fontSize: "14px",
+                    fontSize: "10px",
                   },
                   "& .MuiInputLabel-root": {
                     fontSize: "14px",
+                    transform: "translate(14px, 8px) scale(1)",
+                    "&.MuiInputLabel-shrink": {
+                      transform: "translate(14px, -9px) scale(0.75)",
+                    },
                   },
                   "& .MuiInputBase-input": {
                     padding: "8px 14px",
-                    fontSize: "14px",
+                    fontSize: "10px",
                   },
                   "& .MuiOutlinedInput-root": {
                     height: "36px",
                   },
                   "& .MuiOutlinedInput-notchedOutline": {
                     top: 0,
-                  },
-                  "& .MuiInputLabel-shrink": {
-                    transform: "translate(14px, -9px) scale(0.75)",
                   },
                 }}
                 slotProps={{
