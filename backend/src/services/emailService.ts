@@ -71,25 +71,121 @@ const generateStatusChangeEmailContent = async (
       const itemName = itemDetails
         ? itemDetails.name
         : `Unknown (ID: ${item.itemId})`;
-      return `<p>Item: ${itemName}, Quantity: ${item.quantity}</p>`;
+      return `<tr>
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${itemName}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+      </tr>`;
     })
   );
 
   return `
     <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            max-width: 600px;
+            margin: 0 auto;
+          }
+          .email-container {
+            border: 1px solid #dddddd;
+            border-radius: 5px;
+            padding: 20px;
+            background-color: #ffffff;
+          }
+          .email-header {
+            background-color: #44195b;
+            color: white;
+            padding: 15px;
+            border-radius: 5px 5px 0 0;
+            margin: -20px -20px 20px -20px;
+          }
+          .email-header h2 {
+            margin: 0;
+            font-weight: 500;
+          }
+          .booking-info {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+          }
+          .booking-info p {
+            margin: 5px 0;
+          }
+          .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+          }
+          .items-table th {
+            background-color: #f2f2f2;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+          }
+          .footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #eeeeee;
+            color: #777777;
+            font-size: 14px;
+          }
+          .status-reserved {
+            color: #28a745;
+            font-weight: bold;
+          }
+          .status-cancelled {
+            color: #dc3545;
+            font-weight: bold;
+          }
+          .status-other {
+            color: #0066cc;
+            font-weight: bold;
+          }
+        </style>
+      </head>
       <body>
-        <h2>Booking Status Update</h2>
-        <p>Hello ${userName},</p>
-        <p>${statusMessage}</p>
-        <p>Booking ID: ${bookingId}</p>
-        <p>Booking date: From ${startDate
-          .toString()
-          .replace(/(\d{4})-(\d{2})-(\d{2})T.*/g, "$2-$3-$1")} To ${endDate
-    .toString()
+        <div class="email-container">
+          <div class="email-header">
+            <h2>Booking Status Update</h2>
+          </div>
+          
+          <p>Hello ${userName},</p>
+          
+          <p class="status-${status.toLowerCase()}">
+            ${statusMessage}
+          </p>
+          
+          <div class="booking-info">
+            <p><strong>Booking ID:</strong> ${bookingId}</p>
+            <p><strong>Booking Period:</strong> ${startDate
+              .toISOString()
+              .replace(/(\d{4})-(\d{2})-(\d{2})T.*/g, "$2-$3-$1")} to ${endDate
+    .toISOString()
     .replace(/(\d{4})-(\d{2})-(\d{2})T.*/g, "$2-$3-$1")}</p>
-        <p>Booking items:</p>
-        ${itemsHtml.join("")}
-        <p>Thank you for using our service!</p>
+          </div>
+          
+          <h3>Booking Items</h3>
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th style="text-align: center;">Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHtml.join("")}
+            </tbody>
+          </table>
+          
+          <div class="footer">
+            <p>Thank you for using our service!</p>
+            <p>If you have any questions, please contact our support team.</p>
+          </div>
+        </div>
       </body>
     </html>
   `;
