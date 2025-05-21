@@ -79,13 +79,18 @@ export const Header = () => {
     navigate("/logoutPage");
   };
 
+  // Extracted dashboard navigation logic
+  const goToDashboard = () => {
+    if (isAdmin) {
+      navigate("/adminDashboard");
+    } else {
+      navigate("/userDashboard");
+    }
+  };
+
   useEffect(() => {
     if (isLoggedIn) {
-      if (isAdmin) {
-        navigate("/adminDashboard");
-      } else {
-        navigate("/userDashboard");
-      }
+      goToDashboard();
     }
   }, [isAdmin, isLoggedIn]);
 
@@ -215,7 +220,6 @@ export const Header = () => {
               <Button color="inherit" variant="text" component={Link} to="/">
                 <Typography variant="body1">{t("common.home")}</Typography>
               </Button>
-              {/* Store or Dashboard button */}
               {!isLoggedIn ? (
                 <Button
                   color="inherit"
@@ -228,18 +232,10 @@ export const Header = () => {
                   </Typography>
                 </Button>
               ) : (
-                <Button
-                  color="inherit"
-                  variant="text"
-                  onClick={() => {
-                    if (isAdmin) {
-                      navigate("/adminDashboard");
-                    } else {
-                      navigate("/userDashboard");
-                    }
-                  }}
-                >
-                  <Typography variant="body1">DASHBOARD</Typography>
+                <Button color="inherit" variant="text" onClick={goToDashboard}>
+                  <Typography variant="body1">
+                    {t("headerPage.dashboard")}
+                  </Typography>
                 </Button>
               )}
               <Button
@@ -273,7 +269,6 @@ export const Header = () => {
             >
               {isLoggedIn ? (
                 <>
-                  {/* Show cart icon for all signed-in, non-admin users */}
                   {isLoggedIn && !isAdmin && <ShoppingCartIconComponent />}
 
                   <Box
