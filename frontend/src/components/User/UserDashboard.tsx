@@ -22,7 +22,6 @@ import {
 import { JSX, useState, useEffect } from "react";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
-import DraftsIcon from "@mui/icons-material/Drafts";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 //import { Link } from "react-router-dom";
@@ -38,8 +37,8 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 // Import useLocation from react-router-dom
 import { useLocation, Link, useNavigate } from "react-router-dom";
 
-import HistoryIcon from '@mui/icons-material/History';
-import FeedIcon from '@mui/icons-material/Feed';
+import HistoryIcon from "@mui/icons-material/History";
+import FeedIcon from "@mui/icons-material/Feed";
 
 const UserDashboard = () => {
   const theme = useTheme();
@@ -58,6 +57,7 @@ const UserDashboard = () => {
   const state = location.state as {
     showBookings?: boolean;
     selectDates?: boolean;
+    scrollToDates?: boolean;
   } | null;
 
   // Add an effect to check for showBookings state and open bookings tab if needed
@@ -68,8 +68,8 @@ const UserDashboard = () => {
       navigate("/userBookings");
     }
 
-    // Handle selectDates state if it exists
-    if (state && state.selectDates) {
+    // Handle selectDates or scrollToDates state if it exists
+    if (state && (state.selectDates || state.scrollToDates)) {
       // Focus on Products section which contains the date picker
       setProductsOpen(true);
       handleProductsMenuClick();
