@@ -838,7 +838,6 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           {currentItems.length > 0 ? (
             currentItems.map((item) => {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              //const category = categories.find((c) => c.id === item.categoryId);
               const isAvailable = item.isAvailable ?? true;
 
               return (
