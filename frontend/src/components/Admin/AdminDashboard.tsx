@@ -27,6 +27,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 import AdminProducts from "./AdminProducts";
+import AdminBookingHistory from "./AdminBookingHistory";
 import useCategories from "../../services/categoryService";
 import { UserManagement } from "../userManagement/UserManagement";
 import { AdminBookingApproval } from "../AdminBookingApproval";
@@ -263,7 +264,7 @@ const AdminDashboard = () => {
                               primary: { style: { color: "white" } },
                             }}
                             onClick={() =>
-                              handleSideBar("Display reservations")
+                              handleSideBar(<AdminBookingHistory />)
                             }
                           />
                         )}

@@ -22,14 +22,12 @@ import {
 import { JSX, useState, useEffect } from "react";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
-import DraftsIcon from "@mui/icons-material/Drafts";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 //import { Link } from "react-router-dom";
 
 // import UserProducts from "./UserProducts";
 import UserProducts from "./UserProducts";
-import UserBookings from "./UserBookings";
 import useCategories from "../../services/categoryService";
 //import UserSingleProduct from "./UserSingleProduct";
 
@@ -37,10 +35,10 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 // Import useLocation from react-router-dom
-import { useLocation } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 
-import HistoryIcon from '@mui/icons-material/History';
-import FeedIcon from '@mui/icons-material/Feed';
+import HistoryIcon from "@mui/icons-material/History";
+import FeedIcon from "@mui/icons-material/Feed";
 
 const UserDashboard = () => {
   const theme = useTheme();
@@ -52,18 +50,41 @@ const UserDashboard = () => {
   const [component, setComponent] = useState<React.ReactElement | null>(null);
 
   const categoriesService = useCategories();
+  const navigate = useNavigate();
 
   // Inside the component, add this near the beginning
   const location = useLocation();
-  const state = location.state as { showBookings?: boolean } | null;
+  const state = location.state as {
+    showBookings?: boolean;
+    selectDates?: boolean;
+    scrollToDates?: boolean;
+  } | null;
 
   // Add an effect to check for showBookings state and open bookings tab if needed
   useEffect(() => {
     if (state && state.showBookings) {
       setBookingsOpen(true);
-      handleSideBar(<UserBookings />);
+      // Use React Router's navigate function instead of window.location.href
+      navigate("/userBookings");
     }
-  }, [state]);
+
+    // Handle selectDates or scrollToDates state if it exists
+    if (state && (state.selectDates || state.scrollToDates)) {
+      // Focus on Products section which contains the date picker
+      setProductsOpen(true);
+      handleProductsMenuClick();
+
+      // Wait for the component to render, then scroll to the date picker section
+      setTimeout(() => {
+        const datePickerElement = document.getElementById(
+          "date-picker-section"
+        );
+        if (datePickerElement) {
+          datePickerElement.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 500);
+    }
+  }, [state, navigate]);
 
   // Initialize component with user products when categories are loaded
   useEffect(() => {
@@ -99,10 +120,6 @@ const UserDashboard = () => {
   //handle arrow up/down for bookings
   const handleBookingsClick = () => {
     setBookingsOpen(!bookingsOpen);
-    // Show bookings when clicking on bookings menu item
-    if (!bookingsOpen) {
-      handleSideBar(<UserBookings />);
-    }
   };
 
   // Function to handle Products menu item click
@@ -224,33 +241,37 @@ const UserDashboard = () => {
                 >
                   <ListItem disablePadding>
                     <List component="div" disablePadding>
-                      <ListItemButton sx={{ pl: 6 }}>
+                      <ListItemButton
+                        sx={{ pl: 6 }}
+                        component={Link}
+                        to="/userBookings"
+                      >
                         <ListItemIcon style={{ color: "white" }}>
                           <FeedIcon />
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
-                            primary="Pending"
+                            primary="Active Bookings"
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
-                            onClick={() => handleSideBar(<UserBookings />)}
                           />
                         )}
                       </ListItemButton>
-                      <ListItemButton sx={{ pl: 6 }}>
+                      <ListItemButton
+                        sx={{ pl: 6 }}
+                        component={Link}
+                        to="/userBookingHistory"
+                      >
                         <ListItemIcon style={{ color: "white" }}>
                           <HistoryIcon />
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
-                            primary="Reservations"
+                            primary="Booking History"
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
-                            onClick={() =>
-                              handleSideBar("Display reservations")
-                            }
                           />
                         )}
                       </ListItemButton>

@@ -99,8 +99,11 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
       clearCart();
       onClose();
 
-      // Navigate to the user dashboard showing the bookings tab
-      navigate("/userDashboard", { state: { showBookings: true } });
+      // Add a slight delay before navigating to ensure the success message is visible
+      setTimeout(() => {
+        // Navigate to the user bookings page directly to avoid potential routing issues
+        navigate("/userBookings");
+      }, 1500);
     } catch (err) {
       console.error("Error creating booking:", err);
       setError("Failed to create booking. Please try again.");
@@ -154,7 +157,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
             mb: 2,
           }}
         >
-          <Typography variant="h5" sx={{color: "#9537c7"}}>
+          <Typography variant="h5" sx={{ color: "#9537c7" }}>
             Shopping Cart and Summary
           </Typography>
           <IconButton onClick={onClose}>
@@ -171,9 +174,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
             <div>
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="h6">
-                    Shopping Cart
-                  </Typography>
+                  <Typography variant="h6">Shopping Cart</Typography>
                 </AccordionSummary>
                 <Box sx={{ p: 2 }}>
                   <Typography variant="h6" sx={{ mb: -1, fontSize: "1rem" }}>
@@ -186,8 +187,9 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                         size="small"
                         onClick={() => {
                           onClose();
-                          // navigate("/");
-                          navigate("/UserDashboard",{ state: { scrollToDates: true } });
+                          navigate("/userDashboard", {
+                            state: { selectDates: true },
+                          });
                         }}
                       >
                         Select Dates
@@ -352,9 +354,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                 onChange={(_, expanded) => setOrderSummaryExpanded(expanded)}
               >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="h6">
-                    Order summary
-                  </Typography>
+                  <Typography variant="h6">Order summary</Typography>
                 </AccordionSummary>
                 <Box>
                   <Typography sx={{ pl: 2, fontSize: "1rem" }}>
@@ -385,8 +385,12 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
                       </ListItem>
                     ))}
                   </List>
-                  <Typography variant="h6" sx={{ pl: 2, fontSize: "1rem" , mb: 1 }}>
-                    Product Items: {items.reduce((total, item) => total + item.quantity, 0)}
+                  <Typography
+                    variant="h6"
+                    sx={{ pl: 2, fontSize: "1rem", mb: 1 }}
+                  >
+                    Product Items:{" "}
+                    {items.reduce((total, item) => total + item.quantity, 0)}
                   </Typography>
                   <Typography
                     variant="h6"

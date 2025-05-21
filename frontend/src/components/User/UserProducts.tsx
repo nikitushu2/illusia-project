@@ -1159,6 +1159,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
 
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Box
+              id="date-picker-section"
               sx={{
                 display: "flex",
                 gap: 2,

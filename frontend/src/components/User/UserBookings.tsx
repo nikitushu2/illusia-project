@@ -36,6 +36,7 @@ import bookingService, {
 } from "../../services/bookingService";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import { BookingStatus } from "../../types/booking";
 
 const UserBookings: React.FC = () => {
   const theme = useTheme();
@@ -59,7 +60,14 @@ const UserBookings: React.FC = () => {
         const fetchedBookings = await bookingService.getAll();
         console.log("Fetched bookings:", fetchedBookings);
 
-        setBookings(fetchedBookings);
+        // Filter out CLOSED and CANCELLED bookings for pending view
+        const pendingBookings = fetchedBookings.filter(
+          (booking) =>
+            booking.status !== BookingStatus.CLOSED &&
+            booking.status !== BookingStatus.CANCELLED
+        );
+
+        setBookings(pendingBookings);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching bookings:", err);
@@ -147,6 +155,9 @@ const UserBookings: React.FC = () => {
   if (bookings.length === 0) {
     return (
       <Box sx={{ mt: 2, p: 3 }}>
+        <Typography variant="h4" sx={{ mb: 3, color: "#44195b" }}>
+          Active Bookings
+        </Typography>
         <Typography variant="h6">You have no bookings yet</Typography>
       </Box>
     );
@@ -156,6 +167,9 @@ const UserBookings: React.FC = () => {
   const renderMobileView = () => {
     return (
       <Box sx={{ mt: 2, px: 1 }}>
+        <Typography variant="h4" sx={{ mb: 3, color: "#44195b" }}>
+          Active Bookings
+        </Typography>
         {bookings.map((booking) => (
           <Card key={booking.id} sx={{ mb: 2 }}>
             <CardContent>
@@ -416,11 +430,10 @@ const UserBookings: React.FC = () => {
   };
 
   return (
-    <Box sx={{ mt: 2 }}>
-      <Typography variant="h5" gutterBottom>
-        Your Bookings
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" sx={{ mb: 3, color: "#44195b" }}>
+        Active Bookings
       </Typography>
-
       {isMobile ? renderMobileView() : renderTableView()}
 
       {/* Delete Confirmation Dialog */}
@@ -535,8 +548,6 @@ const UserBookings: React.FC = () => {
                 const formattedEndDate = editEndDate
                   ? dayjs(editEndDate).format("YYYY-MM-DD")
                   : undefined;
-
-              
 
                 const updated = await bookingService.update(
                   selectedBooking.id,
