@@ -14,6 +14,8 @@ import {
   IconButton,
   CircularProgress,
   //TextField,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 // import AppsIcon from "@mui/icons-material/Apps";
 // import TableRowsIcon from "@mui/icons-material/TableRows";
@@ -36,7 +38,12 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 // Import useLocation from react-router-dom
 import { useLocation, Link, useNavigate } from "react-router-dom";
 
+import HistoryIcon from '@mui/icons-material/History';
+import FeedIcon from '@mui/icons-material/Feed';
+
 const UserDashboard = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [sideLink, setsideLink] = useState<string | null>(null);
   const [productsOpen, setProductsOpen] = useState(false);
   const [bookingsOpen, setBookingsOpen] = useState(false);
@@ -85,6 +92,11 @@ const UserDashboard = () => {
       setComponent(<UserProducts categories={categoriesService.categories} />);
     }
   }, [categoriesService.categories, categoriesService.loading]);
+
+  // Add effect to handle automatic collapse
+  useEffect(() => {
+    setIsCollapsed(isMobile);
+  }, [isMobile]);
 
   const handleSideBar = (content: JSX.Element | string) => {
     if (typeof content === "string") {
@@ -235,7 +247,7 @@ const UserDashboard = () => {
                         to="/userBookings"
                       >
                         <ListItemIcon style={{ color: "white" }}>
-                          <DraftsIcon />
+                          <FeedIcon />
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
@@ -252,7 +264,7 @@ const UserDashboard = () => {
                         to="/userBookingHistory"
                       >
                         <ListItemIcon style={{ color: "white" }}>
-                          <DraftsIcon />
+                          <HistoryIcon />
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText

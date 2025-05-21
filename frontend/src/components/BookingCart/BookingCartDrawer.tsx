@@ -14,6 +14,8 @@ import {
   CircularProgress,
   Alert,
   Snackbar,
+  Accordion,
+  AccordionSummary,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -21,6 +23,9 @@ import { useBookingCart, CartItem } from "../../context/BookingCartContext";
 import { useNavigate } from "react-router-dom";
 import bookingService from "../../services/bookingService";
 import { BookingStatus } from "../../types/booking";
+
+import noImage from "../../images/noImage.png";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 interface BookingCartDrawerProps {
   open: boolean;
@@ -37,6 +42,7 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successSnackbar, setSuccessSnackbar] = useState(false);
+  const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
 
   const handleQuantityChange = (item: CartItem, newQuantity: number) => {
     console.log(
@@ -112,6 +118,27 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
     return total + price * item.quantity;
   }, 0);
 
+  const checkout = () => {
+    if (items.length === 0) {
+      setError("Your cart is empty");
+      return;
+    }
+
+    if (!startDate || !endDate) {
+      setError("Please select booking dates first");
+      return;
+    }
+
+    // Basic validation
+    if (new Date(startDate) > new Date(endDate)) {
+      setError("Start date must be before end date");
+      return;
+    }
+
+    // Open the Order Summary accordion
+    setOrderSummaryExpanded(true);
+  };
+
   return (
     <>
       <Drawer
@@ -130,8 +157,8 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
             mb: 2,
           }}
         >
-          <Typography variant="h5" fontWeight="bold">
-            Your Cart
+          <Typography variant="h5" sx={{color: "#9537c7"}}>
+            Shopping Cart and Summary
           </Typography>
           <IconButton onClick={onClose}>
             <CloseIcon />
@@ -144,156 +171,253 @@ const BookingCartDrawer: React.FC<BookingCartDrawerProps> = ({
           </Box>
         ) : (
           <>
-            <Box sx={{ mt: 3, p: 2 }}>
-              <Typography variant="h6" sx={{ mb: 2 }}>
-                Booking Start Date:{" "}
-                {startDate ? (
-                  new Date(startDate).toLocaleDateString()
-                ) : (
-                  <Button
-                    color="primary"
-                    size="small"
-                    onClick={() => {
-                      onClose();
-                      navigate("/userDashboard", {
-                        state: { selectDates: true },
-                      });
+            <div>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="h6">
+                    Shopping Cart
+                  </Typography>
+                </AccordionSummary>
+                <Box sx={{ p: 2 }}>
+                  <Typography variant="h6" sx={{ mb: -1, fontSize: "1rem" }}>
+                    Booking Start Date:{" "}
+                    {startDate ? (
+                      new Date(startDate).toLocaleDateString()
+                    ) : (
+                      <Button
+                        color="primary"
+                        size="small"
+                        onClick={() => {
+                          onClose();
+                          // navigate("/");
+                          navigate("/UserDashboard",{ state: { scrollToDates: true } });
+                        }}
+                      >
+                        Select Dates
+                      </Button>
+                    )}
+                  </Typography>
+                  <Typography variant="h6" sx={{ mb: -2, fontSize: "1rem" }}>
+                    Booking End Date:{" "}
+                    {endDate
+                      ? new Date(endDate).toLocaleDateString()
+                      : "Not selected"}
+                  </Typography>
+                </Box>
+
+                <List sx={{ flexGrow: 1, overflow: "auto" }}>
+                  {items.map((item) => (
+                    <React.Fragment key={item.id}>
+                      <ListItem
+                        sx={{ py: 2 }}
+                        secondaryAction={
+                          <IconButton
+                            edge="end"
+                            onClick={() => removeItem(item.id)}
+                          >
+                            <DeleteIcon sx={{ color: "red" }} />
+                          </IconButton>
+                        }
+                      >
+                        <ListItemAvatar>
+                          <Avatar
+                            alt={item.name}
+                            src={item.imageUrl || noImage}
+                          />
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={
+                            <Typography sx={{ fontSize: "1rem" }}>
+                              {item.name}
+                            </Typography>
+                          }
+                          secondary={
+                            <Box>
+                              <Typography
+                                variant="body2"
+                                component="span"
+                                sx={{ fontSize: "1rem" }}
+                              >
+                                €
+                                {typeof item.price === "string"
+                                  ? parseFloat(item.price).toFixed(2)
+                                  : item.price.toFixed(2)}
+                              </Typography>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  mt: 1,
+                                }}
+                              >
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  onClick={() =>
+                                    handleQuantityChange(
+                                      item,
+                                      Math.max(1, item.quantity - 1)
+                                    )
+                                  }
+                                  sx={{
+                                    minWidth: "24px",
+                                    width: "24px",
+                                    height: "24px",
+                                    p: 0,
+                                    fontSize: "14px",
+                                  }}
+                                  disabled={item.quantity <= 1}
+                                >
+                                  -
+                                </Button>
+                                <Typography sx={{ mx: 1, fontSize: "1rem" }}>
+                                  {item.quantity}
+                                </Typography>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  onClick={() =>
+                                    handleQuantityChange(
+                                      item,
+                                      item.quantity + 1
+                                    )
+                                  }
+                                  sx={{
+                                    minWidth: "24px",
+                                    width: "24px",
+                                    height: "24px",
+                                    p: 0,
+                                    fontSize: "14px",
+                                  }}
+                                  disabled={
+                                    item.quantity >=
+                                    (item.remainingQuantity || item.quantity)
+                                  }
+                                >
+                                  +
+                                </Button>
+                              </Box>
+                            </Box>
+                          }
+                        />
+                      </ListItem>
+                      <Divider sx={{ mt: -1.5 }} />
+                    </React.Fragment>
+                  ))}
+                </List>
+
+                <Box sx={{ p: 2, mt: -2 }}>
+                  <Typography variant="h6" sx={{ mb: 1, fontSize: "1rem" }}>
+                    Subtotal: €{subtotal.toFixed(2)}
+                  </Typography>
+
+                  {error && (
+                    <Alert severity="error" sx={{ mt: 2 }}>
+                      {error}
+                    </Alert>
+                  )}
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      mt: 1,
+                      justifyContent: "end",
                     }}
                   >
-                    Select Dates
-                  </Button>
-                )}
-              </Typography>
-              <Typography variant="h6" sx={{ mb: 2 }}>
-                Booking End Date:{" "}
-                {endDate
-                  ? new Date(endDate).toLocaleDateString()
-                  : "Not selected"}
-              </Typography>
-            </Box>
+                    <Button
+                      variant="outlined"
+                      onClick={clearCart}
+                      disabled={loading}
+                    >
+                      Clear Cart
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      onClick={checkout}
+                      disabled={loading}
+                      sx={{
+                        backgroundColor: "#3ec3ba",
+                        color: "white",
+                        "&:hover": {
+                          backgroundColor: "#primary.main",
+                        },
+                      }}
+                    >
+                      Checkout
+                    </Button>
+                  </Box>
+                </Box>
+              </Accordion>
 
-            <List sx={{ flexGrow: 1, overflow: "auto" }}>
-              {items.map((item) => (
-                <React.Fragment key={item.id}>
-                  <ListItem
-                    sx={{ py: 2 }}
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        onClick={() => removeItem(item.id)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    }
-                  >
-                    <ListItemAvatar>
-                      <Avatar
-                        alt={item.name}
-                        src={item.imageUrl || undefined}
-                      />
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={item.name}
-                      secondary={
-                        <Box sx={{ mt: 1 }}>
-                          <Typography variant="body2" component="span">
-                            €
-                            {typeof item.price === "string"
-                              ? parseFloat(item.price).toFixed(2)
-                              : item.price.toFixed(2)}
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              mt: 1,
-                            }}
-                          >
-                            <Button
-                              size="small"
-                              variant="outlined"
-                              onClick={() =>
-                                handleQuantityChange(
-                                  item,
-                                  Math.max(1, item.quantity - 1)
-                                )
-                              }
-                              sx={{
-                                minWidth: "24px",
-                                width: "24px",
-                                height: "24px",
-                                p: 0,
-                                fontSize: "14px",
-                              }}
-                              disabled={item.quantity <= 1}
-                            >
-                              -
-                            </Button>
-                            <Typography sx={{ mx: 1 }}>
-                              {item.quantity}
+              <Accordion
+                expanded={orderSummaryExpanded}
+                onChange={(_, expanded) => setOrderSummaryExpanded(expanded)}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="h6">
+                    Order summary
+                  </Typography>
+                </AccordionSummary>
+                <Box>
+                  <Typography sx={{ pl: 2, fontSize: "1rem" }}>
+                    Booking Dates: {startDate || "start date"} to {endDate}
+                  </Typography>
+                  <List sx={{ py: 0 }}>
+                    {items.map((item) => (
+                      <ListItem key={item.id} sx={{ py: 0.5 }}>
+                        <ListItemText
+                          primary={
+                            <Typography sx={{ fontSize: "1rem" }}>
+                              {item.name}
                             </Typography>
-                            <Button
-                              size="small"
-                              variant="outlined"
-                              onClick={() =>
-                                handleQuantityChange(item, item.quantity + 1)
-                              }
-                              sx={{
-                                minWidth: "24px",
-                                width: "24px",
-                                height: "24px",
-                                p: 0,
-                                fontSize: "14px",
-                              }}
-                              disabled={
-                                item.quantity >=
-                                (item.remainingQuantity || item.quantity)
-                              }
-                            >
-                              +
-                            </Button>
-                          </Box>
-                        </Box>
-                      }
-                    />
-                  </ListItem>
-                  <Divider />
-                </React.Fragment>
-              ))}
-            </List>
-
-            <Box sx={{ mt: 3, p: 2 }}>
-              <Typography variant="h6" sx={{ mb: 2 }}>
-                Subtotal: €{subtotal.toFixed(2)}
-              </Typography>
-
-              {error && (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                  {error}
-                </Alert>
-              )}
-
-              <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
-                <Button
-                  variant="outlined"
-                  onClick={clearCart}
-                  disabled={loading}
-                  fullWidth
-                >
-                  Clear Cart
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSubmit}
-                  disabled={loading || items.length === 0}
-                  fullWidth
-                  sx={{ backgroundColor: "#3ec3ba" }}
-                >
-                  {loading ? <CircularProgress size={24} /> : "Book Now"}
-                </Button>
-              </Box>
-            </Box>
+                          }
+                          secondary={
+                            <Typography sx={{ fontSize: "1rem" }}>
+                              Quantity: {item.quantity}
+                            </Typography>
+                          }
+                        />
+                        <ListItemAvatar>
+                          <Avatar
+                            alt="Subtotal"
+                            src={item.imageUrl || noImage}
+                            sx={{ width: 56, height: 56 }}
+                          />
+                        </ListItemAvatar>
+                      </ListItem>
+                    ))}
+                  </List>
+                  <Typography variant="h6" sx={{ pl: 2, fontSize: "1rem" , mb: 1 }}>
+                    Product Items: {items.reduce((total, item) => total + item.quantity, 0)}
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{ mb: 1, pl: 2, fontSize: "1rem" }}
+                  >
+                    Subtotal: €{subtotal.toFixed(2)}
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      mb: 2,
+                      mr: 2,
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSubmit}
+                      disabled={loading || items.length === 0}
+                      sx={{ backgroundColor: "#9537c7" }}
+                    >
+                      {loading ? <CircularProgress /> : "Book Now"}
+                    </Button>
+                  </Box>
+                </Box>
+              </Accordion>
+            </div>
           </>
         )}
       </Drawer>

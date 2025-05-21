@@ -4,6 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import { ApplicationUser } from '../../types/applicationUser';
 import SearchIcon from '@mui/icons-material/Search';
 import { ApiRole, useFetch } from "../../hooks/useFetch";
+import { useTranslation } from "react-i18next";
 
 interface UserRowView {
     email: React.ReactNode, 
@@ -22,7 +23,7 @@ interface UserTableProps {
 
 
 const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState, deleteUserFromState }: UserTableProps) => {
-
+    const { t } = useTranslation();
     const { data: updatedUser, apiError: updateApiError, put } = useFetch<ApplicationUser>(ApiRole.ADMIN);
     const { ok, apiError: deleteApiError, remove } = useFetch<ApplicationUser>(ApiRole.ADMIN);
 
@@ -203,7 +204,7 @@ const UserTable = ({ applicationUsers, showDeleteButton, updateUserApprovalState
                 fullWidth
                 value={searchValue}
                 onChange={handleSearchChange}
-                placeholder={"Search user by email"}
+                placeholder={t("userTable.searchPlaceholderText")}
                 startAdornment={
                 <InputAdornment position="start">
                     <SearchIcon />

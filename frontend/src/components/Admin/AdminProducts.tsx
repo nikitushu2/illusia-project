@@ -450,25 +450,45 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
             gap: { xs: "20px", sm: "50px" },
           }}
         >
+          {/* height of search bar */}
           <TextField
             onChange={handleSearch}
             value={searchInput}
-            label="search item"
+            label="Search item"
+            variant="outlined"
             sx={{
               width: { xs: "100%", sm: "50%" },
               "& .MuiInputBase-root": {
-                height: { xs: "40px", sm: "56px" },
+                height: "36px",
+                fontSize: "14px",
+              },
+              "& .MuiInputLabel-root": {
+                fontSize: "14px",
+                transform: "translate(14px, 8px) scale(1)",
+                "&.MuiInputLabel-shrink": {
+                  transform: "translate(14px, -9px) scale(0.75)",
+                },
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                top: 0,
+              },
+            }}
+            InputProps={{
+              sx: {
+                height: "36px",
               },
             }}
           />
           <Button
             onClick={handleCreate}
             sx={{
-              width: { xs: "100%", sm: "auto" },
-              height: { xs: "40px", sm: "56px" },
-              fontSize: { xs: "0.875rem", sm: "1rem" },
+              width: { xs: "auto", sm: "auto" },
+              height: "37px",
+              fontSize: "0.875rem",
               backgroundColor: "primary.main",
               color: "white",
+              padding: "16px",
+              borderRadius: "15px", // Reduce the rounding of the button sides
               "&:hover": { backgroundColor: "primary.dark" },
             }}
           >
@@ -490,7 +510,14 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
             sx={{
               width: { xs: "100%", sm: 200 },
               "& .MuiInputBase-root": {
-                height: { xs: "40px", sm: "56px" },
+                height: "36px", // reduced height
+                fontSize: "14px",
+              },
+              "& .MuiInputLabel-root": {
+                fontSize: "13px",
+              },
+              "& .MuiSelect-select": {
+                padding: "8px 14px", // tighter padding
               },
             }}
           >
@@ -517,7 +544,6 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
               )}
             </Select>
           </FormControl>
-
           <Box
             sx={{
               display: "flex",
@@ -661,6 +687,7 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
               overflowX: "auto",
               marginTop: { xs: 2, sm: 4 },
               padding: { xs: 1, sm: 2 },
+              maxWidth: "100%",
             }}
           >
             <TableContainer
@@ -669,6 +696,7 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
                 borderRadius: 2,
                 boxShadow: 2,
                 overflowX: "auto",
+                width: "100%",
                 "&::-webkit-scrollbar": {
                   width: "8px",
                   height: "8px",
@@ -829,7 +857,7 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
                           {category ? category.name : "n/a"}
                         </TableCell>
                         <TableCell>
-                          <Box sx={{ display: "flex", gap: 1 }}>
+                          <Box sx={{ display: "flex" }}>
                             <IconButton
                               color="primary"
                               onClick={() => handleEdit(item)}
@@ -1042,7 +1070,8 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
         <DialogTitle sx={{ backgroundColor: "primary.main", color: "white" }}>
           Confirm Deletion
         </DialogTitle>
-        <DialogContent sx={{ pt: 2, pb: 1, px: 3, minWidth: "400px" }}>
+        {/* <DialogContent sx={{ pt: 5, pb: 1, px: 3, minWidth: "400px" }}> */}
+        <DialogContent sx={{ p: 5, minWidth: "400px" }}>
           <DialogContentText>
             Are you sure you want to delete this item? This action cannot be
             undone.

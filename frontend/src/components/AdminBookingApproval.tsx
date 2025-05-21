@@ -4,8 +4,10 @@ import { useFetch, ApiRole } from "../hooks/useFetch";
 import { AdminBookingDetail } from "./AdminBookingDetail";
 import { Item } from "../services/itemService";
 import { BookingWithDetails, BookingStatus } from "../types/booking";
+import { useTranslation } from "react-i18next";
 
 export const AdminBookingApproval = () => {
+    const { t } = useTranslation();
   const { data: bookings, get } = useFetch<BookingWithDetails[]>(ApiRole.ADMIN);
   const [page, setPage] = useState(1);
   const { data: items, get: getItems } = useFetch<Item[]>(ApiRole.PUBLIC);
@@ -42,21 +44,15 @@ export const AdminBookingApproval = () => {
     : [];
 
   return (
-    <Box>
-      <Typography variant="h4" textAlign={"center"} sx={{ marginBottom: 3 }}>
-        Booking Details
-      </Typography>
-      {paginatedBooking.map((booking) => (
+<Box sx={{ maxWidth: 800, margin: "0 auto" }}>
+    <Typography variant="h4" textAlign={"center"} sx={{ marginBottom: 3 }}>{t("adminBookingApproval.bookingDetails")}
+    </Typography>
+    {paginatedBooking.map((booking) => (
         <AdminBookingDetail bookingDetails={booking} items={items || []} />
-      ))}
-      <Stack spacing={2} paddingTop={5} alignItems={"center"}>
-        <Pagination
-          count={numberOfPages}
-          onChange={(_, value) => setPage(value)}
-          variant="outlined"
-          shape="rounded"
-        />
-      </Stack>
-    </Box>
+    ))}
+    <Stack spacing={2} paddingTop={5} alignItems={'center'}>
+        <Pagination count={numberOfPages} onChange={(_, value) => setPage(value)} variant="outlined" shape="rounded" />
+    </Stack>
+</Box>
   );
 };

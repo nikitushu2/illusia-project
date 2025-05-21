@@ -13,12 +13,14 @@ import {
   Typography,
   IconButton,
   CircularProgress,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { JSX, useState, useEffect } from "react";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import GroupIcon from "@mui/icons-material/Group";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
-import DraftsIcon from "@mui/icons-material/Drafts";
+//import DraftsIcon from "@mui/icons-material/Drafts";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -30,7 +32,12 @@ import useCategories from "../../services/categoryService";
 import { UserManagement } from "../userManagement/UserManagement";
 import { AdminBookingApproval } from "../AdminBookingApproval";
 
+import HistoryIcon from '@mui/icons-material/History';
+import FeedIcon from '@mui/icons-material/Feed';
+
 const AdminDashboard = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [sideLink, setsideLink] = useState<string | null>(null);
   const [productsOpen, setProductsOpen] = useState(false);
   const [bookingsOpen, setBookingsOpen] = useState(false);
@@ -38,6 +45,11 @@ const AdminDashboard = () => {
   const [component, setComponent] = useState<React.ReactElement | null>(null);
 
   const categoriesService = useCategories();
+
+  // Add effect to handle automatic collapse
+  useEffect(() => {
+    setIsCollapsed(isMobile);
+  }, [isMobile]);
 
   // Initialize the component with admin products
   useEffect(() => {
@@ -70,6 +82,10 @@ const AdminDashboard = () => {
   //handle arrow up/down for bookings
   const handleBookingsClick = () => {
     setBookingsOpen(!bookingsOpen);
+    // Show bookings when clicking on bookings menu item
+    if (!bookingsOpen) {
+      handleSideBar(<AdminBookingApproval />);
+    }
   };
 
   const toggleSidebar = () => {
@@ -93,7 +109,7 @@ const AdminDashboard = () => {
         <Box
           sx={{
             display: "flex",
-            gap: "20px",
+            gap: "10px",
             margin: "10px",
           }}
         >
@@ -104,7 +120,7 @@ const AdminDashboard = () => {
               backgroundColor: "#44195b",
               padding: "20px",
               borderRadius: "8px 0 0 8px", // Rounded corners only on the right side
-              width: isCollapsed ? "80px" : "290px",
+              width: isCollapsed ? "80px" : "240px",
               transition: "width 0.3s ease-in-out",
               position: "relative",
             }}
@@ -118,12 +134,12 @@ const AdminDashboard = () => {
             >
               {!isCollapsed && (
                 <Typography
-                  color="white"
                   variant="h5"
+                  color="white"
                   sx={{
                     fontWeight: "bold",
                     marginTop: "50px",
-                    marginBottom: "20px",
+                    marginBottom: "50px",
                   }}
                 >
                   Admin Dashboard
@@ -148,7 +164,7 @@ const AdminDashboard = () => {
                 display: "flex",
                 flexDirection: "column",
                 gap: "20px",
-                marginTop: "120px",
+                marginTop: "100px",
               }}
             >
               <List>
@@ -199,10 +215,12 @@ const AdminDashboard = () => {
                         <ListItemText
                           primary="Bookings"
                           slotProps={{
-                            primary: { style: { color: "white" } },
+                            primary: {
+                              style: { color: "white" },
+                              marginRight: "20px",
+                            },
                           }}
                         />
-
                         {bookingsOpen ? (
                           <ExpandLess style={{ color: "white" }} />
                         ) : (
@@ -221,11 +239,11 @@ const AdminDashboard = () => {
                     <List component="div" disablePadding>
                       <ListItemButton sx={{ pl: 6 }}>
                         <ListItemIcon style={{ color: "white" }}>
-                          <DraftsIcon />
+                          <FeedIcon />
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
-                            primary="Pending"
+                            primary="Details"
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
@@ -237,7 +255,7 @@ const AdminDashboard = () => {
                       </ListItemButton>
                       <ListItemButton sx={{ pl: 6 }}>
                         <ListItemIcon style={{ color: "white" }}>
-                          <DraftsIcon />
+                          <HistoryIcon />
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
@@ -264,13 +282,20 @@ const AdminDashboard = () => {
               margin: "10px",
               width: isCollapsed ? "calc(100% - 100px)" : "calc(100% - 270px)",
               transition: "width 0.3s ease-in-out",
-
               display: "flex",
               justifyContent: "center",
+              alignItems: "center",
+              minHeight: "100vh",
             }}
           >
             {/* data here */}
-            <Box sx={{ marginTop: "50px", marginRight: "50px" }}>
+            <Box
+              sx={{
+                width: "100%",
+                maxWidth: "1200px",
+                padding: "20px",
+              }}
+            >
               {categoriesService.loading ? (
                 <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
                   <CircularProgress />

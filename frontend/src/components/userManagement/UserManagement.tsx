@@ -4,6 +4,7 @@ import { Box, Tabs, Tab, Badge, Typography } from "@mui/material";
 import UserTable from "./UserTable";
 import { useAuth } from "../../context/AuthContext";
 import { ApiRole, useFetch } from "../../hooks/useFetch";
+import { useTranslation } from "react-i18next";
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -27,7 +28,7 @@ const CustomTabPanel = (props: TabPanelProps) =>{
   }
 
 export const UserManagement = () => {
-
+    const { t } = useTranslation();
     const { data: applicationUser, apiError, get } = useFetch<ApplicationUser[]>(ApiRole.ADMIN);
 
     const [users, setUsers] = useState<ApplicationUser[]>([]);
@@ -69,8 +70,8 @@ export const UserManagement = () => {
 
   return (
     <Box sx={{ padding: 2, backgroundColor: "#f5f5f5", textAlign: "center" }}>
-        <h2>User Management</h2>
-        <p>Manage user roles and approval status.</p>
+        <h2>{t("userManagement.userManagementText")}</h2>
+        <p>{t("userManagement.paragraphText")}</p>
         <Box sx={{ mt: 3 }}>  
             <Tabs
                 value={tabValue}
@@ -84,7 +85,8 @@ export const UserManagement = () => {
                     label={
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <Badge color="primary" badgeContent={adminUsers.length}/>
-                            <Typography variant="body2" sx={{ ml: 2 }}>Admin Management</Typography>
+                            <Typography variant="body2" sx={{ ml: 2 }}>
+                                {t("userManagement.superAdminManagementTab")}</Typography>
                         </Box>
                     } 
                     id="admin-need-approval-list" 
@@ -94,7 +96,9 @@ export const UserManagement = () => {
                     label={
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <Badge color="primary" badgeContent={needApprovalUsers.length}/>
-                            <Typography variant="body2" sx={{ ml: 2 }}>User Needs Approval</Typography>
+                            <Typography variant="body2" sx={{ ml: 2 }}>
+                                {t("userManagement.adminManagementTab")}
+                                </Typography>
                         </Box>  
                     }  
                     id="user-need-approval-list" 
@@ -104,7 +108,9 @@ export const UserManagement = () => {
                     label={
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <Badge color="primary" badgeContent={approvedUsers.length}/>
-                            <Typography variant="body2" sx={{ ml: 2 }}>Approved Users</Typography>
+                            <Typography variant="body2" sx={{ ml: 2 }}>
+                               {t("userManagement.approvedUsers")}
+                                </Typography>
                         </Box>
                     } 
                     id="approved-users-list" 

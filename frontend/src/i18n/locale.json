@@ -1,0 +1,198 @@
+{
+    "common": {
+        "home": {
+            "en": "HOME",
+            "fi": "ETUSIVU"
+        }
+
+    },
+
+    "headerPage": {
+        "store": {
+            "en": "STORE",
+            "fi": "KAUPPA"
+        },
+        "events": {
+            "en": "EVENTS",
+            "fi": "TAPAHTUMAT"
+        },
+        "info": {
+            "en": "INFO",
+            "fi": "TIETOA"
+        },
+        "items": {
+            "en": "ITEMS",
+            "fi": "TUOTTEET"
+        },
+        "signup": {
+            "en": "Sign Up",
+            "fi": "Rekisteröidy" 
+        },
+        "login": {
+            "en": "Login",
+            "fi": "Kirjaudu Sisään" 
+        },
+        "logout": {
+            "en": "Logout",
+            "fi": "Kirjaudu ulos"
+        }
+    },
+
+    "logoutPage": {
+        "loggedOut": {
+            "en": "You have been logged out.",
+            "fi": "Olet kirjautunut ulos."
+        },
+        "thankYou": {
+            "en": "Thank you for using our application!",
+            "fi": "Kiitos, että käytit sovellustamme!"
+        },
+        "goToLogin": {
+            "en": "GO TO LOGIN",
+            "fi": "SIIRRY KIRJAUTUMISEEN"
+        }
+    },
+
+
+    "landingPage": {
+        "imageText": {
+            "en": "Your Next Adventure Starts Here",
+            "fi": "Seuraava seikkailusi alkaa tästä"
+        },
+        "welcomeMessage": {
+            "en": "Welcome to Illusia ry – The Heart of Immersive LARP Experiences!",
+            "fi": "Tervetuloa Illusia ry:een – Immersiivisten LARP-kokemusten sydämeen!"
+        },
+        "description": {
+            "en": "Step into a world of boundless imagination with Illusia Ry, the creative force behind Odysseus and other unforgettable live-action role-playing (LARP) adventures. Whether you're a seasoned LARPer or new to the scene, we invite you to bring your stories to life with our expertly crafted props, set pieces, and immersive game design.",
+            "fi": "Astut rajattoman mielikuvituksen maailmaan Illusia Ry:n kanssa, joka on Odysseuksen ja muiden unohtumattomien live-toimintaroolipelien (LARP) luova voima. Olitpa kokenut LARPer tai uusi alalla, kutsumme sinut tuomaan tarinasi eloon asiantuntevasti suunnitelluilla rekvisiitoilla, lavasteilla ja immersiivisellä pelisuunnittelulla."
+        },
+
+        "booking": {
+            "en": "Booking",
+            "fi": "Varaa kokemuksesi"
+        },
+        "bookingDescription": {
+            "en": "Book your next event or use our porps",
+            "fi": "Varaa seuraava tapahtumasi tai käytä rekvisiittaamme"
+        },
+
+        "events": {
+            "en": "Events",
+            "fi": "Tapahtumat"
+        },
+        "eventsDescription": {
+            "en": "Events and games for you to join",
+            "fi": "Tapahtumat ja pelit, joihin voit liittyä"
+        },
+        "locations": {
+            "en": "Locations",
+            "fi": "Sijainnit"
+        },
+        "locationDescription": {
+            "en": "Real live events for you to join",
+            "fi": "Reaaliaikaiset tapahtumat, joihin voit liittyä"
+        },
+        "userReviews": {
+            "en": "User Reviews",
+            "fi": "Käyttäjäarvostelut"
+        },
+        "reviewTitle": {
+            "en": "Review",
+            "fi": "Arvostelu"
+        },
+        "review": {
+            "en": "This is a review of Illusia",
+            "fi": "Tämä on arvostelu Illusiasta"
+        }
+
+    },
+
+
+    "adminBookingApproval": {
+        "bookingDetails": {
+            "en": "Booking Details",
+            "fi": "Varauksen tiedot"
+        }
+    },
+
+    "adminBookingDetail": {
+        "user": {
+            "en": "User:",
+            "fi": "Käyttäjä:"
+        },
+        "totalQuantity": {
+            "en": "Total Quantity",
+            "fi": "Kokonaismäärä"
+        },
+        "status": {
+            "en": "Status",
+            "fi": "Tila"
+        },
+        "itemName": {
+            "en": "Item Name",
+            "fi": "Tuotteen nimi"
+        },
+        "itemImage": {
+            "en": "Item Image",
+            "fi": "Tuotteen kuva"
+        },
+        "bookedQuantity": {
+            "en": "Booked Quantity",
+            "fi": "Varattu määrä"
+        },
+        "startDate": {
+            "en": "Start Date",
+            "fi": "Aloituspäivämäärä"
+        },
+        "endDate": {
+            "en": "End Date",
+            "fi": "Loppupäivämäärä"
+        },
+        "approveButton": {
+            "en": "Approve",
+            "fi": "Hyväksy"
+        },
+        "rejectButton": {
+            "en": "Reject",
+            "fi": "Hylkää"
+        }
+    },
+
+    "userManagement": {
+        "userManagementText": {
+            "en": "User Management",
+            "fi": "Käyttäjien hallinta"
+        },
+        "paragraphText": {
+            "en": "Manage user roles and approval status.",
+            "fi": "Hallinnoi käyttäjien rooleja ja hyväksyntätilaa."
+        },
+        "superAdminManagementTab": {
+            "en": "Admin Management",
+            "fi": "Ylläpitäjien hallinta"
+        },
+        "adminManagementTab": {
+            "en": "User Needs Approval",
+            "fi": "Käyttäjä tarvitsee hyväksynnän"
+        },
+        "approvedUsers": {
+            "en": "Approved Users",
+            "fi": "Hyväksytyt käyttäjät"
+        }
+    },
+
+    "userTable": {
+        "searchPlaceholderText": {
+            "en": "Search user by email",
+            "fi": "Etsi käyttäjää sähköpostilla"
+        }
+
+    }
+
+   
+
+   
+
+    
+}

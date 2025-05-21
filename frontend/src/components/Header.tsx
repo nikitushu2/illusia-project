@@ -15,6 +15,7 @@ import {
   ListItemButton,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import LanguageIcon from "@mui/icons-material/Language";
 import logo from "../images/logo-transparent.png";
 
 import { Link, useLocation } from "react-router-dom";
@@ -25,8 +26,43 @@ import { useNavigate } from "react-router-dom";
 import { useBookingCart } from "../context/BookingCartContext";
 import BookingCartDrawer from "./BookingCart/BookingCartDrawer";
 import ShoppingCartIconComponent from "./ShoppingCartIcon";
+import { useTranslation } from "react-i18next";
+
+enum Locale {
+  EN = "en",
+  FI = "fi",
+}
+
+const LocaleSelector = () => {
+  const { i18n } = useTranslation();
+
+  const handleLocaleChange = (lang: Locale) => {
+    i18n.changeLanguage(lang);
+  };
+
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", color: "primary.main" }}>
+      <LanguageIcon />
+      <select
+        defaultValue={i18n.language as Locale}
+        onChange={(event) => handleLocaleChange(event.target.value as Locale)}
+        style={{
+          border: "none",
+          color: "inherit",
+          fontSize: "1rem",
+          fontWeight: "bold",
+          marginLeft: "4px",
+        }}
+      >
+        <option value={Locale.EN}>EN</option>
+        <option value={Locale.FI}>FI</option>
+      </select>
+    </Box>
+  );
+};
 
 export const Header = () => {
+  const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const themeContext = useContext(ThemeContext);
   const { logout, isLoggedIn, signUp, signUpUser, isAdmin, applicationUser } =
@@ -75,7 +111,7 @@ export const Header = () => {
             <ListItemText
               primary={
                 <Typography sx={{ fontSize: { xs: "0.8rem", sm: "1rem" } }}>
-                  HOME
+                  {t("common.home")}
                 </Typography>
               }
             />
@@ -86,7 +122,7 @@ export const Header = () => {
             <ListItemText
               primary={
                 <Typography sx={{ fontSize: { xs: "0.8rem", sm: "1rem" } }}>
-                  ITEMS
+                  {t("headerPage.items")}
                 </Typography>
               }
             />
@@ -97,7 +133,7 @@ export const Header = () => {
             <ListItemText
               primary={
                 <Typography sx={{ fontSize: { xs: "0.8rem", sm: "1rem" } }}>
-                  EVENTS
+                  {t("headerPage.events")}
                 </Typography>
               }
             />
@@ -108,7 +144,7 @@ export const Header = () => {
             <ListItemText
               primary={
                 <Typography sx={{ fontSize: { xs: "0.8rem", sm: "1rem" } }}>
-                  INFO
+                  {t("headerPage.info")}
                 </Typography>
               }
             />
@@ -140,7 +176,7 @@ export const Header = () => {
 
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="static" sx={{height:"100px"}}>
         <Container maxWidth="xl">
           <Toolbar
             disableGutters
@@ -150,6 +186,8 @@ export const Header = () => {
               sx={{
                 alignItems: "center",
                 display: "flex",
+                width: "200px",
+                height: "100px",
               }}
             >
               <Link to="/">
@@ -171,10 +209,13 @@ export const Header = () => {
                 display: { xs: "none", md: "flex" },
                 justifyContent: "center",
                 gap: "20px",
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
               }}
             >
               <Button color="inherit" variant="text" component={Link} to="/">
-                <Typography variant="body1">HOME</Typography>
+                <Typography variant="body1">{t("common.home")}</Typography>
               </Button>
               <Button
                 color="inherit"
@@ -182,7 +223,7 @@ export const Header = () => {
                 component={Link}
                 to="/items"
               >
-                <Typography variant="body1">STORE</Typography>
+                <Typography variant="body1">{t("headerPage.store")}</Typography>
               </Button>
               <Button
                 color="inherit"
@@ -190,7 +231,9 @@ export const Header = () => {
                 component={Link}
                 to="/events"
               >
-                <Typography variant="body1">EVENTS</Typography>
+                <Typography variant="body1">
+                  {t("headerPage.events")}
+                </Typography>
               </Button>
               <Button
                 color="inherit"
@@ -198,7 +241,7 @@ export const Header = () => {
                 component={Link}
                 to="/info"
               >
-                <Typography variant="body1">INFO</Typography>
+                <Typography variant="body1">{t("headerPage.info")}</Typography>
               </Button>
             </Box>
 
@@ -207,6 +250,8 @@ export const Header = () => {
                 display: "flex",
                 alignItems: "center",
                 gap: "20px",
+                width: "200px",
+                justifyContent: "flex-end",
               }}
             >
               {isLoggedIn ? (
@@ -217,7 +262,7 @@ export const Header = () => {
                     sx={{
                       display: { xs: "none", md: "flex" },
                       alignItems: "center",
-                      gap: "20px",
+                      gap: "2px",
                     }}
                   >
                     <Chip
@@ -237,46 +282,68 @@ export const Header = () => {
                     />
                     <Button
                       onClick={handleLogout}
-                      color="inherit"
-                      variant="contained"
-                      sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                      // color="inherit"
+                      // variant="contained"
+                      sx={{
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        padding: "10px 10px",
+                      }}
                     >
-                      Logout
+                      {t("headerPage.logout")}
                     </Button>
                   </Box>
                   <Box sx={{ display: { xs: "block", md: "none" } }}>
                     <Button
                       onClick={handleLogout}
-                      color="inherit"
-                      variant="contained"
-                      sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                      // color="inherit"
+                      // variant="contained"
+                      sx={{
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        padding: "10px 10px",
+                      }}
                     >
-                      Logout
+                      {t("headerPage.logout")}
                     </Button>
                   </Box>
                 </>
               ) : (
                 <>
-                  <Button
-                    onClick={signUp}
-                    color="inherit"
-                    variant="contained"
-                    sx={{ fontSize: "1rem", fontWeight: "bold" }}
-                  >
-                    Sign Up
-                  </Button>
-                  <Button
-                    to="/login"
-                    component={Link}
-                    color="inherit"
-                    variant="contained"
-                    sx={{ fontSize: "1rem", fontWeight: "bold" }}
-                  >
-                    Log In
-                  </Button>
+                  <Box sx={{ display: { xs: "none", md: "flex" } }}>
+                    <Button
+                      onClick={signUp}
+                      // color="inherit"
+                      // variant="contained"
+                      sx={{
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        padding: "10px 10px",
+                      }}
+                    >
+                      {t("headerPage.signup")}
+                    </Button>
+                    <Button
+                      to="/login"
+                      component={Link}
+                      // color="inherit"
+                      // variant="contained"
+                      sx={{
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        padding: "10px 10px",
+                      }}
+                    >
+                      {t("headerPage.login")}
+                    </Button>
+                  </Box>
                 </>
               )}
-
+              <LocaleSelector />
               <Box sx={{ display: { xs: "block", md: "none" } }}>
                 <IconButton
                   color="inherit"

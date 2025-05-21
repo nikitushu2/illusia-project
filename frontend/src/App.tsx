@@ -24,8 +24,6 @@ import UserBookings from "./components/User/UserBookings";
 import UserBookingHistory from "./components/User/UserBookingHistory";
 
 const App: React.FC = () => {
-  console.log("App rendering with BookingCartProvider");
-
   return (
     <AuthProvider>
       <BookingCartProvider>

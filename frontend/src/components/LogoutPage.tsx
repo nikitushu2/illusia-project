@@ -1,8 +1,9 @@
 import { Box, Button, Typography } from "@mui/material"
 import { useNavigate } from "react-router-dom";
-
+import { useTranslation } from "react-i18next";
 
 export const LogoutPage = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const backToLogin = () => {
@@ -15,10 +16,10 @@ export const LogoutPage = () => {
   return (
     <Box>
         <Typography variant="h4" sx={{ textAlign: "center", marginTop: 5 }}>
-            You have been logged out.
+            {t("logoutPage.loggedOut")}
         </Typography>
         <Typography variant="body1" sx={{ textAlign: "center", marginTop: 2 }}>
-            Thank you for using our application!
+            {t("logoutPage.thankYou")}
         </Typography>
         <Box sx={{ textAlign: "center", marginTop: 3 }}>
             <Button
@@ -27,14 +28,14 @@ export const LogoutPage = () => {
             onClick={backToLogin}
             sx={{ marginRight: 2 }}
             >
-            Go to Login
+                {t("logoutPage.goToLogin")}
             </Button>
             <Button
             variant="contained"
             color="primary"
             onClick={backToHome}
             >
-            Home
+                {t("common.home")}
             </Button>
         </Box>
     </Box>
