@@ -167,7 +167,29 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
                                     <Typography variant="subtitle2"><b>
                                     {t("adminBookingDetail.status")}
                                         </b></Typography>
-                                    <Typography variant="body2">{booking.status}</Typography>
+                                    <Typography
+                                        variant="body2"
+                                        sx={{
+                                            backgroundColor:
+                                                booking.status === BookingStatus.RESERVED
+                                                    ? "success.main"
+                                                    : booking.status === BookingStatus.PENDING_APPROVAL
+                                                    ? "warning.main"
+                                                    : "transparent",
+                                            color:
+                                                booking.status === BookingStatus.RESERVED || booking.status === BookingStatus.PENDING_APPROVAL
+                                                    ? "common.white"
+                                                    : "inherit",
+                                            px: 1.5,
+                                            py: 0.5,
+                                            borderRadius: 1,
+                                            display: "inline-block",
+                                            minWidth: 80,
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        {booking.status}
+                                    </Typography>
                                 </Box>
                             </Grid>
                         </Grid>
@@ -242,21 +264,21 @@ export const AdminBookingDetail = ({ bookingDetails, items }: BookingDetailProps
                 </Table>
             </TableContainer>
         )}
-                        <Box display={"flex"} gap={2} marginTop={3} paddingX={2}>
+                        <Box display="flex" gap={2} marginTop={3} paddingX={2} justifyContent="flex-end">
                             <Button
                                 variant="contained"
                                 color="primary"
                                 onClick={() => handleApprove()}
                                 disabled={disableButton}
-                                >
+                            >
                                 {bookingApprovalLoading ? <CircularProgress /> : t("adminBookingDetail.approveButton")}
                             </Button>
                             <Button
                                 variant="contained"
-                                color="primary" 
+                                color="primary"
                                 onClick={() => handleReject()}
                                 disabled={disableButton}
-                                >
+                            >
                                 {bookingRejectionLoading ? <CircularProgress /> : t("adminBookingDetail.rejectButton")}
                             </Button>
                         </Box>

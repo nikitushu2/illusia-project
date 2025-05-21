@@ -1,47 +1,38 @@
 import {
   Box,
-  //Button,
   Divider,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  //TextField,
-  // Typography,
   Collapse,
   Typography,
   IconButton,
   CircularProgress,
-  //TextField,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-// import AppsIcon from "@mui/icons-material/Apps";
-// import TableRowsIcon from "@mui/icons-material/TableRows";
 import { JSX, useState, useEffect } from "react";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-//import { Link } from "react-router-dom";
 
-// import UserProducts from "./UserProducts";
 import UserProducts from "./UserProducts";
 import useCategories from "../../services/categoryService";
-//import UserSingleProduct from "./UserSingleProduct";
 
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-
-// Import useLocation from react-router-dom
 import { useLocation, Link, useNavigate } from "react-router-dom";
 
-import HistoryIcon from "@mui/icons-material/History";
-import FeedIcon from "@mui/icons-material/Feed";
+import HistoryIcon from '@mui/icons-material/History';
+import FeedIcon from '@mui/icons-material/Feed';
+import { useTranslation } from "react-i18next";
 
 const UserDashboard = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [sideLink, setsideLink] = useState<string | null>(null);
   const [productsOpen, setProductsOpen] = useState(false);
@@ -138,7 +129,6 @@ const UserDashboard = () => {
             margin: "10px",
           }}
         >
-          {/* <h2>sidebar component</h2> */}
           <Box
             sx={{
               minHeight: "100vh",
@@ -167,7 +157,7 @@ const UserDashboard = () => {
                     marginBottom: "50px",
                   }}
                 >
-                  User Dashboard
+                  {t("sidebar.userDashboard")}
                 </Typography>
               )}
               <IconButton
@@ -200,7 +190,7 @@ const UserDashboard = () => {
                     {!isCollapsed && (
                       <>
                         <ListItemText
-                          primary="Products"
+                          primary={t("sidebar.products")}
                           slotProps={{
                             primary: { style: { color: "white" } },
                           }}
@@ -220,7 +210,7 @@ const UserDashboard = () => {
                     {!isCollapsed && (
                       <>
                         <ListItemText
-                          primary="Bookings"
+                          primary={t("sidebar.bookings")}
                           slotProps={{
                             primary: { style: { color: "white" } },
                           }}
@@ -251,7 +241,7 @@ const UserDashboard = () => {
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
-                            primary="Active Bookings"
+                            primary={t("sidebar.activeBookings")}
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
@@ -268,7 +258,7 @@ const UserDashboard = () => {
                         </ListItemIcon>
                         {!isCollapsed && (
                           <ListItemText
-                            primary="Booking History"
+                            primary={t("sidebar.bookingHistory")}
                             slotProps={{
                               primary: { style: { color: "white" } },
                             }}
@@ -278,14 +268,10 @@ const UserDashboard = () => {
                     </List>
                   </ListItem>
                 </Collapse>
-                {/* <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)" }} /> */}
-
                 <Divider />
               </List>
             </Box>
           </Box>
-
-          {/* <h2>(main dashboard component)</h2> */}
           <Box
             sx={{
               margin: "10px",

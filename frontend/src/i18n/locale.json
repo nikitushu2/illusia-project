@@ -38,6 +38,17 @@
         }
     },
 
+    "logInPage": {
+        "welcomeToIllusiaRY": {
+            "en": "Welcome to Illusia ry",
+            "fi": "Tervetuloa Illusia ry:een"
+        },
+        "signupLoginToPlaceOrders": {
+            "en": "Sign up/Log in to place orders",
+            "fi": "Rekisteröidy tai kirjaudu sisään tehdaksesi tilauksia"
+        }
+    },
+
     "logoutPage": {
         "loggedOut": {
             "en": "You have been logged out.",
@@ -55,11 +66,11 @@
 
 
     "landingPage": {
-        "imageText": {
+        "YourNextAdventureStartsHere": {
             "en": "Your Next Adventure Starts Here",
             "fi": "Seuraava seikkailusi alkaa tästä"
         },
-        "welcomeMessage": {
+        "welcomeText": {
             "en": "Welcome to Illusia ry – The Heart of Immersive LARP Experiences!",
             "fi": "Tervetuloa Illusia ry:een – Immersiivisten LARP-kokemusten sydämeen!"
         },
@@ -92,20 +103,7 @@
         "locationDescription": {
             "en": "Real live events for you to join",
             "fi": "Reaaliaikaiset tapahtumat, joihin voit liittyä"
-        },
-        "userReviews": {
-            "en": "User Reviews",
-            "fi": "Käyttäjäarvostelut"
-        },
-        "reviewTitle": {
-            "en": "Review",
-            "fi": "Arvostelu"
-        },
-        "review": {
-            "en": "This is a review of Illusia",
-            "fi": "Tämä on arvostelu Illusiasta"
         }
-
     },
 
 
@@ -188,6 +186,46 @@
             "fi": "Etsi käyttäjää sähköpostilla"
         }
 
+    },
+
+    "sidebar": {
+        "adminDashboard": {
+            "en": "Admin Dashboard",
+            "fi": "Ylläpitäjän hallintapaneeli"
+        },
+        "userDashboard": {
+            "en": "User Dashboard",
+            "fi": "Käyttäjän hallintapaneeli"
+        },
+
+        "products": {
+            "en": "Products",
+            "fi": "Tuotteet"
+        },
+        "users": {
+            "en": "Users",
+            "fi": "Käyttäjät"
+        },
+        "bookings": {
+            "en": "Bookings",
+            "fi": "Varaukset"
+        },
+        "details": {
+            "en": "Details",
+            "fi": "Tiedot"
+        },
+        "bookingHistory": {
+            "en": "Booking History",
+            "fi": "Varauksen historia"
+        },
+        "activeBookings": {
+            "en": "Active Booking",
+            "fi": "Aktiivinen varaus"
+        },
+        "reservations": {
+            "en": "Reservations",
+            "fi": "Varaukset"
+        }
     }
 
    
