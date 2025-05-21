@@ -20,7 +20,7 @@ interface FetchState<T> {
   ok: boolean;
   apiError: ApiErrorType | null;
   loading: boolean;
-  get: (url: string) => Promise<void>;
+  get: (url: string) => Promise<T | null>;
   post: (url: string, body: any) => Promise<void>;
   put: (url: string, body: any) => Promise<void>;
   patch: (url: string, body: any) => Promise<void>;
@@ -35,7 +35,7 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
   const [loading, setLoading] = useState(false);
   const [ok, setOk] = useState(false);
 
-  const fetchData = async (method: string, url: string, body: any) => {
+  const fetchData = async (method: string, url: string, body: any): Promise<T | null> => {
     setLoading(true);
     setApiError(null);
     try {
@@ -49,8 +49,9 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
       if (response.ok) {
         setOk(true);
         const text = await response.text();
-        const data = text ? (JSON.parse(text) as T) : null;
-        setData(data);
+        const responseData = text ? (JSON.parse(text) as T) : null;
+        setData(responseData);
+        return responseData;
       } else {
         let errorMessage: ApiErrorType;
         switch (response.status) {
@@ -73,10 +74,12 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
             errorMessage = ApiErrorType.SOMETHING_WENT_WRONG;
         }
         setApiError(errorMessage);
+        return null;
       }
     } catch (error) {
       setApiError(ApiErrorType.SOMETHING_WENT_WRONG);
       console.error("Fetch error:", error);
+      return null;
     } finally {
       setLoading(false);
     }

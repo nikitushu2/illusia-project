@@ -215,6 +215,33 @@ privateBookingsRouter.get(
   }
 );
 
+// Check availability for items
+privateBookingsRouter.get(
+  "/check-availability",
+  async (req: RequestWithSession, res: Response, next: NextFunction) => {
+    try {
+      const { startDate, endDate } = req.query;
+
+      if (!startDate || !endDate) {
+        res.status(400).json({
+          success: false,
+          message: "Missing required parameters: startDate and endDate are required",
+        });
+        return;
+      }
+
+      const availability = await bookingService.checkAvailability(
+        new Date(startDate as string),
+        new Date(endDate as string)
+      );
+
+      res.json(availability);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 // GET a specific booking owned by the current user
 privateBookingsRouter.get(
   "/:id",

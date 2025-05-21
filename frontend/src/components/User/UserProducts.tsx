@@ -30,8 +30,6 @@ import {
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-//import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
 import { Item } from "../../services/itemService";
 import { useBookingCart } from "../../context/BookingCartContext";
@@ -39,10 +37,9 @@ import { useBookingCart } from "../../context/BookingCartContext";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 
 import { ApiRole, useFetch } from "../../hooks/useFetch";
-import { BookingStatus, BookingWithDetails } from "../../types/booking";
 import noImage from "../../images/noImage.png";
 
 // Add extended Item type
@@ -52,6 +49,15 @@ interface ExtendedItem extends Item {
   isAvailable?: boolean;
 }
 
+// Add type for availability response
+interface AvailabilityResponse {
+  [itemId: number]: {
+    totalQuantity: number;
+    bookedQuantity: number;
+    remainingQuantity: number;
+  };
+}
+
 interface ItemListProps {
   categories?: { id: number; name: string }[];
 }
@@ -59,9 +65,6 @@ interface ItemListProps {
 const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  // navigate is used in other places in this component, or reserved for future use
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const navigate = useNavigate();
   const { addItem, setStartDate, setEndDate } = useBookingCart();
 
   const [modeDisplay, setModeDisplay] = useState("table");
@@ -84,18 +87,14 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
     get,
   } = useFetch<Item[]>(ApiRole.PUBLIC);
 
-  const {
-    data: bookings,
-    loading: bookingsLoading,
-    get: getBookings,
-  } = useFetch<BookingWithDetails[]>(ApiRole.PRIVATE);
+  const { loading: bookingsLoading, get: getBookings } =
+    useFetch<AvailabilityResponse>(ApiRole.PRIVATE);
 
-  // Fetch items and bookings on component mount
+  // Fetch items on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         await get("items");
-        await getBookings("bookings/my-bookings");
       } catch (error) {
         console.error("Error in initial data fetch:", error);
         setSnackbar({
@@ -106,7 +105,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
       }
     };
     fetchData();
-  }, [get, getBookings]); // Remove items and bookings from dependencies
+  }, [get]);
 
   // Update filtered items when items change
   useEffect(() => {
@@ -168,25 +167,21 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         return;
       }
 
-      if (startDate.isAfter(endDate)) {
-        setSnackbar({
-          open: true,
-          message: "Start date must be before end date",
-          severity: "error",
-        });
-        return;
-      }
-
       // Format dates consistently as YYYY-MM-DD
       const formattedStartDate = startDate.format("YYYY-MM-DD");
       const formattedEndDate = endDate.format("YYYY-MM-DD");
+
+      console.log("DEBUG - Checking availability for dates:", {
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
+      });
 
       // Set dates in the context
       setStartDate(formattedStartDate);
       setEndDate(formattedEndDate);
 
       // Ensure we have the data before proceeding
-      if (!items || !bookings) {
+      if (!items) {
         setSnackbar({
           open: true,
           message: "Data not available. Please refresh the page and try again.",
@@ -195,67 +190,91 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
         return;
       }
 
-      // Process the availability
-      const activeBookings = bookings.filter((booking) => {
-        const isConfirmed =
-          booking.status === BookingStatus.RESERVED ||
-          booking.status === BookingStatus.IN_PROGRESS ||
-          booking.status === BookingStatus.PENDING_APPROVAL ||
-          booking.status === BookingStatus.IN_QUEUE;
-        const overlaps =
-          dayjs(booking.startDate).isBefore(endDate) &&
-          dayjs(booking.endDate).isAfter(startDate);
-        return isConfirmed && overlaps;
+      // Show loading state
+      setSnackbar({
+        open: true,
+        message: "Checking availability...",
+        severity: "info",
       });
 
-      const bookedQuantities: Record<number, number> = {};
-      activeBookings.forEach((booking) => {
-        booking.items.forEach((item) => {
-          if (!bookedQuantities[item.itemId]) {
-            bookedQuantities[item.itemId] = 0;
-          }
-          bookedQuantities[item.itemId] += item.quantity;
+      try {
+        console.log("DEBUG - Making request to check-availability endpoint");
+        // Get availability information from the new endpoint
+        const response = await getBookings(
+          `bookings/check-availability?startDate=${formattedStartDate}&endDate=${formattedEndDate}`
+        );
+
+        console.log("DEBUG - Response from check-availability:", response);
+
+        if (!response) {
+          throw new Error("No response from server");
+        }
+
+        // Update the filtered items with availability information
+        const updatedFilteredItems = filteredItems.map((item) => {
+          // Default values in case the item is not in the response
+          const defaultAvailability = {
+            totalQuantity: item.quantity,
+            bookedQuantity: 0,
+            remainingQuantity: item.quantity,
+          };
+
+          // Get availability for this item, or use default if not found
+          const itemAvailability = response[item.id] || defaultAvailability;
+
+          console.log(`DEBUG - Item ${item.id} availability:`, {
+            itemName: item.name,
+            totalQuantity: itemAvailability.totalQuantity,
+            bookedQuantity: itemAvailability.bookedQuantity,
+            remainingQuantity: itemAvailability.remainingQuantity,
+          });
+
+          return {
+            ...item,
+            isAvailable: itemAvailability.remainingQuantity > 0,
+            remainingQuantity: itemAvailability.remainingQuantity,
+          };
         });
-      });
 
-      // Update the filtered items with availability information
-      const updatedFilteredItems = filteredItems.map((item) => {
-        const booked = bookedQuantities[item.id] || 0;
-        const remainingQuantity = item.quantity - booked; // Adjust for booked quantity only
-        const isAvailable = remainingQuantity > 0;
+        setFilteredItems(updatedFilteredItems);
+        setPage(1);
+        setHasSearched(true);
 
-        return {
-          ...item,
-          isAvailable,
-          remainingQuantity,
-        };
-      });
+        // Show availability message
+        const availableCount = updatedFilteredItems.filter(
+          (item) => item.isAvailable
+        ).length;
+        const unavailableCount = updatedFilteredItems.length - availableCount;
 
-      setFilteredItems(updatedFilteredItems);
-      setPage(1);
-      setHasSearched(true);
+        console.log("DEBUG - Final availability summary:", {
+          totalItems: updatedFilteredItems.length,
+          availableCount,
+          unavailableCount,
+        });
 
-      // Show availability message
-      const availableCount = updatedFilteredItems.filter(
-        (item) => item.isAvailable
-      ).length;
-      const unavailableCount = updatedFilteredItems.length - availableCount;
-
-      if (availableCount === 0) {
+        if (availableCount === 0) {
+          setSnackbar({
+            open: true,
+            message: "No items available for the selected dates",
+            severity: "info",
+          });
+        } else {
+          setSnackbar({
+            open: true,
+            message: `${availableCount} items available, ${unavailableCount} items fully booked for the selected dates`,
+            severity: "success",
+          });
+        }
+      } catch (error) {
+        console.error("DEBUG - Error fetching availability:", error);
         setSnackbar({
           open: true,
-          message: "No items available for the selected dates",
-          severity: "info",
-        });
-      } else {
-        setSnackbar({
-          open: true,
-          message: `${availableCount} items available, ${unavailableCount} items fully booked for the selected dates`,
-          severity: "success",
+          message: "Unable to check availability. Please try again later.",
+          severity: "error",
         });
       }
     } catch (error) {
-      console.error("Error in searchAvailability:", error);
+      console.error("DEBUG - Error in searchAvailability:", error);
       setSnackbar({
         open: true,
         message: "Error checking availability. Please try again.",

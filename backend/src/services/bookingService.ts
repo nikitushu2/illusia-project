@@ -314,3 +314,72 @@ export const updateCompleteBooking = async (
     throw error;
   }
 };
+
+export const checkAvailability = async (
+  startDate: Date,
+  endDate: Date
+): Promise<Record<number, { totalQuantity: number; bookedQuantity: number; remainingQuantity: number }>> => {
+  try {
+    // Get all active bookings that overlap with the date range
+    const activeBookings = await Booking.findAll({
+      where: {
+        status: {
+          [Op.in]: [
+            BookingStatus.RESERVED,
+            BookingStatus.IN_PROGRESS,
+            BookingStatus.PENDING_APPROVAL,
+            BookingStatus.IN_QUEUE
+          ]
+        },
+        [Op.or]: [
+          {
+            startDate: {
+              [Op.lte]: endDate
+            },
+            endDate: {
+              [Op.gte]: startDate
+            }
+          }
+        ]
+      },
+      include: [
+        {
+          model: BookingItem,
+          as: "bookingItems",
+          include: [{ model: Item, as: "item" }]
+        }
+      ]
+    });
+
+    // Get all items to know their total quantities
+    const allItems = await Item.findAll();
+    const itemQuantities: Record<number, { totalQuantity: number; bookedQuantity: number; remainingQuantity: number }> = {};
+
+    // Initialize quantities for all items
+    allItems.forEach(item => {
+      itemQuantities[item.id] = {
+        totalQuantity: item.quantity,
+        bookedQuantity: 0,
+        remainingQuantity: item.quantity
+      };
+    });
+
+    // Calculate booked quantities from overlapping bookings
+    activeBookings.forEach(booking => {
+      const bookingWithItems = booking as unknown as { bookingItems: Array<{ itemId: number; quantity: number }> };
+      bookingWithItems.bookingItems.forEach(bookingItem => {
+        const itemId = bookingItem.itemId;
+        if (itemQuantities[itemId]) {
+          itemQuantities[itemId].bookedQuantity += bookingItem.quantity;
+          itemQuantities[itemId].remainingQuantity = 
+            itemQuantities[itemId].totalQuantity - itemQuantities[itemId].bookedQuantity;
+        }
+      });
+    });
+
+    return itemQuantities;
+  } catch (error) {
+    console.error("Error checking availability:", error);
+    throw error;
+  }
+};
