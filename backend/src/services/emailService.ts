@@ -161,11 +161,14 @@ const generateStatusChangeEmailContent = async (
           
           <div class="booking-info">
             <p><strong>Booking ID:</strong> ${bookingId}</p>
-            <p><strong>Booking Period:</strong> ${startDate
-              .toISOString()
-              .replace(/(\d{4})-(\d{2})-(\d{2})T.*/g, "$2-$3-$1")} to ${endDate
-    .toISOString()
-    .replace(/(\d{4})-(\d{2})-(\d{2})T.*/g, "$2-$3-$1")}</p>
+            <p><strong>Booking Period:</strong> ${startDate.toLocaleDateString(
+              "en-US",
+              { day: "numeric", month: "long", year: "numeric" }
+            )} to ${endDate.toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })}</p>
           </div>
           
           <h3>Booking Items</h3>
