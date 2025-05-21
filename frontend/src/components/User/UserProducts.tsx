@@ -30,8 +30,6 @@ import {
 import AppsIcon from "@mui/icons-material/Apps";
 import TableRowsIcon from "@mui/icons-material/TableRows";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-//import camera from "../../images/camera.png";
 import UserSingleProduct from "./UserSingleProduct";
 import { Item } from "../../services/itemService";
 import { useBookingCart } from "../../context/BookingCartContext";
@@ -61,7 +59,6 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   // navigate is used in other places in this component, or reserved for future use
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const navigate = useNavigate();
   const { addItem, setStartDate, setEndDate } = useBookingCart();
 
   const [modeDisplay, setModeDisplay] = useState("table");
@@ -841,7 +838,7 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
           {currentItems.length > 0 ? (
             currentItems.map((item) => {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              const category = categories.find((c) => c.id === item.categoryId);
+              //const category = categories.find((c) => c.id === item.categoryId);
               const isAvailable = item.isAvailable ?? true;
 
               return (
@@ -877,9 +874,6 @@ const UserProducts: React.FC<ItemListProps> = ({ categories = [] }) => {
                     <Typography style={{ margin: 0 }}>
                       {item.description}
                     </Typography>
-                    {/* <Typography style={{ margin: 0, color: "gray" }}>
-                      Category: {category ? category.name : ""}
-                    </Typography> */}
                     {hasSearched && startDate && endDate && (
                       <>
                         <Typography
