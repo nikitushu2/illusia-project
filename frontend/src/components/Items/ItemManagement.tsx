@@ -106,7 +106,7 @@ const ItemManagement: React.FC = () => {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            mb: 3,
+            mb: 1,
           }}
         >
           <Typography
@@ -115,7 +115,7 @@ const ItemManagement: React.FC = () => {
             color="primary"
             fontWeight="bold"
           >
-            All Items
+            The Adventurer's Pack
           </Typography>
           <Button
             variant="outlined"
@@ -126,6 +126,9 @@ const ItemManagement: React.FC = () => {
             {categoriesLoading ? "Refreshing..." : "Refresh Categories"}
           </Button>
         </Box>
+        <Typography variant="h6" color="primary" sx={{ fontStyle: "italic" }}>
+        Equip yourself. Sign in to book your next prop
+        </Typography>
 
         <Divider sx={{ mb: 3 }} />
 
