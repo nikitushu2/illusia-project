@@ -1,8 +1,8 @@
-import { CardMedia, Typography, Box, Button, IconButton, Modal } from "@mui/material";
+import { CardMedia, Typography, Box,  IconButton, Modal } from "@mui/material";
 import React from "react";
 import { Item } from "../../services/itemService";
 import CloseIcon from '@mui/icons-material/Close';
-//import camera from "../../images/camera.png";
+
 
 import noImage from "../../images/noImage.png";
 
@@ -26,7 +26,7 @@ const modalStyle = {
   overflowY: 'auto',
 };
 
-const UserSingleProduct: React.FC<UserSingleProductProps> = ({ item, onClose, buttonText, onEdit }) => {
+const UserSingleProduct: React.FC<UserSingleProductProps> = ({ item, onClose }) => {
   if (!item) {
     return null;
   }

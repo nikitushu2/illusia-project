@@ -9,9 +9,9 @@ import {
   Alert,
   Grid,
   Divider,
-  Paper,
+ 
   IconButton,
-  Collapse,
+  
 } from "@mui/material";
 import {
   Item,
@@ -33,7 +33,6 @@ interface ItemFormProps {
 const ItemForm: React.FC<ItemFormProps> = ({
   initialValues,
   onSubmit,
-  onCancel,
   categories = [],
   onCategoryCreate,
 }) => {
