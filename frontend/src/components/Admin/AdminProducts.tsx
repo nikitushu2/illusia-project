@@ -40,7 +40,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useItems, {
   UpdateItemData,
-  CreateItemData,
   Item,
 } from "../../services/itemService";
 //import camera from "../../images/camera.png";
@@ -67,15 +66,10 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
     items,
     loading,
     error,
-    create,
     update,
     delete: deleteItem,
     refresh,
   } = useItems();
-
-  // Add debug logging
-  console.log("isMobile:", isMobile);
-  console.log("window.innerWidth:", window.innerWidth);
 
   const { isLoggedIn, isAdmin } = useAuth();
   const [modeDisplay, setModeDisplay] = React.useState("table");
@@ -140,7 +134,6 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
   // Handle API errors
   useEffect(() => {
     if (error) {
-      console.error("Error fetching items:", error);
       setSnackbar({
         open: true,
         message: "Failed to fetch items",
@@ -196,7 +189,6 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
       });
       refresh();
     } catch (error) {
-      console.error("Error deleting item:", error);
       setSnackbar({
         open: true,
         message: "Failed to delete item",
@@ -282,8 +274,6 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
         });
       } else {
         // Create new item
-        const result = await create(values as CreateItemData);
-        console.log("Created new item:", result);
         setSnackbar({
           open: true,
           message: "Item created successfully",
@@ -296,7 +286,6 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
       setSelectedItem(undefined);
       refresh(); // Refresh the items list
     } catch (error) {
-      console.error("Error submitting item:", error);
       setSnackbar({
         open: true,
         message: selectedItem
@@ -345,8 +334,6 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
       });
       return;
     }
-
-    console.log("Opening create modal");
     setSelectedItem(undefined);
     setIsModalOpen(true);
   };
@@ -397,7 +384,6 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
       }
       return null;
     } catch (error) {
-      console.error("Error creating category:", error);
       setSnackbar({
         open: true,
         message: "Failed to create category",

@@ -8,7 +8,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  //IconButton,
   Typography,
   CircularProgress,
   Snackbar,
@@ -39,7 +38,7 @@ interface ItemListProps {
   categories?: { id: number; name: string }[];
 }
 
-const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
+const ItemList: React.FC<ItemListProps> = ({categories = [] }) => {
   const { data: items, apiError, loading, get } = useFetch<Item[]>(ApiRole.PUBLIC);
   const { remove } = useFetch(ApiRole.ADMIN);
   // const [items, setItems] = useState<Item[]>([]);
@@ -105,7 +104,7 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     if (itemToDelete === null) return;
 
     try {
-      await remove(`/items/${itemToDelete}`);
+      await remove(`/items/${itemToDelete}`, null);
       setSnackbar({
         open: true,
         message: "Item deleted successfully",
@@ -139,7 +138,7 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = ( newPage: number) => {
     setPage(newPage);
   };
 
@@ -368,7 +367,7 @@ const ItemList: React.FC<ItemListProps> = ({ onEdit, categories = [] }) => {
             count={filteredItems.length}
             rowsPerPage={rowsPerPage}
             page={page}
-            onPageChange={handleChangePage}
+            onPageChange={(_event, page) => handleChangePage(page)}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </>

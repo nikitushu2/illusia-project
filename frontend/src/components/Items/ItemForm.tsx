@@ -9,9 +9,7 @@ import {
   Alert,
   Grid,
   Divider,
-  Paper,
   IconButton,
-  Collapse,
 } from "@mui/material";
 import {
   Item,
@@ -33,7 +31,6 @@ interface ItemFormProps {
 const ItemForm: React.FC<ItemFormProps> = ({
   initialValues,
   onSubmit,
-  onCancel,
   categories = [],
   onCategoryCreate,
 }) => {
@@ -231,7 +228,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
       </Box>
 
       <Grid container spacing={3}>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <TextField
             fullWidth
             label="Name"
@@ -246,7 +243,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <TextField
             fullWidth
             label="Description"
@@ -262,7 +259,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <TextField
             fullWidth
             label="Image URL"
@@ -273,7 +270,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
           />
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             fullWidth
             label="Price"
@@ -292,7 +289,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
           />
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             fullWidth
             label="Quantity"
@@ -310,7 +307,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Box sx={{ mb: 2 }}>
             <Box
               sx={{
@@ -465,7 +462,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
       </Box>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             fullWidth
             label="Size"
@@ -476,7 +473,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
           />
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             fullWidth
             label="Color"
@@ -487,7 +484,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
           />
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             fullWidth
             label="Item Location"
@@ -498,7 +495,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
           />
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             fullWidth
             label="Storage Location"
