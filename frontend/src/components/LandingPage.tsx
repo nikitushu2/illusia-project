@@ -56,7 +56,7 @@ const LandingPage = () => {
       </Box>
 
       {/* Right skewed image box */}
-      <Box sx={{ width: "60%", height: "100%", clipPath: "polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%)",  overflow: "hidden" , borderRadius: "20px", }} >
+      <Box sx={{ width: "60%", height: "100%", clipPath: "polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%)",  overflow: "hidden" , borderRadius: "20px", border: "3px solid #3ec3ba" }} >
         <Fade in={fadeIn} timeout={500}>
         <img src={images[currentImage]} alt="slideshow" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
         </Fade>
@@ -76,7 +76,7 @@ const LandingPage = () => {
       <Box>
         <CalendarMonthIcon sx={{ width: "70px", height: "70px" }} color="secondary" />
           <Typography variant="h5">{t("landingPage.booking")}</Typography>
-            <Typography variant="h6">{t("landingPage.bookingDescription")} </Typography>
+            <Typography variant="h6">{t("landingPage.bookingDescription")}</Typography>
       </Box>
       <Box>
         <TheaterComedyIcon sx={{ width: "70px", height: "70px" }} color="secondary"  />

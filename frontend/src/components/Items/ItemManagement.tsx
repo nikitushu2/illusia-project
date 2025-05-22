@@ -21,8 +21,10 @@ import useItems, {
   UpdateItemData,
 } from "../../services/itemService";
 import useCategories, { Category } from "../../services/categoryService";
+import { useTranslation } from "react-i18next";
 
 const ItemManagement: React.FC = () => {
+  const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | undefined>(undefined);
   const [refreshKey, setRefreshKey] = useState(0); // Used to force ItemList to refresh
@@ -106,7 +108,7 @@ const ItemManagement: React.FC = () => {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            mb: 3,
+            mb: 1,
           }}
         >
           <Typography
@@ -115,7 +117,7 @@ const ItemManagement: React.FC = () => {
             color="primary"
             fontWeight="bold"
           >
-            All Items
+            {t("itemManangement.theAdventurersPack")}
           </Typography>
           <Button
             variant="outlined"
@@ -126,6 +128,9 @@ const ItemManagement: React.FC = () => {
             {categoriesLoading ? "Refreshing..." : "Refresh Categories"}
           </Button>
         </Box>
+        <Typography variant="h6" color="primary" sx={{ fontStyle: "italic" }}>
+        {t("itemManangement.itemManagementText")}
+        </Typography>
 
         <Divider sx={{ mb: 3 }} />
 

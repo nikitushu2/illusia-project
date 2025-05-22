@@ -10,8 +10,11 @@ export const Login = () => {
   return (
     <Box sx={{ margin: "auto", textAlign: "center", maxWidth: 600, px: 2 }}>
       <Box sx={{ paddingTop: 2, mb: 6 }}>
+        <Typography variant="h4" sx={{ color: "primary.main"}}>
+        {t("logInPage.Adventurer")}!
+        </Typography>
         <Typography variant="h3" sx={{color: "primary.main"}}>
-          {t("logInPage.welcomeToIllusiaRY")}</Typography>
+        {t("logInPage.welcomeToIllusiaRY")}</Typography>
         <Typography sx={{fontStyle:"italic"}} >{t("logInPage.signupLoginToPlaceOrders")}</Typography>
       </Box>
 
