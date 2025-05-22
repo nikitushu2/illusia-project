@@ -40,7 +40,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useItems, {
   UpdateItemData,
+  CreateItemData,
   Item,
+  
 } from "../../services/itemService";
 //import camera from "../../images/camera.png";
 import ItemForm from "../Items/ItemForm";
@@ -66,6 +68,7 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
     items,
     loading,
     error,
+    create,
     update,
     delete: deleteItem,
     refresh,
@@ -274,6 +277,7 @@ const AdminProducts = ({ categories = [] }: ItemListProps): React.ReactNode => {
         });
       } else {
         // Create new item
+        await create(values as CreateItemData);
         setSnackbar({
           open: true,
           message: "Item created successfully",
