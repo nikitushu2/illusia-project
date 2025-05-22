@@ -30,7 +30,7 @@ interface ItemFormProps {
 const ItemForm: React.FC<ItemFormProps> = ({
   initialValues,
   onSubmit,
-  onCancel,
+
   categories = [],
   onCategoryCreate,
 }) => {
