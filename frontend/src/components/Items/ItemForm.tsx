@@ -7,11 +7,8 @@ import {
   MenuItem,
   Snackbar,
   Alert,
-  Grid,
   Divider,
- 
   IconButton,
-  
 } from "@mui/material";
 import {
   Item,
@@ -33,6 +30,7 @@ interface ItemFormProps {
 const ItemForm: React.FC<ItemFormProps> = ({
   initialValues,
   onSubmit,
+  onCancel,
   categories = [],
   onCategoryCreate,
 }) => {
@@ -228,9 +226,8 @@ const ItemForm: React.FC<ItemFormProps> = ({
         </Typography>
         <Divider />
       </Box>
-
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <Box>
           <TextField
             fullWidth
             label="Name"
@@ -243,9 +240,9 @@ const ItemForm: React.FC<ItemFormProps> = ({
             autoFocus
             variant="outlined"
           />
-        </Grid>
+        </Box>
 
-        <Grid item xs={12}>
+        <Box>
           <TextField
             fullWidth
             label="Description"
@@ -259,9 +256,9 @@ const ItemForm: React.FC<ItemFormProps> = ({
             rows={1}
             variant="outlined"
           />
-        </Grid>
+        </Box>
 
-        <Grid item xs={12}>
+        <Box>
           <TextField
             fullWidth
             label="Image URL"
@@ -270,46 +267,51 @@ const ItemForm: React.FC<ItemFormProps> = ({
             onChange={handleChange}
             variant="outlined"
           />
-        </Grid>
+        </Box>
 
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Price"
-            name="price"
-            type="number"
-            InputProps={{
-              startAdornment: <Typography variant="body1">€</Typography>,
-              inputProps: { min: 0, step: 0.01 },
-            }}
-            value={formValues.price}
-            onChange={handleChange}
-            error={!!errors.price}
-            helperText={errors.price}
-            required
-            variant="outlined"
-          />
-        </Grid>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 3,
+          }}
+        >
+          <Box sx={{ flex: 1 }}>
+            <TextField
+              fullWidth
+              label="Price"
+              name="price"
+              type="number"
+              InputProps={{
+                startAdornment: <Typography variant="body1">€</Typography>,
+                inputProps: { min: 0, step: 0.01 },
+              }}
+              value={formValues.price}
+              onChange={handleChange}
+              error={!!errors.price}
+              helperText={errors.price}
+              required
+              variant="outlined"
+            />
+          </Box>
 
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Quantity"
-            name="quantity"
-            type="number"
-            // InputProps={{
-            //   inputProps: { min: 0 },
-            // }}
-            value={formValues.quantity}
-            onChange={handleChange}
-            error={!!errors.quantity}
-            helperText={errors.quantity}
-            required
-            variant="outlined"
-          />
-        </Grid>
+          <Box sx={{ flex: 1 }}>
+            <TextField
+              fullWidth
+              label="Quantity"
+              name="quantity"
+              type="number"
+              value={formValues.quantity}
+              onChange={handleChange}
+              error={!!errors.quantity}
+              helperText={errors.quantity}
+              required
+              variant="outlined"
+            />
+          </Box>
+        </Box>
 
-        <Grid item xs={12}>
+        <Box>
           <Box sx={{ mb: 2 }}>
             <Box
               sx={{
@@ -450,8 +452,8 @@ const ItemForm: React.FC<ItemFormProps> = ({
               </TextField>
             )}
           </Box>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       <Box sx={{ mt: 4, mb: 3 }}>
         <Typography
@@ -463,51 +465,67 @@ const ItemForm: React.FC<ItemFormProps> = ({
         <Divider />
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Size"
-            name="size"
-            value={formValues.size || ""}
-            onChange={handleChange}
-            variant="outlined"
-          />
-        </Grid>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 3,
+          }}
+        >
+          <Box sx={{ flex: 1 }}>
+            <TextField
+              fullWidth
+              label="Size"
+              name="size"
+              value={formValues.size || ""}
+              onChange={handleChange}
+              variant="outlined"
+            />
+          </Box>
 
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Color"
-            name="color"
-            value={formValues.color || ""}
-            onChange={handleChange}
-            variant="outlined"
-          />
-        </Grid>
+          <Box sx={{ flex: 1 }}>
+            <TextField
+              fullWidth
+              label="Color"
+              name="color"
+              value={formValues.color || ""}
+              onChange={handleChange}
+              variant="outlined"
+            />
+          </Box>
+        </Box>
 
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Item Location"
-            name="itemLocation"
-            value={formValues.itemLocation || ""}
-            onChange={handleChange}
-            variant="outlined"
-          />
-        </Grid>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 3,
+          }}
+        >
+          <Box sx={{ flex: 1 }}>
+            <TextField
+              fullWidth
+              label="Item Location"
+              name="itemLocation"
+              value={formValues.itemLocation || ""}
+              onChange={handleChange}
+              variant="outlined"
+            />
+          </Box>
 
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Storage Location"
-            name="storageLocation"
-            value={formValues.storageLocation || ""}
-            onChange={handleChange}
-            variant="outlined"
-          />
-        </Grid>
-      </Grid>
+          <Box sx={{ flex: 1 }}>
+            <TextField
+              fullWidth
+              label="Storage Location"
+              name="storageLocation"
+              value={formValues.storageLocation || ""}
+              onChange={handleChange}
+              variant="outlined"
+            />
+          </Box>
+        </Box>
+      </Box>
 
       <Snackbar
         open={snackbar.open}
