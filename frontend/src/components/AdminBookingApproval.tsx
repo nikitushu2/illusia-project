@@ -44,15 +44,15 @@ export const AdminBookingApproval = () => {
     : [];
 
   return (
-<Box sx={{ maxWidth: 800, margin: "0 auto" }}>
-    <Typography variant="h4" textAlign={"center"} sx={{ marginBottom: 3 }}>{t("adminBookingApproval.bookingDetails")}
-    </Typography>
-    {paginatedBooking.map((booking) => (
-        <AdminBookingDetail bookingDetails={booking} items={items || []} />
-    ))}
-    <Stack spacing={2} paddingTop={5} alignItems={'center'}>
-        <Pagination count={numberOfPages} onChange={(_, value) => setPage(value)} variant="outlined" shape="rounded" />
-    </Stack>
-</Box>
+    <Box sx={{ maxWidth: 1200, margin: "0 auto" }}>
+        <Typography variant="h4" textAlign={"center"} sx={{ marginBottom: 3 }}>{t("adminBookingApproval.bookingDetails")}
+        </Typography>
+        {paginatedBooking.map((booking) => (
+            <AdminBookingDetail bookingDetails={booking} items={items || []} />
+        ))}
+        <Stack spacing={2} paddingTop={5} alignItems={'center'}>
+            <Pagination count={numberOfPages} onChange={(_, value) => setPage(value)} variant="outlined" shape="rounded" />
+        </Stack>
+    </Box>
   );
 };

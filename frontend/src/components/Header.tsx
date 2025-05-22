@@ -165,9 +165,9 @@ export const Header = () => {
               }
               label={
                 <Typography
-                  variant="body1"
+                  variant="body2"
                   sx={{ color: "primary.main", fontWeight: "bold" }}
-                >{`${applicationUser?.email} (${applicationUser?.role})`}</Typography>
+                >{`(${applicationUser?.role})`}</Typography>
               }
               variant="outlined"
             />
@@ -288,15 +288,13 @@ export const Header = () => {
                       }
                       label={
                         <Typography
-                          variant="body1"
+                          variant="body2"
                           sx={{ color: "primary.main", fontWeight: "bold" }}
                         >{`(${applicationUser?.role})`}</Typography>
                       }
                     />
                     <Button
                       onClick={handleLogout}
-                      // color="inherit"
-                      // variant="contained"
                       sx={{
                         fontSize: "15px",
                         fontWeight: "bold",
@@ -310,8 +308,6 @@ export const Header = () => {
                   <Box sx={{ display: { xs: "block", md: "none" } }}>
                     <Button
                       onClick={handleLogout}
-                      // color="inherit"
-                      // variant="contained"
                       sx={{
                         fontSize: "15px",
                         fontWeight: "bold",
@@ -328,8 +324,6 @@ export const Header = () => {
                   <Box sx={{ display: { xs: "none", md: "flex" } }}>
                     <Button
                       onClick={signUp}
-                      // color="inherit"
-                      // variant="contained"
                       sx={{
                         fontSize: "15px",
                         fontWeight: "bold",
@@ -342,8 +336,6 @@ export const Header = () => {
                     <Button
                       to="/login"
                       component={Link}
-                      // color="inherit"
-                      // variant="contained"
                       sx={{
                         fontSize: "15px",
                         fontWeight: "bold",

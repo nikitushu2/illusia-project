@@ -141,8 +141,8 @@ const AdminBookingHistory: React.FC = () => {
 
   return (
     <Box sx={{ mt: 2 }}>
-      <Typography variant="h5" gutterBottom>
-        Booking History
+      <Typography variant="h5" mb={4}>
+        <b>Booking History</b> 
       </Typography>
 
       <Box sx={{ mb: 3 }}>
