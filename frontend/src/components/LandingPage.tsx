@@ -76,12 +76,12 @@ const LandingPage = () => {
       <Box>
         <CalendarMonthIcon sx={{ width: "70px", height: "70px" }} color="secondary" />
           <Typography variant="h5">{t("landingPage.booking")}</Typography>
-            <Typography variant="h6">Secure your spot by reserving our props</Typography>
+            <Typography variant="h6">{t("landingPage.bookingDescription")}</Typography>
       </Box>
       <Box>
         <TheaterComedyIcon sx={{ width: "70px", height: "70px" }} color="secondary"  />
           <Typography variant="h5">{t("landingPage.events")}</Typography>
-          <Typography variant="h6">Find your next adventure and fellow friends</Typography>
+          <Typography variant="h6">{t("landingPage.eventsDescription")}</Typography>
       </Box>
       <Box>
         <HandshakeIcon sx={{ width: "70px", height: "70px" }} color="secondary" />

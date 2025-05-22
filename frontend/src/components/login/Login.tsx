@@ -11,7 +11,7 @@ export const Login = () => {
     <Box sx={{ margin: "auto", textAlign: "center", maxWidth: 600, px: 2 }}>
       <Box sx={{ paddingTop: 2, mb: 6 }}>
         <Typography variant="h4" sx={{ color: "primary.main"}}>
-        Adventurer!
+        {t("logInPage.Adventurer")}!
         </Typography>
         <Typography variant="h3" sx={{color: "primary.main"}}>
         {t("logInPage.welcomeToIllusiaRY")}</Typography>

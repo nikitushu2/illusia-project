@@ -46,6 +46,10 @@
         "signupLoginToPlaceOrders": {
             "en": "Sign up/Log in to place orders",
             "fi": "Rekisteröidy tai kirjaudu sisään tehdaksesi tilauksia"
+        },
+        "Adventurer":{
+            "en": "Adventurer",
+            "fi": "Seikkailija"
         }
     },
 
@@ -84,8 +88,8 @@
             "fi": "Varaa kokemuksesi"
         },
         "bookingDescription": {
-            "en": "Book your next event or use our porps",
-            "fi": "Varaa seuraava tapahtumasi tai käytä rekvisiittaamme"
+            "en": "Secure your spot by reserving our props",
+            "fi": "Varmista paikkasi varaamalla rekvisiittamme"
         },
 
         "events": {
@@ -93,8 +97,8 @@
             "fi": "Tapahtumat"
         },
         "eventsDescription": {
-            "en": "Events and games for you to join",
-            "fi": "Tapahtumat ja pelit, joihin voit liittyä"
+            "en": "Find your next adventure and fellow friends",
+            "fi": "Löydä seuraava seikkailusi ja kaverit"
         },
         "locations": {
             "en": "Locations",
@@ -226,11 +230,17 @@
             "en": "Reservations",
             "fi": "Varaukset"
         }
+    },
+
+    "itemManangement": {
+        "theAdventurersPack": {
+            "en": "The Adventurer's Pack",
+            "fi": "Seikkailijan paketti"
+        },
+        "itemManagementText": {
+            "en": "Equip yourself. Sign in to book your next prop",
+            "fi": "Varusta itsesi. Kirjaudu sisään varataksesi seuraavan rekvisiitin."
+        }
+       
     }
-
-   
-
-   
-
-    
 }

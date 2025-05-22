@@ -21,8 +21,10 @@ import useItems, {
   UpdateItemData,
 } from "../../services/itemService";
 import useCategories, { Category } from "../../services/categoryService";
+import { useTranslation } from "react-i18next";
 
 const ItemManagement: React.FC = () => {
+  const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | undefined>(undefined);
   const [refreshKey, setRefreshKey] = useState(0); // Used to force ItemList to refresh
@@ -115,7 +117,7 @@ const ItemManagement: React.FC = () => {
             color="primary"
             fontWeight="bold"
           >
-            The Adventurer's Pack
+            {t("itemManangement.theAdventurersPack")}
           </Typography>
           <Button
             variant="outlined"
@@ -127,7 +129,7 @@ const ItemManagement: React.FC = () => {
           </Button>
         </Box>
         <Typography variant="h6" color="primary" sx={{ fontStyle: "italic" }}>
-        Equip yourself. Sign in to book your next prop
+        {t("itemManangement.itemManagementText")}
         </Typography>
 
         <Divider sx={{ mb: 3 }} />
