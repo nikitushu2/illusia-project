@@ -35,6 +35,10 @@
         "logout": {
             "en": "Logout",
             "fi": "Kirjaudu ulos"
+        },
+        "dashboard": {
+            "en": "DASHBOARD",
+            "fi": "HALLINTAPANEELI"
         }
     },
 
