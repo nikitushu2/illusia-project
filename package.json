@@ -18,5 +18,8 @@
     "docker:dev:build": "docker-compose -f docker-compose.dev.yml build --no-cache && docker-compose -f docker-compose.dev.yml up",
     "docker:prod": "docker-compose up",
     "docker:prod:build": "docker-compose build --no-cache && docker-compose up"
+  },
+  "dependencies": {
+    "concurrently": "^9.1.0"
   }
 }
