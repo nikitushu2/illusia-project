@@ -34,7 +34,8 @@ const findBookingById = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const id = parseInt(req.params.id);
+    const idParam = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const id = parseInt(idParam, 10);
     const booking = await bookingService.findById(id);
 
     if (!booking) {

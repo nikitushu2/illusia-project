@@ -33,7 +33,8 @@ const itemFinder = async (
   _res: Response,
   next: NextFunction
 ) => {
-  const id = parseInt(req.params.id, 10);
+  const idParam = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(idParam, 10);
   req.item = await itemService.findById(id);
   next();
 };
@@ -46,7 +47,8 @@ publicItemsRouter.get("/", async (_req: Request, res: Response) => {
 // Get items by category
 publicItemsRouter.get("/category/:categoryId", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const categoryId = parseInt(req.params.categoryId, 10);
+    const categoryIdParam = Array.isArray(req.params.categoryId) ? req.params.categoryId[0] : req.params.categoryId;
+    const categoryId = parseInt(categoryIdParam, 10);
     const items = await itemService.findByCategory(categoryId);
     res.json(items);
   } catch (error) {
@@ -186,7 +188,8 @@ adminItemsRouter.delete(
         return;
       }
 
-      const id = parseInt(req.params.id, 10);
+      const idParam = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const id = parseInt(idParam, 10);
       await itemService.remove(id);
       res.status(204).end();
     } catch (error) {

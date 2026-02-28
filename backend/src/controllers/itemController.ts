@@ -40,7 +40,8 @@ export const search = async (req: Request, res: Response): Promise<Response> => 
 export const findById = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { id } = req.params;
-    const idNumber = parseInt(id, 10);
+    const idString = Array.isArray(id) ? id[0] : id;
+    const idNumber = parseInt(idString, 10);
     
     if (isNaN(idNumber)) {
       return res.status(400).json({ message: 'Invalid ID format' });
@@ -71,7 +72,8 @@ export const create = async (req: Request, res: Response): Promise<Response> => 
 export const update = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { id } = req.params;
-    const idNumber = parseInt(id, 10);
+    const idString = Array.isArray(id) ? id[0] : id;
+    const idNumber = parseInt(idString, 10);
     
     if (isNaN(idNumber)) {
       return res.status(400).json({ message: 'Invalid ID format' });
@@ -88,7 +90,8 @@ export const update = async (req: Request, res: Response): Promise<Response> => 
 export const remove = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { id } = req.params;
-    const idNumber = parseInt(id, 10);
+    const idString = Array.isArray(id) ? id[0] : id;
+    const idNumber = parseInt(idString, 10);
     
     if (isNaN(idNumber)) {
       return res.status(400).json({ message: 'Invalid ID format' });

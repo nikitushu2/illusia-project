@@ -18,7 +18,8 @@ interface CategoryUpdateRequest {
 const categoriesRouter = Router();
 
 const categoryFinder = async (req: CategoryRequest, _res: Response, next: NextFunction) => {
-  req.category = await categoryService.findById(req.params.id);
+  const idParam = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  req.category = await categoryService.findById(idParam);
   next();
 };
 
@@ -49,7 +50,8 @@ categoriesRouter.get('/:id', (req: Request, res: Response, next: NextFunction) =
 
 // Get a category with its items
 categoriesRouter.get('/:id/items', async (req: Request, res: Response) => {
-  const categoryWithItems = await categoryService.findWithItems(req.params.id);
+  const idParam = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const categoryWithItems = await categoryService.findWithItems(idParam);
   
   if (categoryWithItems) {
     res.json(categoryWithItems);
