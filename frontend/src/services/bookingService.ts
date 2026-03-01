@@ -36,7 +36,10 @@ export interface CreateBookingData {
   }[];
 }
 
-const BASE_URL = `http://localhost:3000/api/private`;
+// Use relative path in production (same origin), or env var, or fallback to localhost for dev
+const BASE_URL = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL}/private`
+  : (import.meta.env.PROD ? '/api/private' : 'http://localhost:3000/api/private');
 
 const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
   const response = await fetch(`${BASE_URL}${url}`, {

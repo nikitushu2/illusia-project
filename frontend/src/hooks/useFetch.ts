@@ -27,7 +27,10 @@ interface FetchState<T> {
   remove: (url: string, body: any) => Promise<void>;
 }
 
-const BACKEND_BASE_PATH = import.meta.env.VITE_BACKEND_ORIGIN + "/api";
+// Use relative path in production (same origin), or env var, or fallback to localhost for dev
+const BACKEND_BASE_PATH = import.meta.env.VITE_BACKEND_ORIGIN 
+  ? `${import.meta.env.VITE_BACKEND_ORIGIN}/api`
+  : (import.meta.env.PROD ? '/api' : 'http://localhost:3000/api');
 
 export const useFetch = <T>(role: ApiRole): FetchState<T> => {
   const [data, setData] = useState<T | null>(null);

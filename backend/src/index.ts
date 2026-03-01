@@ -2,6 +2,7 @@
 
 import express from "express";
 import { ErrorRequestHandler } from "express";
+import path from "path";
 import { PORT } from "./config/config";
 import { connectToDatabase } from "./util/db";
 import {
@@ -31,7 +32,7 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV === "production"
-        ? "https://illusia-project-2947763ee03d.herokuapp.com"
+        ? process.env.FRONTEND_ORIGIN || true // Allow same origin in production
         : ["http://localhost:5173", "http://localhost:5174"],
     methods: "GET,POST,PUT,PATCH,DELETE",
     credentials: true,
@@ -87,6 +88,18 @@ apiRouter.use("/private", privateApiRouter);
 
 app.use("/api", apiRouter);
 
+// Serve static files from the frontend build directory
+const frontendDistPath = path.join(__dirname, "../../../frontend/dist");
+app.use(express.static(frontendDistPath));
+
+// Serve the React app for all non-API routes (for React Router)
+app.get("*", (req, res) => {
+  // Don't serve index.html for API routes
+  if (req.path.startsWith("/api")) {
+    return res.status(404).json({ message: "API route not found" });
+  }
+  res.sendFile(path.join(frontendDistPath, "index.html"));
+});
 
 const errorHandlerMiddleware: ErrorRequestHandler = (err, req, res, next) => {
   errorHandler(err as AppError, req, res, next);
