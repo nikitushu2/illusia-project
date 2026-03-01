@@ -4,17 +4,23 @@ import admin from "../config/firebase";
 import { findByEmail, createUser } from "../services/userService";
 import { setSessionCookie, clearSessionCookie } from "../util/cookieUtils";
 import { signJWT } from "../util/jwtUtils";
+import { UserRole } from "../types/applicationUser";
 
 
 
 const authRouter = Router();
 
-authRouter.post("/login", async (req: Request, res: Response) => {
-    const { token } = req.body;
+authRouter.post("/login", async (req: Request, res: Response): Promise<void> => {
+    const { token } = req.body as { token?: string };
+    if (!token) {
+        res.status(400).json({ error: 'Token is required' });
+        return;
+    }
     try {
         // Check if Firebase is initialized
         if (!admin.apps.length) {
-            return res.status(503).json({ error: 'Firebase authentication is not configured' });
+            res.status(503).json({ error: 'Firebase authentication is not configured' });
+            return;
         }
         // Verify Firebase ID token
         const decodeToken = await admin.auth().verifyIdToken(token);
@@ -35,12 +41,15 @@ authRouter.post("/login", async (req: Request, res: Response) => {
             applicationUser.picture = picture;
 
             res.status(200).json(applicationUser);
+            return;
         } else {
             res.status(404).json({ error: `No registered user found with email ${email}` });
+            return;
         }
     } catch (error) {
         console.error('Firebase verification error:', error);
         res.status(401).json({ error: 'Unauthorized' });
+        return;
     }
 });
 
@@ -51,8 +60,8 @@ authRouter.post("/logout", (_: Request, res: Response) => {
 });
 
 
-authRouter.post('/signup', async (req: Request, res: Response) => {
-    const { token, displayName, role } = req.body;
+authRouter.post('/signup', async (req: Request, res: Response): Promise<void> => {
+    const { token, displayName, role } = req.body as { token?: string; displayName?: string; role?: string };
     if (!token || !displayName || !role) {
         res.status(400).json({ message: "Missing required fields" });
         return;
@@ -61,7 +70,8 @@ authRouter.post('/signup', async (req: Request, res: Response) => {
     try {
         // Check if Firebase is initialized
         if (!admin.apps.length) {
-            return res.status(503).json({ message: 'Firebase authentication is not configured' });
+            res.status(503).json({ message: 'Firebase authentication is not configured' });
+            return;
         }
         // Verify Firebase ID token
         const decodedToken = await admin.auth().verifyIdToken(token);
@@ -77,7 +87,7 @@ authRouter.post('/signup', async (req: Request, res: Response) => {
         const savedUser = await createUser({
             email: email!,
             displayName,
-            role,
+            role: role as UserRole,
         });
         if (!savedUser) {
             res.status(500).json({ message: "Error creating user" });
@@ -88,8 +98,9 @@ authRouter.post('/signup', async (req: Request, res: Response) => {
             message: "User registered successfully. Waiting for approval.",
             user: savedUser,
         });
-    } catch (error: any) {
-        if (error.code === 'auth/argument-error') {
+        return;
+    } catch (error: unknown) {
+        if (error && typeof error === 'object' && 'code' in error && error.code === 'auth/argument-error') {
             res.status(400).json({ message: "Invalid token" });
             return;
         }
@@ -97,8 +108,9 @@ authRouter.post('/signup', async (req: Request, res: Response) => {
         res.status(500).json({ 
             message: "Error creating user",
         });
+        return;
     }
-})
+});
 
 
 export { authRouter };
