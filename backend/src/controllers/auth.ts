@@ -12,6 +12,10 @@ const authRouter = Router();
 authRouter.post("/login", async (req: Request, res: Response) => {
     const { token } = req.body;
     try {
+        // Check if Firebase is initialized
+        if (!admin.apps.length) {
+            return res.status(503).json({ error: 'Firebase authentication is not configured' });
+        }
         // Verify Firebase ID token
         const decodeToken = await admin.auth().verifyIdToken(token);
         const { picture, email } = decodeToken;
@@ -55,6 +59,10 @@ authRouter.post('/signup', async (req: Request, res: Response) => {
     }
 
     try {
+        // Check if Firebase is initialized
+        if (!admin.apps.length) {
+            return res.status(503).json({ message: 'Firebase authentication is not configured' });
+        }
         // Verify Firebase ID token
         const decodedToken = await admin.auth().verifyIdToken(token);
         const { email } = decodedToken;
