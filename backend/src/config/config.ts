@@ -51,9 +51,10 @@ const prodConfig = {
 
 export const config = isProd ? prodConfig : devConfig;
 
-export const DATABASE_URL = process.env.NODE_ENV === 'production'
-  ? process.env.HEROKU_POSTGRESQL_IVORY_URL
-  : `postgres://${config.database.user}:${config.database.password}@${config.database.host}:${config.database.port}/${config.database.name}`;
+// DATABASE_URL priority: 1) DATABASE_URL env var (Railway, etc.), 2) HEROKU_POSTGRESQL_IVORY_URL (Heroku), 3) Construct from individual vars
+export const DATABASE_URL = process.env.DATABASE_URL 
+  || process.env.HEROKU_POSTGRESQL_IVORY_URL
+  || `postgres://${config.database.user}:${config.database.password}@${config.database.host}:${config.database.port}/${config.database.name}`;
 
 export const PORT = process.env.PORT || 3000;
 
