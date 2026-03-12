@@ -45,7 +45,7 @@ export const useFetch = <T>(role: ApiRole): FetchState<T> => {
         body: body ? JSON.stringify(body) : null,
         credentials: 'include',
       };
-      const response = await fetch(`${BACKEND_BASE_PATH}${role}/${url}`, options);
+      const response = await fetch(`${BACKEND_BASE_PATH}${role}/${url.replace(/^\//, "")}`, options);
       if (response.ok) {
         setOk(true);
         const text = await response.text();

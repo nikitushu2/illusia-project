@@ -38,7 +38,7 @@ const UserDashboard = () => {
   const [productsOpen, setProductsOpen] = useState(false);
   const [bookingsOpen, setBookingsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [component, setComponent] = useState<React.ReactElement | null>(null);
+  const [component, setComponent] = useState<JSX.Element | null>(null);
 
   const categoriesService = useCategories();
   const navigate = useNavigate();

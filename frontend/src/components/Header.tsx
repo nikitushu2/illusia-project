@@ -269,7 +269,7 @@ export const Header = () => {
             >
               {isLoggedIn ? (
                 <>
-                  {isLoggedIn && !isAdmin && <ShoppingCartIconComponent />}
+                  {isLoggedIn && <ShoppingCartIconComponent />}
 
                   <Box
                     sx={{
